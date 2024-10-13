@@ -1,6 +1,8 @@
 package mpoljak.data;
 
-public class GPS {
+import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+
+public class GPS implements IKdComparable<GPS> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 
@@ -53,5 +55,11 @@ public class GPS {
     /** Degrees for E | W */
     public double getLongDeg() {
         return this.longDeg;
+    }
+
+    @Override
+    public int compareTo(GPS other, int dim) {
+        // TODO
+        return 0;
     }
 }
