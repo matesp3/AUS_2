@@ -1,5 +1,7 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 
+import mpoljak.data.Parcel;
+
 public class KdNode <T extends IKdComparable<T>> {
     private KdNode<T> parent;
     private KdNode<T> leftSon;
