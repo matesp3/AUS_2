@@ -2,7 +2,7 @@ package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
-public class GeoData implements IKdComparable<GeoData> {
+public class GeoData implements IKdComparable<GeoData, Double> {
 //    { duplicate keys --> could be whatever type, but has to be comparable
     private final int k1 = 1;
     private final int kn = 10;
@@ -23,5 +23,10 @@ public class GeoData implements IKdComparable<GeoData> {
             return Integer.compare(this.x, other.x);
         else
             return Integer.compare(this.y, other.y);
+    }
+
+    @Override
+    public Double getUpperBound(int dim) {
+        return null;
     }
 }

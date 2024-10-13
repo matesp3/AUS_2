@@ -1,17 +1,18 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 /** functional interface */
-interface IOperation<D extends IKdComparable<D> > {
-    void doSomething(KdNode<D> node);
+interface IOperation<D extends IKdComparable<D, B>, B> {
+    void doSomething(KdNode<D, B> node);
 }
 
-public class KDTree<T extends IKdComparable<T>> {
+public class KDTree<T extends IKdComparable<T, K>, K> {
     private final int k;    // dimension of tree, k is from {1,2,...,n}
 
     private final IOperation operation = (node) -> {
         System.out.println("[" + node.getData().toString() + "], ");
     };
 
-    private KdNode<T> root;
+    private KdNode<T,K> root;
+
 
     public KDTree(int k) {
         this.k = k;
@@ -24,11 +25,11 @@ public class KDTree<T extends IKdComparable<T>> {
             * if level down => height++; else height--; height <0,h>
          */
         if (this.root == null) {
-            this.root = new KdNode<T>(null, null, null, data);
+            this.root = new KdNode<T,K>(null, null, null, data);
             return;
         }
 
-        KdNode<T> currentNode = this.root;
+        KdNode<T,K> currentNode = this.root;
 
         int height = 0; // from 0, in order to start with dim = 1, which is the lowest acceptable number of dim
         int dim = Integer.MIN_VALUE;    // undefined
@@ -39,7 +40,7 @@ public class KDTree<T extends IKdComparable<T>> {
             cmp = data.compareTo(currentNode.getData(), dim);
             if (cmp == -1 || cmp == 0) { // v------ go to the left subtree
                 if (!currentNode.hasLeftSon()) {
-                    KdNode<T> leafNode = new KdNode<T>(currentNode, null, null, data);
+                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data);
                     currentNode.setLeftSon(leafNode);
                     return;
                 }
@@ -49,7 +50,7 @@ public class KDTree<T extends IKdComparable<T>> {
                 height++;
             } else if (cmp == 1) {      // v------- go to the right subtree
                 if (!currentNode.hasRightSon()) {
-                    KdNode<T> leafNode = new KdNode<T>(currentNode, null, null, data);
+                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data);
                     currentNode.setRightSon(leafNode);
                     return;
                 }
@@ -97,7 +98,7 @@ public class KDTree<T extends IKdComparable<T>> {
     }
 
     private void inOrderProcessing(IOperation operation) {
-        KdNode<T> current = this.root;
+        KdNode<T,K> current = this.root;
         boolean isLeftSonProcessed = false;
         while (current != null) {
             if (!isLeftSonProcessed) {
@@ -109,7 +110,7 @@ public class KDTree<T extends IKdComparable<T>> {
                         current = current.getRightSon();
                     }
                     else { // hasNoneSon
-                        KdNode<T> parent = current.getParent();
+                        KdNode<T,K> parent = current.getParent();
                         while (parent != null && !parent.isLeftSon(current)) {
                             current = parent;
                             parent = parent.getParent();

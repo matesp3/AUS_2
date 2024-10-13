@@ -21,6 +21,7 @@ public class App {
 //        MyIntervalInt ii8 = new MyIntervalInt(2, 8);
 //        MyIntervalInt ii9 = new MyIntervalInt(6, 12);
 //        MyIntervalInt ii10 = new MyIntervalInt(18, 41);
+
         MyInt i1 = new MyInt(5);
         MyInt i2 = new MyInt(1);
         MyInt i3 = new MyInt(8);
@@ -32,7 +33,7 @@ public class App {
         MyInt i9 = new MyInt(6);
         MyInt i10 = new MyInt(18);
 
-        KDTree<MyInt> kdTree = new KDTree<MyInt>(1);
+        KDTree<MyInt, Integer> kdTree = new KDTree<MyInt, Integer>(1);
         kdTree.insert(i1);
         kdTree.insert(i2);
         kdTree.insert(i3);

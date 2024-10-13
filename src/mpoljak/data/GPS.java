@@ -2,7 +2,7 @@ package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
-public class GPS implements IKdComparable<GPS> {
+public class GPS implements IKdComparable<GPS, Double> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 
@@ -61,5 +61,10 @@ public class GPS implements IKdComparable<GPS> {
     public int compareTo(GPS other, int dim) {
         // TODO
         return 0;
+    }
+
+    @Override
+    public Double getUpperBound(int dim) {
+        return null;
     }
 }

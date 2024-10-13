@@ -2,7 +2,7 @@ package mpoljak.data.forTesting;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
-public class MyInt implements IKdComparable<MyInt> {
+public class MyInt implements IKdComparable<MyInt, Integer> {
     private int value;
     public MyInt(int value) {
         this.value = value;
@@ -14,6 +14,11 @@ public class MyInt implements IKdComparable<MyInt> {
         if (dim == 1)
             return Integer.compare(this.value, other.value);
         return 0;
+    }
+
+    @Override
+    public Integer getUpperBound(int dim) {
+        return null;
     }
 
     @Override

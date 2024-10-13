@@ -2,17 +2,19 @@ package mpoljak.dataStructures.searchTrees.KdTree;
 
 import mpoljak.data.Parcel;
 
-public class KdNode <T extends IKdComparable<T>> {
-    private KdNode<T> parent;
-    private KdNode<T> leftSon;
-    private KdNode<T> rightSon;
+public class KdNode <T extends IKdComparable<T, K>, K> { // T type must implement IKdComparable interface, K is anything
+    private KdNode<T, K> parent;
+    private KdNode<T, K> leftSon;
+    private KdNode<T, K> rightSon;
     private T data;
+    private K upperBound;
 
-    public KdNode(KdNode<T> parent, KdNode<T> leftSon, KdNode<T> rightSon, T data) {
+    public KdNode(KdNode<T, K> parent, KdNode<T, K> leftSon, KdNode<T, K> rightSon, T data) {
         this.parent = parent;
         this.leftSon = leftSon;
         this.rightSon = rightSon;
         this.data = data;
+        this.upperBound = null; // by default, data don't have to has interval data
     }
     /**
      * Compares nodes by defined dimension(key).
@@ -21,7 +23,7 @@ public class KdNode <T extends IKdComparable<T>> {
      * @return -1 - other instance is bigger, 0 - both instances are equal, 1 - other is smaller, else
      *                                      instance of 'mpoljak.dataStructures.searchTrees.KdTree.ERROR'
      */
-    public int compareTo(KdNode<T> other, int dim) {
+    public int compareTo(KdNode<T, K> other, int dim) {
         if (dim < 1)
             return Error.INVALID_DIMENSION.getErrCode();
         if (other == null)
@@ -29,17 +31,17 @@ public class KdNode <T extends IKdComparable<T>> {
         return data.compareTo(other.data, dim);
     }
 
-    public void setParent(KdNode<T> parent) { this.parent = parent; }
-    public void setLeftSon(KdNode<T> leftSon) { this.leftSon = leftSon; }
-    public void setRightSon(KdNode<T> rightSon) { this.rightSon = rightSon; }
+    public void setParent(KdNode<T, K> parent) { this.parent = parent; }
+    public void setLeftSon(KdNode<T, K> leftSon) { this.leftSon = leftSon; }
+    public void setRightSon(KdNode<T, K> rightSon) { this.rightSon = rightSon; }
 
-    public KdNode<T> getParent() { return parent; }
-    public KdNode<T> getLeftSon() { return leftSon; }
-    public KdNode<T> getRightSon() { return rightSon; }
+    public KdNode<T, K> getParent() { return parent; }
+    public KdNode<T, K> getLeftSon() { return leftSon; }
+    public KdNode<T, K> getRightSon() { return rightSon; }
 
-    public boolean isParent(KdNode<T> node) { return this.parent == node; }
-    public boolean isLeftSon(KdNode<T> node) { return this.leftSon == node; }
-    public boolean isRightSon(KdNode<T> node) { return this.rightSon == node; }
+    public boolean isParent(KdNode<T, K> node) { return this.parent == node; }
+    public boolean isLeftSon(KdNode<T, K> node) { return this.leftSon == node; }
+    public boolean isRightSon(KdNode<T, K> node) { return this.rightSon == node; }
 
     public boolean hasParent() { return this.parent != null; }
     public boolean hasLeftSon() { return this.leftSon != null; }
