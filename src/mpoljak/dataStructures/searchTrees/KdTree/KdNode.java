@@ -2,19 +2,20 @@ package mpoljak.dataStructures.searchTrees.KdTree;
 
 import mpoljak.data.Parcel;
 
-public class KdNode <T extends IKdComparable<T, K>, K> { // T type must implement IKdComparable interface, K is anything
+public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
     private KdNode<T, K> parent;
     private KdNode<T, K> leftSon;
     private KdNode<T, K> rightSon;
     private T data;
     private K upperBound;
 
-    public KdNode(KdNode<T, K> parent, KdNode<T, K> leftSon, KdNode<T, K> rightSon, T data) {
+    public KdNode(KdNode<T, K> parent, KdNode<T, K> leftSon, KdNode<T, K> rightSon, T data, int dim) {
         this.parent = parent;
         this.leftSon = leftSon;
         this.rightSon = rightSon;
         this.data = data;
-        this.upperBound = null; // by default, data don't have to has interval data
+
+        this.upperBound = (data == null) ? null : data.getUpperBound(dim); // by default, data don't have to has interval data
     }
     /**
      * Compares nodes by defined dimension(key).
@@ -47,7 +48,21 @@ public class KdNode <T extends IKdComparable<T, K>, K> { // T type must implemen
     public boolean hasLeftSon() { return this.leftSon != null; }
     public boolean hasRightSon() { return this.rightSon != null; }
 
+    public K getUpperBound(int dim) {
+        if (this.upperBound == null)
+            return this.data.getUpperBound(dim);
+        return this.upperBound;
+    }
+    public void setUpperBound(K upperBound) { this.upperBound = upperBound; }
+
     public T getData() {
         return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "KdNode{" + data.toString() +
+                ", upperBound=" + upperBound.toString() +
+                '}';
     }
 }

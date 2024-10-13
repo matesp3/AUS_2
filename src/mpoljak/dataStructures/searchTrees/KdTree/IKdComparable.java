@@ -5,7 +5,7 @@ package mpoljak.dataStructures.searchTrees.KdTree;
  * @param <T> Type, which can has more duplicate keys
  * @param <K> Type of key
  */
-public interface IKdComparable<T, K> {
+public interface IKdComparable<T, K extends Comparable<K>> { // super means
 
     /**
      *

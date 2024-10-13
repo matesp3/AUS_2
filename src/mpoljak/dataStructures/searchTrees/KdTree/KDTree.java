@@ -1,14 +1,16 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
+import java.util.Comparator;
+import java.lang.Integer;
 /** functional interface */
-interface IOperation<D extends IKdComparable<D, B>, B> {
+interface IOperation<D extends IKdComparable<D, B>, B extends Comparable<B> > {
     void doSomething(KdNode<D, B> node);
 }
 
-public class KDTree<T extends IKdComparable<T, K>, K> {
+public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
     private final int k;    // dimension of tree, k is from {1,2,...,n}
 
-    private final IOperation operation = (node) -> {
-        System.out.println("[" + node.getData().toString() + "], ");
+    private final IOperation operationPrint = (node) -> {
+        System.out.println("[" + node.toString() + "], ");
     };
 
     private KdNode<T,K> root;
@@ -25,34 +27,32 @@ public class KDTree<T extends IKdComparable<T, K>, K> {
             * if level down => height++; else height--; height <0,h>
          */
         if (this.root == null) {
-            this.root = new KdNode<T,K>(null, null, null, data);
+            this.root = new KdNode<T,K>(null, null, null, data, 1);
             return;
         }
 
         KdNode<T,K> currentNode = this.root;
-
+        boolean inserted = false;
         int height = 0; // from 0, in order to start with dim = 1, which is the lowest acceptable number of dim
         int dim = Integer.MIN_VALUE;    // undefined
         int cmp = Integer.MIN_VALUE;    // undefined
 
-        while (currentNode != null) {
+        while (!inserted) {
             dim = (height % this.k) + 1;
             cmp = data.compareTo(currentNode.getData(), dim);
             if (cmp == -1 || cmp == 0) { // v------ go to the left subtree
                 if (!currentNode.hasLeftSon()) {
-                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data);
+                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data, dim);
                     currentNode.setLeftSon(leafNode);
-                    return;
+                    inserted = true;
                 }
-                else {
-                    currentNode = currentNode.getLeftSon();
-                }
+                currentNode = currentNode.getLeftSon();
                 height++;
             } else if (cmp == 1) {      // v------- go to the right subtree
                 if (!currentNode.hasRightSon()) {
-                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data);
+                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data, dim);
                     currentNode.setRightSon(leafNode);
-                    return;
+                    inserted = true;
                 }
                 currentNode = currentNode.getRightSon();
                 height++;
@@ -62,6 +62,19 @@ public class KDTree<T extends IKdComparable<T, K>, K> {
                 else if (cmp == Error.NULL_PARAMETER.getErrCode())
                     throw new NullPointerException("KdNode.compareTo(): NULL argument!");
             }
+        }
+        if (currentNode == null) throw new NullPointerException("CurrentNode should be inserted leaf, but is null.");
+
+        KdNode<T, K> parent = currentNode.getParent();
+        while (parent != null) {
+            dim = (height % this.k) + 1;
+            cmp = currentNode.getUpperBound(dim).compareTo( parent.getUpperBound(dim) );
+            if (cmp == 1) { // current.upper > parent.upper
+                parent.setUpperBound( currentNode.getUpperBound(dim) );
+            }
+            currentNode = parent;
+            parent = parent.getParent();
+            height--;
         }
     }
 
@@ -94,7 +107,7 @@ public class KDTree<T extends IKdComparable<T, K>, K> {
     public void remove(T data) {}
 
     public void printTree() {
-        inOrderProcessing(operation);
+        inOrderProcessing(operationPrint);
     }
 
     private void inOrderProcessing(IOperation operation) {
@@ -143,4 +156,6 @@ public class KDTree<T extends IKdComparable<T, K>, K> {
            }
         }
     }
+
+    private boolean isRoot(KdNode<T,K> node) { return this.root == node; }
 }
