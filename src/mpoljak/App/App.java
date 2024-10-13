@@ -5,11 +5,22 @@ import mpoljak.data.GeoData;
 import mpoljak.data.Parcel;
 import mpoljak.data.Property;
 import mpoljak.data.forTesting.MyInt;
+import mpoljak.data.forTesting.MyIntervalInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
 
 public class App {
     public static void main(String[] args) {
+//        MyIntervalInt ii1 = new MyIntervalInt(5, 12);
+//        MyIntervalInt ii2 = new MyIntervalInt(1, 5);
+//        MyIntervalInt ii3 = new MyIntervalInt(8, 17);
+//        MyIntervalInt ii4 = new MyIntervalInt(3, 4);
+//        MyIntervalInt ii5 = new MyIntervalInt(4, 75);
+//        MyIntervalInt ii6 = new MyIntervalInt(21, 27);
+//        MyIntervalInt ii7 = new MyIntervalInt(13, 30);
+//        MyIntervalInt ii8 = new MyIntervalInt(2, 8);
+//        MyIntervalInt ii9 = new MyIntervalInt(6, 12);
+//        MyIntervalInt ii10 = new MyIntervalInt(18, 41);
         MyInt i1 = new MyInt(5);
         MyInt i2 = new MyInt(1);
         MyInt i3 = new MyInt(8);

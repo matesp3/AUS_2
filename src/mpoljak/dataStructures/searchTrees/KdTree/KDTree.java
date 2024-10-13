@@ -110,7 +110,7 @@ public class KDTree<T extends IKdComparable<T>> {
                     }
                     else { // hasNoneSon
                         KdNode<T> parent = current.getParent();
-                        while (!parent.isLeftSon(current)) {
+                        while (parent != null && !parent.isLeftSon(current)) {
                             current = parent;
                             parent = parent.getParent();
                         }
@@ -132,8 +132,12 @@ public class KDTree<T extends IKdComparable<T>> {
                    while (current.getParent() != null && current.getParent().isRightSon(current)) {
                        current = current.getParent();
                    }
-                   if (current.getParent() == null)
+                   if (current.getParent() == null) // this could be true only for returning back to the root from
+                                                    // right subtree
                        return;
+                   else {
+                        current = current.getParent();
+                   }
                }
            }
         }
