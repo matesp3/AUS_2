@@ -115,15 +115,6 @@ public class KDTree<T extends IKdComparable<T>> {
                             parent = parent.getParent();
                         }
                         current = parent;
-//                        if (parent.isLeftSon(current)) {
-//                            current = parent;
-//                        }
-//                        else if (parent.isRightSon(current)) {
-//                            current = current.getParent().getParent();    // may be null if current.parent is a root
-//                        }
-//                        else
-//                            throw new NullPointerException("Parent has no reference to his son"); /* this should never
-//                                                        happen. If it does, the code is not written logically right.*/
                         isLeftSonProcessed = true;
                     }
                 }
