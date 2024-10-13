@@ -1,7 +1,16 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
+/** functional interface */
+interface IOperation<D extends IKdComparable<D> > {
+    void doSomething(KdNode<D> node);
+}
 
 public class KDTree<T extends IKdComparable<T>> {
     private final int k;    // dimension of tree, k is from {1,2,...,n}
+
+    private final IOperation operation = (node) -> {
+        System.out.println(node);
+    };
+
     private KdNode<T> root;
 
     public KDTree(int k) {
@@ -34,45 +43,45 @@ public class KDTree<T extends IKdComparable<T>> {
             }
 
         }
-    } ;
-    public void remove(T data) {} ;
+    }
 
-    /**
-     *  Node current =tree.root;
-     *  boolean isLeftSonProcessed = false;
-     *  while (current != null) {
-     *      if (!isLeftSonProcessed) {
-     *          if (current.hasLeftSon()) {
-     *              current = current.leftSon;
-     *          } else {
-     *              doSomething(current);
-     *              if (current.hasRightSon()) {
-     *                  current = current.rightSon;
-     *              }
-     *              else {
-     *                  if (isLeftSon(current)) {
-     *                      current = current.parent();
-     *                  }
-     *                  else {
-     *                      current = current.parent;
-     *                      current = (current.hasParent()) ? current.parent : current; // TODO OSETRIT TENTO STAV
-     *                  }
-     *                  isLeftSonProcessed = true;
-     *              }
-     *          }
-     *      }
-     *      else {
-     *          doSomething(current);
-     *          if (current.hasRightSon()) {
-     *              current = current.rightSon;
-     *              isLeftSonProcessed = false;
-     *          }
-     *          else {
-     *              current = current.parent;
-     *          }
-     *
-     *      }
-     *  }
-     */
+    public void remove(T data) {}
 
+    private void inOrderProcessing(IOperation operation) {
+        KdNode<T> current = this.root;
+        boolean isLeftSonProcessed = false;
+        while (current != null) {
+            if (!isLeftSonProcessed) {
+               if (current.hasLeftSon()) {
+                  current = current.getLeftSon();
+               } else {
+                   operation.doSomething(current);
+                   if (current.hasRightSon()) {
+                       current = current.getRightSon();
+                   }
+                   else {
+                       if (current.getParent().isLeftSon(current)) {
+                           current = current.getParent();
+                       }
+                       else { // isRightSon
+                           // current = current.parent;
+                           // current = (current.hasParent()) ? current.parent : current;
+                           current = current.getParent().getParent();    // may be null if current.parent is a root
+                       }
+                       isLeftSonProcessed = true;
+                   }
+               }
+           }
+           else { // left son is processed
+               operation.doSomething(current);
+               if (current.hasRightSon()) {
+                   current = current.getRightSon();
+                   isLeftSonProcessed = false;
+               }
+               else {
+                   current = current.getParent();
+               }
+           }
+        }
+    }
 }

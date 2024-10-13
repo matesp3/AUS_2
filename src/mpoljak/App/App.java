@@ -8,10 +8,11 @@ import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
 
 public class App {
     public static void main(String[] args) {
-        GPS g1 = new GPS('N', 15, 'W', 4);
-        GPS g2 = new GPS('N', 30, 'W', 5);
-        Property p = new Property(1, "Dom", g1, g2);
-        GPS[] pos = p.getPositions();
+
+//        GPS g1 = new GPS('N', 15, 'W', 4);
+//        GPS g2 = new GPS('N', 30, 'W', 5);
+//        Property p = new Property(1, "Dom", g1, g2);
+//        GPS[] pos = p.getPositions();
 
 //        int k = 2;
 //        System.out.println((18 % k + 1));

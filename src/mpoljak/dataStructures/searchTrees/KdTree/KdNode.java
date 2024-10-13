@@ -36,6 +36,15 @@ public class KdNode <T extends IKdComparable<T>> {
     public KdNode<T> getParent() { return parent; }
     public KdNode<T> getLeftSon() { return leftSon; }
     public KdNode<T> getRightSon() { return rightSon; }
+
+    public boolean isParent(KdNode<T> node) { return this.parent == node; }
+    public boolean isLeftSon(KdNode<T> node) { return this.leftSon == node; }
+    public boolean isRightSon(KdNode<T> node) { return this.rightSon == node; }
+
+    public boolean hasParent() { return this.parent != null; }
+    public boolean hasLeftSon() { return this.leftSon != null; }
+    public boolean hasRightSon() { return this.rightSon != null; }
+
     public T getData() {
         return this.data;
     }
