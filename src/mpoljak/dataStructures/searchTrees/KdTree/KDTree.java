@@ -37,5 +37,42 @@ public class KDTree<T extends IKdComparable<T>> {
     } ;
     public void remove(T data) {} ;
 
+    /**
+     *  Node current =tree.root;
+     *  boolean isLeftSonProcessed = false;
+     *  while (current != null) {
+     *      if (!isLeftSonProcessed) {
+     *          if (current.hasLeftSon()) {
+     *              current = current.leftSon;
+     *          } else {
+     *              doSomething(current);
+     *              if (current.hasRightSon()) {
+     *                  current = current.rightSon;
+     *              }
+     *              else {
+     *                  if (isLeftSon(current)) {
+     *                      current = current.parent();
+     *                  }
+     *                  else {
+     *                      current = current.parent;
+     *                      current = (current.hasParent()) ? current.parent : current; // TODO OSETRIT TENTO STAV
+     *                  }
+     *                  isLeftSonProcessed = true;
+     *              }
+     *          }
+     *      }
+     *      else {
+     *          doSomething(current);
+     *          if (current.hasRightSon()) {
+     *              current = current.rightSon;
+     *              isLeftSonProcessed = false;
+     *          }
+     *          else {
+     *              current = current.parent;
+     *          }
+     *
+     *      }
+     *  }
+     */
 
 }
