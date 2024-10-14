@@ -15,33 +15,33 @@ public class App {
 //        Integer i_1 = new Integer(5);
 //        Integer i_2 = new Integer(4);
 //        System.out.println("Vysledok >> " + i_1.compareTo(i_2));
-
-        MyIntervalInt ii1 = new MyIntervalInt(5, 12);
-        MyIntervalInt ii2 = new MyIntervalInt(1, 5);
-        MyIntervalInt ii3 = new MyIntervalInt(8, 17);
-        MyIntervalInt ii4 = new MyIntervalInt(3, 4);
-        MyIntervalInt ii5 = new MyIntervalInt(4, 75);
-        MyIntervalInt ii6 = new MyIntervalInt(21, 27);
-        MyIntervalInt ii7 = new MyIntervalInt(13, 30);
-        MyIntervalInt ii8 = new MyIntervalInt(2, 8);
-        MyIntervalInt ii9 = new MyIntervalInt(6, 12);
-        MyIntervalInt ii10 = new MyIntervalInt(18, 41);
-
-        KDTree<MyIntervalInt, Integer> kdTree = new KDTree<MyIntervalInt, Integer>(1);
-
-        kdTree.insert(ii1);
-        kdTree.insert(ii2);
-        kdTree.insert(ii3);
-        kdTree.insert(ii4);
-        kdTree.insert(ii5);
-        kdTree.insert(ii6);
-        kdTree.insert(ii7);
-        kdTree.insert(ii8);
-        kdTree.insert(ii9);
-        kdTree.insert(ii10);
-
-        kdTree.printTree();
-
+//--------------------------------------------------------------
+//        MyIntervalInt ii1 = new MyIntervalInt(5, 12);
+//        MyIntervalInt ii2 = new MyIntervalInt(1, 5);
+//        MyIntervalInt ii3 = new MyIntervalInt(8, 17);
+//        MyIntervalInt ii4 = new MyIntervalInt(3, 4);
+//        MyIntervalInt ii5 = new MyIntervalInt(4, 75);
+//        MyIntervalInt ii6 = new MyIntervalInt(21, 27);
+//        MyIntervalInt ii7 = new MyIntervalInt(13, 30);
+//        MyIntervalInt ii8 = new MyIntervalInt(2, 8);
+//        MyIntervalInt ii9 = new MyIntervalInt(6, 12);
+//        MyIntervalInt ii10 = new MyIntervalInt(18, 41);
+//
+//        KDTree<MyIntervalInt, Integer> kdTree = new KDTree<MyIntervalInt, Integer>(1);
+//
+//        kdTree.insert(ii1);
+//        kdTree.insert(ii2);
+//        kdTree.insert(ii3);
+//        kdTree.insert(ii4);
+//        kdTree.insert(ii5);
+//        kdTree.insert(ii6);
+//        kdTree.insert(ii7);
+//        kdTree.insert(ii8);
+//        kdTree.insert(ii9);
+//        kdTree.insert(ii10);
+//
+//        kdTree.printTree();
+//--------------------------------------------------------------
 //        MyInt i1 = new MyInt(5);
 //        MyInt i2 = new MyInt(1);
 //        MyInt i3 = new MyInt(8);

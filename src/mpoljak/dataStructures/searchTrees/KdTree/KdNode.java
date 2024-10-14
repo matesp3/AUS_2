@@ -2,20 +2,29 @@ package mpoljak.dataStructures.searchTrees.KdTree;
 
 import mpoljak.data.Parcel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
     private KdNode<T, K> parent;
     private KdNode<T, K> leftSon;
     private KdNode<T, K> rightSon;
     private T data;
-    private K upperBound;
+    private List<K> upperBounds;
 
     public KdNode(KdNode<T, K> parent, KdNode<T, K> leftSon, KdNode<T, K> rightSon, T data, int dim) {
         this.parent = parent;
         this.leftSon = leftSon;
         this.rightSon = rightSon;
+        if (data == null)
+            throw new NullPointerException("Data in KdNode is null");
         this.data = data;
 
-        this.upperBound = (data == null) ? null : data.getUpperBound(dim); // by default, data don't have to has interval data
+        this.upperBounds = new ArrayList<K>(dim);
+        for (int i = 0; i < dim; i++) {
+            this.upperBounds.add(data.getUpperBound(i + 1));
+        }
+        // by default, data don't have to has interval data
     }
     /**
      * Compares nodes by defined dimension(key).
@@ -49,11 +58,13 @@ public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { 
     public boolean hasRightSon() { return this.rightSon != null; }
 
     public K getUpperBound(int dim) {
-        if (this.upperBound == null)
-            return this.data.getUpperBound(dim);
-        return this.upperBound;
+        if (this.upperBounds == null)
+            return null;
+        return this.upperBounds.get(dim - 1);
     }
-    public void setUpperBound(K upperBound) { this.upperBound = upperBound; }
+    public void setUpperBound(K upperBound, int dim) {
+        this.upperBounds.set(dim - 1, upperBound);
+    }
 
     public T getData() {
         return this.data;
@@ -62,7 +73,7 @@ public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { 
     @Override
     public String toString() {
         return "KdNode{" + data.toString() +
-                ", upperBound=" + upperBound.toString() +
+                ", upperBound=" + upperBounds.toString() +
                 '}';
     }
 }

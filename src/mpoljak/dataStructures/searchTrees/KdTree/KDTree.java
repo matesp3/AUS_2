@@ -67,11 +67,14 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
 
         KdNode<T, K> parent = currentNode.getParent();
         while (parent != null) {
-            dim = (height % this.k) + 1;
-            cmp = currentNode.getUpperBound(dim).compareTo( parent.getUpperBound(dim) );
-            if (cmp == 1) { // current.upper > parent.upper
-                parent.setUpperBound( currentNode.getUpperBound(dim) );
+//            dim = (height % this.k) + 1;
+            for (int i = 1; i <= this.k; i++) {
+                cmp = currentNode.getUpperBound(i).compareTo( parent.getUpperBound(i) );
+                if (cmp == 1) { // current.upper > parent.upper
+                    parent.setUpperBound( currentNode.getUpperBound(i), i);
+                }
             }
+
             currentNode = parent;
             parent = parent.getParent();
             height--;
