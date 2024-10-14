@@ -1,9 +1,11 @@
 package mpoljak.data;
 
+import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parcel {
+public class Parcel implements IKdComparable<Parcel, Integer> {
     private int parcelId;
     private String description;
     private GPS[] positions;
@@ -45,5 +47,15 @@ public class Parcel {
         if (property == null)
             return;
         this.properties.add(property);
+    }
+
+    @Override
+    public int compareTo(Parcel other, int dim) {
+        return 0;
+    }
+
+    @Override
+    public Integer getUpperBound(int dim) {
+        return 0;
     }
 }
