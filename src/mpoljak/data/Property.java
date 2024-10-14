@@ -1,9 +1,11 @@
 package mpoljak.data;
 
+import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Property {
+public class Property implements IKdComparable<Property, Double> {
     private int propertyId;         // url: https://sk.wikipedia.org/wiki/S%C3%BApisn%C3%A9_%C4%8D%C3%ADslo
     private String description;
     GPS[] positions;                // positions by which is Property bounded
@@ -46,5 +48,20 @@ public class Property {
         if (parcel == null)
             return;
         this.parcels.add(parcel);
+    }
+
+    @Override
+    public int compareTo(Property other, int dim) {
+        return 0;
+    }
+
+    @Override
+    public Double getUpperBound(int dim) {
+        int cmp = this.positions[0].compareTo(this.positions[1], dim);
+        if (cmp == -1 || cmp == 0)
+            return this.positions[1].getUpperBound(dim);
+        if (cmp == 1)
+            return this.positions[0].getUpperBound(dim);
+        return null;
     }
 }

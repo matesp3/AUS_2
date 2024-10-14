@@ -1,14 +1,5 @@
 package mpoljak.App;
 
-import mpoljak.data.GPS;
-import mpoljak.data.GeoData;
-import mpoljak.data.Parcel;
-import mpoljak.data.Property;
-import mpoljak.data.forTesting.MyInt;
-import mpoljak.data.forTesting.MyIntervalInt;
-import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
-import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
-
 public class App {
     public static void main(String[] args) {
 

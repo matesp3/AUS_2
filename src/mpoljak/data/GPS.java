@@ -1,5 +1,6 @@
 package mpoljak.data;
 
+import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
 public class GPS implements IKdComparable<GPS, Double> {
@@ -59,12 +60,26 @@ public class GPS implements IKdComparable<GPS, Double> {
 
     @Override
     public int compareTo(GPS other, int dim) {
-        // TODO
-        return 0;
+        int c1,c2;
+        if (dim == 1) {
+            c1 = this.latitude == 'N' ? 1 : -1;
+            c2 = other.latitude == 'N' ? 1 : -1;
+            return Double.compare((c1 * this.latDeg), (c2 * other.latDeg));
+        }
+        else if (dim == 2) {
+            c1 = this.longitude == 'W' ? 1 : -1;
+            c2 = other.longitude == 'W' ? 1 : -1;
+            return Double.compare((c1 * this.longDeg), (c2 * other.longDeg));
+        }
+        return Error.INVALID_DIMENSION.getErrCode();
     }
 
     @Override
     public Double getUpperBound(int dim) {
+        if (dim == 1)
+            return this.latDeg * (this.latitude == 'N' ? 1 : -1);
+        if (dim == 2)
+            return this.longDeg * (this.longitude == 'W' ? 1 : -1);
         return null;
     }
 }
