@@ -11,7 +11,7 @@ public class Tester {
         Random seedGen = new Random();
         Random gpsGen = new Random();
 //        KDTree<Parcel, Integer> kdTree = new KDTree<Parcel, Integer>(2);
-        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
+        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(1);
         for (int a = 0; a < seedCount; a++) {
             gpsGen.setSeed(seedGen.nextLong());
             for (int i = 0; i < insertionsCount; i++) {

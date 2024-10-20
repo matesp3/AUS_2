@@ -118,83 +118,84 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
     public void remove(T data) {}
 
     public void printTree() {
-        inOrderProcessing(operationPrint);
+//        inOrderProcessing(operationPrint, false);    // in-order for 1-dimension
+        inOrderProcessing(null, true);      // general hierarchical structure
     }
 
-    private void inOrderProcessing(IOperation operation) {
+    private void inOrderProcessing(IOperation operation, boolean printHierarchy) {
         ArrayList<Boolean> llb = new ArrayList<Boolean>();
         int level = 0;
         KdNode<T,K> current = this.root;
-        printNode(level, current.getData().toString(), false, llb);
+        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
         boolean isLeftSubTreeProcessed = false;
         while (current != null) {
             if (!isLeftSubTreeProcessed) {
                 if (current.hasLeftSon()) {
-                    //---v
-                    llb.add(current.hasRightSon());  // if current has both sons
-                    level++;
-                    //---^
+                    if (printHierarchy) {
+                        llb.add(current.hasRightSon());  // if current has both sons
+                        level++;
+                    }
                     current = current.getLeftSon();
-                    printNode(level, current.getData().toString(), true, llb);
+                    if (printHierarchy) printNode(level, current.getData().toString(), true, llb);
 
                 } else { // hasRightSon
-//                    operation.doSomething(current);
+                    if (operation != null) operation.doSomething(current);
                     if (current.hasRightSon()) {
-                        //---v
-                        level++;
-                        llb.add(current.hasLeftSon());  // if current has both sons
-                        //---^
+                        if (printHierarchy) {
+                            level++;
+                            llb.add(current.hasLeftSon());  // if current has both sons
+                        }
                         current = current.getRightSon();
-                        printNode(level, current.getData().toString(), false, llb);
+                        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
 
                     }
                     else { // hasNoneSon
                         KdNode<T,K> parent = current.getParent();
                         while (parent != null && !parent.isLeftSon(current)) {
-                            //---v
-                            llb.remove(llb.size() - 1);
-                            level--;
-                            //---^
+                            if (printHierarchy) {
+                                llb.remove(llb.size() - 1);
+                                level--;
+                            }
                             current = parent;
                             parent = parent.getParent();
                         }
-                        //---v
-                        if (!llb.isEmpty())
-                            llb.remove(llb.size() - 1);
-                        level--;
-                        //---^
+                        if (printHierarchy) {
+                            if (!llb.isEmpty())
+                                llb.remove(llb.size() - 1);
+                            level--;
+                        }
                         current = parent;
                         isLeftSubTreeProcessed = true;
                     }
                 }
             }
            else { // left subtree is processed
-//               operation.doSomething(current);
+                if (operation != null) operation.doSomething(current);
                if (current.hasRightSon()) {
-                   //---v
-                   level++;
-                   llb.add(false);  // left surely exists, because it was processed && after right son is no other son
-                   //---^
+                   if (printHierarchy) {
+                       level++;
+                       llb.add(false);// left surely exists, because it was processed && after right son is no other son
+                   }
                    current = current.getRightSon();
-                   printNode(level, current.getData().toString(), false, llb);
+                   if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
                    isLeftSubTreeProcessed = false;  // continue processing left subtree of right son
                }
                else {
                    while (current.getParent() != null && current.getParent().isRightSon(current)) {
-                       //---v
-                       llb.remove(llb.size() - 1);
-                       level--;
-                       //---^
+                       if (printHierarchy) {
+                           llb.remove(llb.size() - 1);
+                           level--;
+                       }
                        current = current.getParent();
                    }
                    if (current.getParent() == null) // this could be true only for returning back to the root from
                                                     // right subtree
                        return;
                    else {
-                       //---v
-                       llb.remove(llb.size() - 1);
-                       level--;
-                       //---^
+                       if (printHierarchy) {
+                           llb.remove(llb.size() - 1);
+                           level--;
+                       }
                        current = current.getParent();
                    }
                }
