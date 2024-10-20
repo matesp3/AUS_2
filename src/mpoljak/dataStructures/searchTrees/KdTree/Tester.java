@@ -7,11 +7,11 @@ import java.util.Random;
 
 public class Tester {
 
-    public void testRandomInsert(long insertionsCount) {
+    public void testRandomInsert(long insertionsCount, int seedCount) {
         Random seedGen = new Random();
         Random gpsGen = new Random();
         KDTree<Parcel, Integer> kdTree = new KDTree<Parcel, Integer>(2);
-        for (int a = 0; a < 100; a++) {
+        for (int a = 0; a < seedCount; a++) {
             gpsGen.setSeed(seedGen.nextLong());
             for (int i = 0; i < insertionsCount; i++) {
                 GPS g1 = generateGPS(gpsGen);

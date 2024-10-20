@@ -24,7 +24,6 @@ public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { 
         for (int i = 0; i < dim; i++) {
             this.upperBounds.add(data.getUpperBound(i + 1));
         }
-        // by default, data don't have to has interval data
     }
     /**
      * Compares nodes by defined dimension(key).
@@ -72,8 +71,13 @@ public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { 
 
     @Override
     public String toString() {
-        return "KdNode{" + data.toString() +
-                ", upperBound=" + upperBounds.toString() +
-                '}';
+        return "KdNode{" + data.toString() + '}';
     }
+
+//    @Override
+//    public String toString() {
+//        return "KdNode{" + data.toString() +
+//                ", upperBound=" + upperBounds.toString() +
+//                '}';
+//    }
 }
