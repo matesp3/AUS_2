@@ -2,39 +2,45 @@ package mpoljak.App;
 
 import mpoljak.data.forTesting.MyInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
+import mpoljak.dataStructures.searchTrees.KdTree.Tester;
+
+import java.util.ArrayList;
 
 public class App {
     public static void main(String[] args) {
-        MyInt i1 = new MyInt(5);
-        MyInt i2 = new MyInt(1);
-        MyInt i3 = new MyInt(8);
-        MyInt i4 = new MyInt(3);
-        MyInt i5 = new MyInt(4);
-        MyInt i6 = new MyInt(21);
-        MyInt i7 = new MyInt(13);
-        MyInt i8 = new MyInt(6);
-        MyInt i9 = new MyInt(6);
-        MyInt i10 = new MyInt(18);
-        MyInt i11 = new MyInt(15);
-        MyInt i12 = new MyInt(2);
-        MyInt i13 = new MyInt(2);
 
-        KDTree<MyInt, Integer> kdTree = new KDTree<MyInt, Integer>(1);
-        kdTree.insert(i1);
-        kdTree.insert(i2);
-        kdTree.insert(i3);
-        kdTree.insert(i4);
-        kdTree.insert(i5);
-        kdTree.insert(i6);
-        kdTree.insert(i7);
-        kdTree.insert(i8);
-        kdTree.insert(i9);
-        kdTree.insert(i10);
-        kdTree.insert(i11);
-        kdTree.insert(i12);
-        kdTree.insert(i13);
-
-        kdTree.printTree();
+        Tester tester = new Tester();
+        tester.testRandomInsert(5,5);
+//        MyInt i1 = new MyInt(5);
+//        MyInt i2 = new MyInt(1);
+//        MyInt i3 = new MyInt(8);
+//        MyInt i4 = new MyInt(3);
+//        MyInt i5 = new MyInt(4);
+//        MyInt i6 = new MyInt(21);
+//        MyInt i7 = new MyInt(13);
+//        MyInt i8 = new MyInt(6);
+//        MyInt i9 = new MyInt(6);
+//        MyInt i10 = new MyInt(18);
+//        MyInt i11 = new MyInt(15);
+//        MyInt i12 = new MyInt(2);
+//        MyInt i13 = new MyInt(2);
+//
+//        KDTree<MyInt, Integer> kdTree = new KDTree<MyInt, Integer>(1);
+//        kdTree.insert(i1);
+//        kdTree.insert(i2);
+//        kdTree.insert(i3);
+//        kdTree.insert(i4);
+//        kdTree.insert(i5);
+//        kdTree.insert(i6);
+//        kdTree.insert(i7);
+//        kdTree.insert(i8);
+//        kdTree.insert(i9);
+//        kdTree.insert(i10);
+//        kdTree.insert(i11);
+//        kdTree.insert(i12);
+//        kdTree.insert(i13);
+//
+//        kdTree.printTree();
 
 //        Integer i_1 = new Integer(5);
 //        Integer i_2 = new Integer(4);

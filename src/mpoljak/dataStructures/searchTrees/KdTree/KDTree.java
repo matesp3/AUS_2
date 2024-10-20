@@ -12,7 +12,7 @@ interface IOperation<D extends IKdComparable<D, B>, B extends Comparable<B> > {
 
 public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
 
-    private static final int ROW_NODE_MAX = 5;
+    private static final int ROW_NODE_MAX = 15;
     private static final int PREFIX_LENGTH = 6;
 
     private final int k;    // dimension of tree, k is from {1,2,...,n}
@@ -32,7 +32,7 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
         /*
             * k1 <= node.k1: go left
             * if k1 > node.k1: go right
-            * if level down => height++; else height--; height <0,h>
+            * height <0,h>, h+1 levels
          */
         if (this.root == null) {
             this.root = new KdNode<T,K>(null, null, null, data, 1);
@@ -159,7 +159,8 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
                             parent = parent.getParent();
                         }
                         //---v
-                        llb.remove(llb.size() - 1);
+                        if (!llb.isEmpty())
+                            llb.remove(llb.size() - 1);
                         level--;
                         //---^
                         current = parent;
@@ -207,7 +208,7 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
         nodeRepr = nodeRepr == null ? "?" : nodeRepr;
         String nodeType = String.format("_>(%c):", level == 0 ? 'O' : (isLeftSon) ? 'L' : 'R');   // Root | Left | Right
         String prefix = buildTreePrefix(level, llb, '|' );
-//        if (!isLeftSon) System.out.println(prefix);
+        if (!isLeftSon) System.out.println(prefix);
         if (nodeRepr.length() > ROW_NODE_MAX) {
             int row = 1;
             int minIdx;

@@ -82,4 +82,11 @@ public class GPS implements IKdComparable<GPS, Double> {
             return this.longDeg * (this.longitude == 'W' ? 1 : -1);
         return null;
     }
+
+    @Override
+    public String toString() {
+        int c1 = this.latitude == 'N' ? 1 : -1;
+        int c2 = this.longitude == 'W' ? 1 : -1;
+        return String.format("[%.2f;%.2f]", c1 * this.latDeg, c2 * this.longDeg);
+    }
 }
