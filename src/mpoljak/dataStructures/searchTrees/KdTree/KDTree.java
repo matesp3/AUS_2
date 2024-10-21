@@ -1,31 +1,58 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.lang.Integer;
-import java.util.LinkedList;
 import java.util.List;
 
 /** functional interface */
-interface IOperation<D extends IKdComparable<D, B>, B extends Comparable<B> > {
-    void doSomething(KdNode<D, B> node);
+interface IOperation <T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > {
+    void doSomething(KdNode<T, K> node);
 }
 
-public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
+interface IComparison <T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > {
+    int compareTo(T data, T otherData, int dim);
+}
 
-    private static final int ROW_NODE_MAX = 15;
+public class KDTree<T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > {
+
+    public static final int ONLY_ONE_KEY_SET_AVAILABLE = -1;
+    private static final int ROW_NODE_MAX = 7;
     private static final int PREFIX_LENGTH = 6;
 
     private final int k;    // dimension of tree, k is from {1,2,...,n}
+    private final int keySetIdForTreeBuilding;
 
-    private final IOperation operationPrint = (node) -> {
+    private final IOperation<T, K> operationPrint = (node) -> {
         System.out.println("[" + node.toString() + "], ");
     };
+
+    private final IComparison<T, K> operationCompare;
 
     private KdNode<T,K> root;
 
 
-    public KDTree(int k) {
+    /**
+     * Use when there are at least two equivalent key sets in data by which should be data inserted into the tree.
+     * @param k defines how many dimensions will tree work with
+     * @param keySetIdForTreeBuilding by which key from object's key set will tree be built. Starts from 1.
+     */
+    public KDTree(int k, int keySetIdForTreeBuilding) {
+        if ((keySetIdForTreeBuilding != ONLY_ONE_KEY_SET_AVAILABLE && keySetIdForTreeBuilding < 1) || k < 1)
+            throw new IllegalArgumentException("Parameters 'k' and 'keyId' must be positive number greater than zero");
+
         this.k = k;
+        this.keySetIdForTreeBuilding = keySetIdForTreeBuilding - 1;
+
+        this.operationCompare = (keySetIdForTreeBuilding == ONLY_ONE_KEY_SET_AVAILABLE)
+                ? ( (data, otherData, dim) -> data.compareTo(otherData, dim) )
+                : ( (data, otherData, dim) -> data.compareTo(otherData, dim, this.keySetIdForTreeBuilding) );
+    }
+
+    /**
+     * Use in case, inserted data has only one key set. No two equivalent key sets in data.
+     * @param k defines how many dimensions will tree work with
+     */
+    public KDTree(int k) {
+        this(k, ONLY_ONE_KEY_SET_AVAILABLE);
     }
 
     public void insert(T data) {
@@ -47,7 +74,9 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
 
         while (!inserted) {
             dim = (height % this.k) + 1;
-            cmp = data.compareTo(currentNode.getData(), dim);
+//            cmp = data.compareTo(currentNode.getData(), dim);
+//            cmp = data.compareTo(currentNode.getData(), dim, this.keySetIdForTreeBuilding);
+            cmp = operationCompare.compareTo(data, currentNode.getData(), dim);
             if (cmp == -1 || cmp == 0) { // v------ go to the left subtree
                 if (!currentNode.hasLeftSon()) {
                     KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data, dim);
@@ -122,8 +151,8 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
         inOrderProcessing(null, true);      // general hierarchical structure
     }
 
-    private void inOrderProcessing(IOperation operation, boolean printHierarchy) {
-        ArrayList<Boolean> llb = new ArrayList<Boolean>();
+    private void inOrderProcessing(IOperation<T, K> operation, boolean printHierarchy) {
+        ArrayList<Boolean> llb = new ArrayList<>();
         int level = 0;
         KdNode<T,K> current = this.root;
         if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
@@ -238,10 +267,7 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
     private static String buildTreePrefix(int level, ArrayList<Boolean> llb, char branchSign) {
         if (level < 1) return "";
         StringBuilder sb = new StringBuilder(level * (ROW_NODE_MAX + 1 + 1) + 1);
-//        for (Boolean b : llb) {
-//            sb.append(" ".repeat(PREFIX_LENGTH + ROW_NODE_MAX - 1));
-//            sb.append(b ? branchSign : ' ');
-//        }
+
         for (int i = 0; i < level; i++) {
             sb.append(" ".repeat(PREFIX_LENGTH + ROW_NODE_MAX - 1));
             sb.append(llb.get(i) ? branchSign : ' ');
@@ -255,7 +281,7 @@ public class KDTree<T extends IKdComparable<T, K>, K extends Comparable<K> > {
 
     private static void printList(List<Boolean> l) {
         for (Boolean i : l) {
-            System.out.print("" + (i ? 1 : 0) + ", ");
+            System.out.print((i ? 1 : 0) + ", ");
         }
         System.out.println();
     }

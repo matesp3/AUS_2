@@ -1,15 +1,17 @@
 package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parcel implements IKdComparable<Parcel, Integer> {
+public class Parcel implements IKdComparable<Parcel, Integer>, IKeyChoosable {
     private int parcelId;
     private String description;
     private GPS[] positions;
     private List<Property> properties;
+    private int currentKeySetId;
 
     public Parcel(int parcelId, String description, GPS gps1, GPS gps2) {
         if (parcelId < 1)
@@ -25,6 +27,7 @@ public class Parcel implements IKdComparable<Parcel, Integer> {
         this.positions[1] = gps2;
 
         this.properties = new ArrayList<Property>();
+        this.currentKeySetId = 0;
     }
 
     public int getParcelId() {
@@ -49,13 +52,41 @@ public class Parcel implements IKdComparable<Parcel, Integer> {
         this.properties.add(property);
     }
 
+
     @Override
     public int compareTo(Parcel other, int dim) {
-        return 0;
+        return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim); // always compare with first key set
+
+    }
+
+    @Override
+    public int compareTo(Parcel other, int dim, int otherKeySetId) {
+        return this.positions[this.currentKeySetId].compareTo(other.positions[otherKeySetId], dim);
     }
 
     @Override
     public Integer getUpperBound(int dim) {
         return 0;
+    }
+
+    @Override
+    public void toggleComparedKey() {
+        this.currentKeySetId = (this.currentKeySetId + 1) % this.positions.length;
+    }
+
+    @Override
+    public void setComparedKey(int key) {
+        if (key > 0 && key < (this.positions.length + 1))
+            this.currentKeySetId = key - 1;
+    }
+
+    @Override
+    public int getKeysCount() {
+        return this.positions.length;
+    }
+
+    @Override
+    public String getKeysDescription() {
+        return " * Key1 - GPS position 1 [id=1],\n * Key2 - GPS position 2 [id=2]";
     }
 }

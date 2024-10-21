@@ -1,11 +1,12 @@
 package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Property implements IKdComparable<Property, Double> {
+public class Property implements IKdComparable<Property, Double>, IKeyChoosable {
     private int propertyId;         // url: https://sk.wikipedia.org/wiki/S%C3%BApisn%C3%A9_%C4%8D%C3%ADslo
     private String description;
     GPS[] positions;                // positions by which is Property bounded
@@ -56,6 +57,11 @@ public class Property implements IKdComparable<Property, Double> {
     }
 
     @Override
+    public int compareTo(Property other, int dim, int otherKeySetId) {
+        return 0;
+    }
+
+    @Override
     public Double getUpperBound(int dim) {
         int cmp = this.positions[0].compareTo(this.positions[1], dim);
         if (cmp == -1 || cmp == 0)
@@ -63,5 +69,25 @@ public class Property implements IKdComparable<Property, Double> {
         if (cmp == 1)
             return this.positions[0].getUpperBound(dim);
         return null;
+    }
+
+    @Override
+    public void toggleComparedKey() {
+
+    }
+
+    @Override
+    public void setComparedKey(int key) {
+
+    }
+
+    @Override
+    public int getKeysCount() {
+        return 0;
+    }
+
+    @Override
+    public String getKeysDescription() {
+        return "";
     }
 }

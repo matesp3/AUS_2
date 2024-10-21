@@ -5,7 +5,7 @@ import mpoljak.data.Parcel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
+public class KdNode <T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
     private KdNode<T, K> parent;
     private KdNode<T, K> leftSon;
     private KdNode<T, K> rightSon;
@@ -38,6 +38,23 @@ public class KdNode <T extends IKdComparable<T, K>, K extends Comparable<K> > { 
         if (other == null)
             return Error.NULL_PARAMETER.getErrCode();
         return data.compareTo(other.data, dim);
+//        return data.compareTo(other.data, dim, 0);
+    }
+
+    /**
+     * Compares nodes by defined dimension(key) and defined key set of other node.
+     * @param other other instance of the same type to be compared
+     * @param dim defines the level of K-D tree - by which key have to be instances compared
+     * @param keySetId key set of other node
+     * @return -1 - other instance is bigger, 0 - both instances are equal, 1 - other is smaller, else
+     *                                      instance of 'mpoljak.dataStructures.searchTrees.KdTree.ERROR'
+     */
+    public int compareTo(KdNode<T, K> other, int dim, int keySetId) {
+        if (dim < 1)
+            return Error.INVALID_DIMENSION.getErrCode();
+        if (other == null)
+            return Error.NULL_PARAMETER.getErrCode();
+        return data.compareTo(other.data, dim, keySetId);
     }
 
     public void setParent(KdNode<T, K> parent) { this.parent = parent; }
