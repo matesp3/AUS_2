@@ -1,8 +1,9 @@
 package mpoljak.data.forTesting;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
 
-public class MyInt implements IKdComparable<MyInt, Integer> {
+public class MyInt implements IKdComparable<MyInt, Integer>, IKeyChoosable {
     private int value;
     public MyInt(int value) {
         this.value = value;
@@ -17,6 +18,11 @@ public class MyInt implements IKdComparable<MyInt, Integer> {
     }
 
     @Override
+    public int compareTo(MyInt other, int dim, int otherKeySetId) {
+        return compareTo(other, dim);
+    }
+
+    @Override
     public Integer getUpperBound(int dim) {
         return null;
     }
@@ -24,5 +30,25 @@ public class MyInt implements IKdComparable<MyInt, Integer> {
     @Override
     public String toString() {
         return "MyInt{" + value + '}';
+    }
+
+    @Override
+    public void toggleComparedKey() {
+
+    }
+
+    @Override
+    public void setComparedKey(int key) {
+
+    }
+
+    @Override
+    public int getKeysCount() {
+        return 1;
+    }
+
+    @Override
+    public String getKeysDescription() {
+        return "Key - value";
     }
 }

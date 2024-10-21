@@ -1,16 +1,21 @@
 package mpoljak.App;
 
+import mpoljak.data.GPS;
 import mpoljak.data.forTesting.MyInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.dataStructures.searchTrees.KdTree.Tester;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class App {
+
+
     public static void main(String[] args) {
 
         Tester tester = new Tester();
-        tester.testRandomInsert(5,5);
+        tester.testRandomInsert(10000,1000);
+
 //        MyInt i1 = new MyInt(5);
 //        MyInt i2 = new MyInt(1);
 //        MyInt i3 = new MyInt(8);
