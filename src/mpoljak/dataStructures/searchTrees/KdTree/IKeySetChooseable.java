@@ -1,10 +1,11 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 
 /**
- * This interface defines feature of object types which have more than one key of the same type, and therefore it can be
- * chosen by which instance of key should be the object compared.
+ * This interface defines feature of object types which have more than one key set composed of the same type and number
+ * of key attributes (key set), and therefore it can be
+ * chosen by which key set should be the type compared.
  */
-public interface IKeyChoosable {
+public interface IKeySetChooseable {
     /** Toggles actually compared key to the next one defined in some kind of order.
       * If actually compared key was the last in the order, the first in the order is chosen.*/
     public void toggleComparedKey();

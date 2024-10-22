@@ -1,19 +1,19 @@
 package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Property implements IKdComparable<Property, Double>, IKeyChoosable {
+public class Property implements IKdComparable<Property, Double>, IKeySetChooseable {
     private int propertyId;         // url: https://sk.wikipedia.org/wiki/S%C3%BApisn%C3%A9_%C4%8D%C3%ADslo
     private String description;
     GPS[] positions;                // positions by which is Property bounded
     private List<Parcel> parcels;   // on which Property is located
 
     public Property(int propertyId, String description, GPS gps1, GPS gps2) {
-        if (propertyId < 1)
+        if (propertyId < 0)
             throw new IllegalArgumentException("Error constructing Property: 'propertyId' must be positive integer.");
         if (gps1 == null || gps2 == null)
             throw new NullPointerException("Error constructing Property: GPS instance cannot be null.");

@@ -2,9 +2,9 @@ package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
 
-public class GPS implements IKdComparable<GPS, Double>, IKeyChoosable {
+public class GPS implements IKdComparable<GPS, Double>, IKeySetChooseable {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 

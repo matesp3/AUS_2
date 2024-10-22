@@ -1,11 +1,9 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 
-import mpoljak.data.Parcel;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class KdNode <T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
+public class KdNode <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
     private KdNode<T, K> parent;
     private KdNode<T, K> leftSon;
     private KdNode<T, K> rightSon;
