@@ -6,7 +6,7 @@ import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parcel implements IKdComparable<Parcel, Integer>, IKeySetChooseable {
+public class Parcel implements IKdComparable<Parcel, Double>, IKeySetChooseable {
     private int parcelId;
     private String description;
     private GPS[] positions;
@@ -54,8 +54,7 @@ public class Parcel implements IKdComparable<Parcel, Integer>, IKeySetChooseable
 
     @Override
     public int compareTo(Parcel other, int dim) {
-        return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim); // always compare with first key set
-
+        return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim);//always compare with first key set
     }
 
     @Override
@@ -64,8 +63,8 @@ public class Parcel implements IKdComparable<Parcel, Integer>, IKeySetChooseable
     }
 
     @Override
-    public Integer getUpperBound(int dim) {
-        return 0;
+    public Double getUpperBound(int dim) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -85,8 +84,8 @@ public class Parcel implements IKdComparable<Parcel, Integer>, IKeySetChooseable
     }
 
     @Override
-    public String getKeysDescription() {
-        return " * Key1 - GPS position 1 [id=1],\n * Key2 - GPS position 2 [id=2]";
+    public String getKeySetsDescription() {
+        return " * KeySet1 - GPS position 1 [keySetId=1],\n * KeySet2 - GPS position 2 [keySetId=2]";
     }
 
     @Override

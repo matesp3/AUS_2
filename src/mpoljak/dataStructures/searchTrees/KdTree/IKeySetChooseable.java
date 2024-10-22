@@ -14,5 +14,5 @@ public interface IKeySetChooseable {
     /** Informs about number of available equivalent keys to choose from. Always should be higher than 1. */
     public int getKeysCount();
     /** Gives info about all available keys with their id within some key order */
-    public String getKeysDescription();
+    public String getKeySetsDescription();
 }

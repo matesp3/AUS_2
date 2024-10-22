@@ -11,6 +11,7 @@ public class Property implements IKdComparable<Property, Double>, IKeySetChoosea
     private String description;
     GPS[] positions;                // positions by which is Property bounded
     private List<Parcel> parcels;   // on which Property is located
+    private int currentKeySetId;
 
     public Property(int propertyId, String description, GPS gps1, GPS gps2) {
         if (propertyId < 0)
@@ -26,6 +27,7 @@ public class Property implements IKdComparable<Property, Double>, IKeySetChoosea
         this.positions[1] = gps2;
 
         this.parcels = new ArrayList<Parcel>();
+        this.currentKeySetId = 0;
     }
 
     public int getPropertyId() {
@@ -53,41 +55,48 @@ public class Property implements IKdComparable<Property, Double>, IKeySetChoosea
 
     @Override
     public int compareTo(Property other, int dim) {
-        return 0;
+        return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim);//always compare with first key set
     }
 
     @Override
     public int compareTo(Property other, int dim, int otherKeySetId) {
-        return 0;
+        return this.positions[this.currentKeySetId].compareTo(other.positions[otherKeySetId], dim);
     }
 
     @Override
     public Double getUpperBound(int dim) {
-        int cmp = this.positions[0].compareTo(this.positions[1], dim);
-        if (cmp == -1 || cmp == 0)
-            return this.positions[1].getUpperBound(dim);
-        if (cmp == 1)
-            return this.positions[0].getUpperBound(dim);
-        return null;
+//        int cmp = this.positions[0].compareTo(this.positions[1], dim);
+//        if (cmp == -1 || cmp == 0)
+//            return this.positions[1].getUpperBound(dim);
+//        if (cmp == 1)
+//            return this.positions[0].getUpperBound(dim);
+//        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void toggleComparedKey() {
-
+        this.currentKeySetId = (this.currentKeySetId + 1) % this.positions.length;
     }
 
     @Override
     public void setComparedKey(int key) {
-
+        if (key > 0 && key < (this.positions.length + 1))
+            this.currentKeySetId = key - 1;
     }
 
     @Override
     public int getKeysCount() {
-        return 0;
+        return this.positions.length;
     }
 
     @Override
-    public String getKeysDescription() {
-        return "";
+    public String getKeySetsDescription() {
+        return " * KeySet1 - GPS position 1 [keySetId=1],\n * KeySet2 - GPS position 2 [keySetId=2]";
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Prop[id=%d;g1%s;g2%s]", this.propertyId, this.positions[0], this.positions[1]);
     }
 }

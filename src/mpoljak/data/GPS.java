@@ -113,7 +113,7 @@ public class GPS implements IKdComparable<GPS, Double>, IKeySetChooseable {
     }
 
     @Override
-    public String getKeysDescription() {
+    public String getKeySetsDescription() {
         return "Key - latitude degrees X direction, longitude degrees X direction";
     }
 }

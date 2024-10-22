@@ -48,7 +48,7 @@ public class MyInt implements IKdComparable<MyInt, Integer>, IKeySetChooseable {
     }
 
     @Override
-    public String getKeysDescription() {
+    public String getKeySetsDescription() {
         return "Key - value";
     }
 }

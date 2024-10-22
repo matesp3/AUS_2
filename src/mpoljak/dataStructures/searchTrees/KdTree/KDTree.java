@@ -8,6 +8,7 @@ interface IOperation <T extends IKdComparable<T, K> & IKeySetChooseable, K exten
     void doSomething(KdNode<T, K> node);
 }
 
+/** functional interface */
 interface IComparison <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
     int compareTo(T data, T otherData, int dim);
 }
