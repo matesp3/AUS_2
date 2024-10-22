@@ -1,7 +1,6 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 
 import mpoljak.data.GPS;
-import mpoljak.data.Parcel;
 import mpoljak.data.Property;
 
 import java.util.Random;
@@ -18,7 +17,6 @@ public class Tester {
                 "---------------------------------------------------------");
         int id = 1;
         KDTree<Property, Double> kdTree = new KDTree<Property, Double>(2, 1);
-
 //        KDTree<Parcel, Double> kdTree = new KDTree<Parcel, Double>(2, 1);
 //        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
         for (int a = 0; a < seedCount; a++) {
@@ -27,15 +25,17 @@ public class Tester {
             for (int i = 0; i < insertionsCount; i++) {
                 GPS g1 = generateGPS(gpsGen, dirGen);
                 GPS g2 = generateGPS(gpsGen, dirGen);
+
                 Property p = new Property(id++, null, g1, g2);
 //                Parcel p = new Parcel(id++, null, g1, g2);
+
                 kdTree.insert(p); // inserted by first GPS
                 System.out.println("\n ---------------------------------------------------------------------------- ");
                 System.out.println(" (i) Inserting " + p + " FIRST time... (by FIRST GPS)");
                 System.out.println(" ---------------------------------------------------------------------------- ");
                 kdTree.printTree();
 
-                p.toggleComparedKey();
+                p.toggleComparedKeySet();
 
                 kdTree.insert(p); // inserted by second GPS
                 System.out.println("\n ---------------------------------------------------------------------------- ");

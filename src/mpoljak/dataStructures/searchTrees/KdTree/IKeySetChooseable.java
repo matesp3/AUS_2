@@ -8,11 +8,11 @@ package mpoljak.dataStructures.searchTrees.KdTree;
 public interface IKeySetChooseable {
     /** Toggles actually compared key to the next one defined in some kind of order.
       * If actually compared key was the last in the order, the first in the order is chosen.*/
-    public void toggleComparedKey();
+    public void toggleComparedKeySet();
     /** Sets new actually compared key by its id which is defined within some kind of the internal key order. */
-    public void setComparedKey(int key);
+    public void setComparedKeySet(int key);
     /** Informs about number of available equivalent keys to choose from. Always should be higher than 1. */
-    public int getKeysCount();
+    public int getKeySetsCount();
     /** Gives info about all available keys with their id within some key order */
     public String getKeySetsDescription();
 }

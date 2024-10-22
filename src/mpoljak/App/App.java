@@ -4,15 +4,15 @@ import mpoljak.data.GPS;
 import mpoljak.data.forTesting.MyInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.dataStructures.searchTrees.KdTree.Tester;
+import mpoljak.utilities.DoubleComparator;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class App {
 
-
     public static void main(String[] args) {
-
+        DoubleComparator.getInstance().setEpsilon(0.0001);
         Tester tester = new Tester();
         tester.testRandomInsert(2,2);
 

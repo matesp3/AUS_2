@@ -75,18 +75,18 @@ public class Property implements IKdComparable<Property, Double>, IKeySetChoosea
     }
 
     @Override
-    public void toggleComparedKey() {
+    public void toggleComparedKeySet() {
         this.currentKeySetId = (this.currentKeySetId + 1) % this.positions.length;
     }
 
     @Override
-    public void setComparedKey(int key) {
+    public void setComparedKeySet(int key) {
         if (key > 0 && key < (this.positions.length + 1))
             this.currentKeySetId = key - 1;
     }
 
     @Override
-    public int getKeysCount() {
+    public int getKeySetsCount() {
         return this.positions.length;
     }
 
