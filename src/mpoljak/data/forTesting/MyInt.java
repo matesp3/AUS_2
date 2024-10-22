@@ -1,9 +1,9 @@
 package mpoljak.data.forTesting;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
 
-public class MyInt implements IKdComparable<MyInt, Integer>, IKeyChoosable {
+public class MyInt implements IKdComparable<MyInt, Integer>, IKeySetChooseable {
     private int value;
     public MyInt(int value) {
         this.value = value;

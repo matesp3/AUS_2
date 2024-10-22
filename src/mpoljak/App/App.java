@@ -14,7 +14,7 @@ public class App {
     public static void main(String[] args) {
 
         Tester tester = new Tester();
-        tester.testRandomInsert(10000,1000);
+        tester.testRandomInsert(2,2);
 
 //        MyInt i1 = new MyInt(5);
 //        MyInt i2 = new MyInt(1);

@@ -4,18 +4,18 @@ import java.lang.Integer;
 import java.util.List;
 
 /** functional interface */
-interface IOperation <T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > {
+interface IOperation <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
     void doSomething(KdNode<T, K> node);
 }
 
-interface IComparison <T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > {
+interface IComparison <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
     int compareTo(T data, T otherData, int dim);
 }
 
-public class KDTree<T extends IKdComparable<T, K> & IKeyChoosable, K extends Comparable<K> > {
+public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
 
     public static final int ONLY_ONE_KEY_SET_AVAILABLE = -1;
-    private static final int ROW_NODE_MAX = 7;
+    private static final int ROW_NODE_MAX = 30;
     private static final int PREFIX_LENGTH = 6;
 
     private final int k;    // dimension of tree, k is from {1,2,...,n}
@@ -252,7 +252,7 @@ public class KDTree<T extends IKdComparable<T, K> & IKeyChoosable, K extends Com
                 currExpr = nodeRepr.substring(minIdx, minIdx + Math.min(remaining, ROW_NODE_MAX));
                 remaining -= ROW_NODE_MAX;
                 currExpr = remaining < 0
-                        ? ((row == 1 ? "_" : " ").repeat((-1) * remaining) + currExpr)
+                        ? (" ".repeat((-1) * remaining) + currExpr)
                         : currExpr;
                 System.out.println( (row == 1 ? (prefix + nodeType) : (alterPrefix + " ".repeat(PREFIX_LENGTH)) ) +  currExpr);
                 row++;

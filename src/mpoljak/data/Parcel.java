@@ -1,12 +1,12 @@
 package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.IKeyChoosable;
+import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parcel implements IKdComparable<Parcel, Integer>, IKeyChoosable {
+public class Parcel implements IKdComparable<Parcel, Integer>, IKeySetChooseable {
     private int parcelId;
     private String description;
     private GPS[] positions;
@@ -14,7 +14,7 @@ public class Parcel implements IKdComparable<Parcel, Integer>, IKeyChoosable {
     private int currentKeySetId;
 
     public Parcel(int parcelId, String description, GPS gps1, GPS gps2) {
-        if (parcelId < 1)
+        if (parcelId < 0)
             throw new IllegalArgumentException("Error constructing Parcel: 'parcelId' must be positive integer.");
         if (gps1 == null || gps2 == null)
             throw new NullPointerException("Error constructing Parcel: GPS instance cannot be null.");
@@ -52,7 +52,6 @@ public class Parcel implements IKdComparable<Parcel, Integer>, IKeyChoosable {
         this.properties.add(property);
     }
 
-
     @Override
     public int compareTo(Parcel other, int dim) {
         return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim); // always compare with first key set
@@ -88,5 +87,10 @@ public class Parcel implements IKdComparable<Parcel, Integer>, IKeyChoosable {
     @Override
     public String getKeysDescription() {
         return " * Key1 - GPS position 1 [id=1],\n * Key2 - GPS position 2 [id=2]";
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Par[id=%d;g1%s;g2%s]", this.parcelId, this.positions[0], this.positions[1]);
     }
 }

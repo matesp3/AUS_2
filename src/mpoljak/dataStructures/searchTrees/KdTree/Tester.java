@@ -11,19 +11,35 @@ public class Tester {
         Random seedGen = new Random();
         Random gpsGen = new Random();
         Random dirGen = new Random();
-//        KDTree<Parcel, Integer> kdTree = new KDTree<Parcel, Integer>(2);
-        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
+        KDTree<Parcel, Integer> kdTree = new KDTree<Parcel, Integer>(2, 1);
+        System.out.println("        INSERTING Parcels based on GPS positions, tree built by GPS_1\n         " +
+                "---------------------------------------------------------");
+        int id = 1;
+//        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
         for (int a = 0; a < seedCount; a++) {
             gpsGen.setSeed(seedGen.nextLong());
             dirGen.setSeed(seedGen.nextLong());
             for (int i = 0; i < insertionsCount; i++) {
                 GPS g1 = generateGPS(gpsGen, dirGen);
-//                GPS g2 = generateGPS(gpsGen);
-//                Parcel p = new Parcel(i, null, g1, g2);
-                kdTree.insert(g1);
+                GPS g2 = generateGPS(gpsGen, dirGen);
+                Parcel p = new Parcel(id++, null, g1, g2);
+                kdTree.insert(p); // inserted by first GPS
+                System.out.println("\n ---------------------------------------------------------------------------- ");
+                System.out.println(" (i) Inserting Parcel " + p + " FIRST time... (by FIRST GPS)");
+                System.out.println(" ---------------------------------------------------------------------------- ");
+                kdTree.printTree();
+
+                p.toggleComparedKey();
+
+                kdTree.insert(p); // inserted by second GPS
+                System.out.println("\n ---------------------------------------------------------------------------- ");
+                System.out.println(" (i) Inserting Parcel " + p + " SECOND time... (by SECOND GPS)");
+                System.out.println(" ---------------------------------------------------------------------------- ");
+                kdTree.printTree();
+
             }
         }
-//        kdTree.printTree();
+
     }
 
     private static GPS generateGPS(Random generator, Random dirGenerator) {
