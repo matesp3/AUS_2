@@ -3,6 +3,7 @@ package mpoljak.data;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
+import mpoljak.utilities.DoubleComparator;
 
 public class GPS implements IKdComparable<GPS, Double>, IKeySetChooseable {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
@@ -65,12 +66,13 @@ public class GPS implements IKdComparable<GPS, Double>, IKeySetChooseable {
         if (dim == 1) {
             c1 = this.latitude == 'N' ? 1 : -1;
             c2 = other.latitude == 'N' ? 1 : -1;
-            return Double.compare((c1 * this.latDeg), (c2 * other.latDeg));
+//            return Double.compare((c1 * this.latDeg), (c2 * other.latDeg));
+            return DoubleComparator.getInstance().compare((c1 * this.latDeg), (c2 * other.latDeg));
         }
         else if (dim == 2) {
             c1 = this.longitude == 'W' ? 1 : -1;
             c2 = other.longitude == 'W' ? 1 : -1;
-            return Double.compare((c1 * this.longDeg), (c2 * other.longDeg));
+            return DoubleComparator.getInstance().compare((c1 * this.longDeg), (c2 * other.longDeg));
         }
         return Error.INVALID_DIMENSION.getErrCode();
     }
@@ -98,22 +100,22 @@ public class GPS implements IKdComparable<GPS, Double>, IKeySetChooseable {
     }
 
     @Override
-    public void toggleComparedKey() {
+    public void toggleComparedKeySet() {
         // nothing to toggle
     }
 
     @Override
-    public void setComparedKey(int key) {
+    public void setComparedKeySet(int key) {
         // not changeable set
     }
 
     @Override
-    public int getKeysCount() {
+    public int getKeySetsCount() {
         return 1;
     }
 
     @Override
-    public String getKeysDescription() {
+    public String getKeySetsDescription() {
         return "Key - latitude degrees X direction, longitude degrees X direction";
     }
 }

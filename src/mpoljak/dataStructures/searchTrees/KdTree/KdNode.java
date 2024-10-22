@@ -18,10 +18,10 @@ public class KdNode <T extends IKdComparable<T, K> & IKeySetChooseable, K extend
             throw new NullPointerException("Data in KdNode is null");
         this.data = data;
 
-        this.upperBounds = new ArrayList<K>(dim);
-        for (int i = 0; i < dim; i++) {
-            this.upperBounds.add(data.getUpperBound(i + 1));
-        }
+//        this.upperBounds = new ArrayList<K>(dim);
+//        for (int i = 0; i < dim; i++) {
+//            this.upperBounds.add(data.getUpperBound(i + 1));
+//        }
     }
     /**
      * Compares nodes by defined dimension(key).

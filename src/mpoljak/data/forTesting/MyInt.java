@@ -33,22 +33,22 @@ public class MyInt implements IKdComparable<MyInt, Integer>, IKeySetChooseable {
     }
 
     @Override
-    public void toggleComparedKey() {
+    public void toggleComparedKeySet() {
 
     }
 
     @Override
-    public void setComparedKey(int key) {
+    public void setComparedKeySet(int key) {
 
     }
 
     @Override
-    public int getKeysCount() {
+    public int getKeySetsCount() {
         return 1;
     }
 
     @Override
-    public String getKeysDescription() {
+    public String getKeySetsDescription() {
         return "Key - value";
     }
 }
