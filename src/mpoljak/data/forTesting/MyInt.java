@@ -1,10 +1,8 @@
 package mpoljak.data.forTesting;
 
-import mpoljak.dataStructures.searchTrees.KdTree.IKdComparableII;
+import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
-import java.util.ArrayList;
-
-public class MyInt implements IKdComparableII<MyInt, Integer> {
+public class MyInt implements IKdComparable<MyInt, Integer> {
     private int value;
     public MyInt(int value) {
         this.value = value;

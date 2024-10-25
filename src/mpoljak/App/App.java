@@ -1,9 +1,6 @@
 package mpoljak.App;
 
-import mpoljak.data.GPS;
-import mpoljak.data.forTesting.MyInt;
-import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
-import mpoljak.dataStructures.searchTrees.KdTree.Tester;
+import mpoljak.dataStructures.searchTrees.KdTree.Testing.Tester;
 import mpoljak.utilities.DoubleComparator;
 
 public class App {
@@ -11,7 +8,9 @@ public class App {
     public static void main(String[] args) {
         DoubleComparator.getInstance().setEpsilon(0.0001);
         Tester tester = new Tester();
-        tester.testManualInsertion();
+        tester.testSearchOfGPS(10, 10, 0.7);
+
+//        tester.testManualInsertion();
 //        tester.testRandomInsert(2,2);
 // ---------------------------------------------------------------------------------------------------------------------
 

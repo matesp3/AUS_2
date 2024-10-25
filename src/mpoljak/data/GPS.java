@@ -1,11 +1,11 @@
 package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
-import mpoljak.dataStructures.searchTrees.KdTree.IKdComparableII;
+import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
 import mpoljak.utilities.DoubleComparator;
 
-public class GPS implements IKdComparableII<GPS, Double> {
+public class GPS implements IKdComparable<GPS, Double> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 
@@ -87,47 +87,6 @@ public class GPS implements IKdComparableII<GPS, Double> {
     private double convertLongitude() {
         return (this.longitude == 'W' ? 1 : -1) * this.longDeg;
     }
-
-
-//    @Override
-//    public int compareTo(GPS other, int dim, int otherKeySetId) {
-//        return compareTo(other, dim);
-////        throw new UnsupportedOperationException("Not supported for GPS instance.");
-//    }
-//
-//    @Override
-//    public Double getUpperBound(int dim) {
-//        if (dim == 1)
-//            return this.latDeg * (this.latitude == 'N' ? 1 : -1);
-//        if (dim == 2)
-//            return this.longDeg * (this.longitude == 'W' ? 1 : -1);
-//        return null;
-//    }
-//
-//    @Override
-//    public void toggleComparedKeySet() {
-//        // nothing to toggle
-//    }
-//
-//    @Override
-//    public void setComparedKeySet(int key) {
-//        // not changeable set
-//    }
-//
-//    @Override
-//    public int getKeySetsCount() {
-//        return 1;
-//    }
-//
-//    @Override
-//    public int getCurrentKeySet() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public String getKeySetsDescription() {
-//        return "Key - latitude degrees X direction, longitude degrees X direction";
-//    }
 
     @Override
     public String toString() {

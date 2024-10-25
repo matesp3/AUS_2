@@ -5,7 +5,7 @@ import java.util.List;
 
 //public class KdNode <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
 //public class KdNode <T extends IKdComparableII<K, M>, K, M extends Comparable<M> > {
-public class KdNode <T, K extends IKdComparableII<K, M>, M extends Comparable<M> > {
+public class KdNode <T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
     private KdNode<T,K,M> parent;
     private KdNode<T,K,M> leftSon;
     private KdNode<T,K,M> rightSon;

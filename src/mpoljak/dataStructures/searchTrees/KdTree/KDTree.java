@@ -4,13 +4,13 @@ import java.lang.Integer;
 import java.util.List;
 
 /** functional interface */
-interface IOperation <T, K extends IKdComparableII<K, M>, M extends Comparable<M> > {
+interface IOperation <T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
     void doSomething(KdNode<T,K,M> node);
 }
 
 //public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
 //public class KDTree<E extends IKdComparableII<K, M>, K, M extends Comparable<M> > {
-public class KDTree<E, K extends IKdComparableII<K, M>, M extends Comparable<M> > {
+public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > {
     private static final int ROW_NODE_MAX = 30;
     private static final int PREFIX_LENGTH = 6;
 
@@ -140,6 +140,7 @@ public class KDTree<E, K extends IKdComparableII<K, M>, M extends Comparable<M> 
             dim = (height++ % this.k) + 1;
             cmp = currentNode.compareTo(key, dim);
             if (cmp == 0) {
+                System.out.println("level: " + height);
                 return currentNode; // node with searched data found
             } else if (cmp == 1) {
                 currentNode = currentNode.getLeftSon();
