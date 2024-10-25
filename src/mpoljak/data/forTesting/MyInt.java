@@ -18,9 +18,22 @@ public class MyInt implements IKdComparable<MyInt, Integer> {
     }
 
     @Override
-    public Integer getDimensionKey(int dim) {
-        return this.value;
+    public MyInt copyConstruct() {
+        return new MyInt(this.value);
     }
+
+    @Override
+    public boolean fallsInto(MyInt other) {
+        return this.value <= other.value;
+    }
+
+    @Override
+    public void mapGreaterValues(MyInt other) {
+        if (other.value > this.value)
+            this.value = other.value;
+    }
+
+
 
 //    @Override
 //    public int compareTo(MyInt other, int dim, int otherKeySetId) {

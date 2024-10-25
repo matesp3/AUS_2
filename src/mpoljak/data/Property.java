@@ -52,7 +52,8 @@ public class Property implements IGpsLocalizable {
 
     @Override
     public String toString() {
-        return String.format("Prop[id=%d;g1%s;g2%s]", this.propertyId, this.positions[0], this.positions[1]);
+//        return String.format("Prop[id=%d;g1%s;g2%s]", this.propertyId, this.positions[0], this.positions[1]);
+        return String.format("Prop[id=%d;g1%s]", this.propertyId, this.positions[0]);
 //        return String.format("Prop[id=%d]", this.propertyId); // temporally
     }
 }

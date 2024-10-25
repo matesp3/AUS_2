@@ -1,5 +1,6 @@
 package mpoljak.App;
 
+import mpoljak.data.GPS;
 import mpoljak.dataStructures.searchTrees.KdTree.Testing.Tester;
 import mpoljak.utilities.DoubleComparator;
 
@@ -8,10 +9,21 @@ public class App {
     public static void main(String[] args) {
         DoubleComparator.getInstance().setEpsilon(0.0001);
         Tester tester = new Tester();
-        tester.testSearchOfGPS(10, 10, 0.7);
 
-//        tester.testManualInsertion();
+        tester.testSearchOfGPS(100, 10, 25);
+//        tester.debugSearchOfGPS(100,10, 25, 1188562444, -884246284, 1129907258);
+//
+////        tester.testManualInsertion();
 //        tester.testRandomInsert(2,2);
+// ---------------------------------------------------------------------------------------------------------------------
+//        Iteration 9: seed=1188562444; gpsSeed=-884246284; directionSeed=1129907258
+//        SEARCHING FOR [-8,43;-173,35] ...
+//
+//    ** was inserted 13x
+//        1. Prop[id=1000000;g1[-8,43;-173,35]]
+//        2. Prop[id=59;g1[-24,23;-171,72]]
+//        3. Prop[id=61;g1[-60,97;-171,78]]
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 //        MyInt i1 = new MyInt(5);

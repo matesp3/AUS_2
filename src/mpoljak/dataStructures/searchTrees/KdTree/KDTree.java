@@ -40,7 +40,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
             * height <0,h>, h+1 levels
          */
         if (this.root == null) {
-            this.root = new KdNode<E,K,M>(null, null, null, data, 1, key);
+            this.root = new KdNode<E,K,M>(null, null, null, data, key);
             return;
         }
 
@@ -51,6 +51,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         int cmp = Integer.MIN_VALUE;    // undefined
 
         while (!inserted) {
+            currentNode.updateMaxKeyValues(key);
             dim = (height % this.k) + 1;
 //            cmp = data.compareTo(currentNode.getData(), dim);
 //            cmp = data.compareTo(currentNode.getData(), dim, this.keySetIdForTreeBuilding);
@@ -59,7 +60,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
             cmp = currentNode.compareTo(key, dim);
             if (cmp == 0 || cmp == 1) { // v------ go to the left subtree (currentNode has same or greater value of key)
                 if (!currentNode.hasLeftSon()) {
-                    KdNode<E,K,M> leafNode = new KdNode<E,K,M>(currentNode, null, null, data, dim, key);
+                    KdNode<E,K,M> leafNode = new KdNode<E,K,M>(currentNode, null, null, data, key);
                     currentNode.setLeftSon(leafNode);
                     inserted = true;
                 }
@@ -67,7 +68,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
                 height++;
             } else if (cmp == -1) {      // v------- go to the right subtree (currentNode has lower value of key)
                 if (!currentNode.hasRightSon()) {
-                    KdNode<E,K,M> leafNode = new KdNode<E,K,M>(currentNode, null, null, data, dim, key);
+                    KdNode<E,K,M> leafNode = new KdNode<E,K,M>(currentNode, null, null, data, key);
                     currentNode.setRightSon(leafNode);
                     inserted = true;
                 }
@@ -99,14 +100,30 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
 //        }
     }
 
+    private class MyInteger {
+        private int intVal;
+        MyInteger(int val) { this.intVal = val; }
+
+        public int getVal() {
+            return this.intVal;
+        }
+
+        public void setVal(int val) {
+            this.intVal = val;
+        }
+    }
+
     public List<E> find(K key) {
-        KdNode<E,K,M> resultNode = findNodeWithKey(key, this.root);
+        MyInteger height = new MyInteger(0);
+        KdNode<E,K,M> resultNode = findNodeWithKey(key, this.root, height);
+
         if (resultNode == null)
             return null;
         List<E> foundNodes = new ArrayList<>();
         do {
             foundNodes.add(resultNode.getData());
-            resultNode = findNodeWithKey(key, resultNode.getLeftSon());
+            height.setVal(height.getVal() + 1); // because i'm passing left son as parameter, so height has changed
+            resultNode = findNodeWithKey(key, resultNode.getLeftSon(), height);
         } while (resultNode != null);
 
         return foundNodes;
@@ -119,28 +136,29 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         inOrderProcessing(null, true);      // general hierarchical structure
     }
 
+
     /**
      * Tries to search in (sub)tree for the first occurrence of node with data, that are searched for.
      * @param key key to found
      * @param startingNode node(subtree) from which will be searched node with data on the way down
      * @return node with searched data | null if there's no node with wanted data in the given subtree
      */
-    private KdNode<E,K,M> findNodeWithKey(K key, KdNode<E,K,M> startingNode) {
+    private KdNode<E,K,M> findNodeWithKey(K key, KdNode<E,K,M> startingNode, MyInteger currentHeight) {
         if (startingNode == null)
             return null;
-//            throw new NullPointerException("findNodeWithKey: starting node is null, cannot launch searching for data");
 
         KdNode<E,K,M> currentNode = startingNode;
-        /* (k1 <= node.k1: go left) ; (k1 > node.k1: go right)
-         * height <0,h> */
-        int height = 0  ; // from 0, in order to start with dim = 1, which is the lowest number of dim
+        int height = currentHeight.getVal();
         int cmp = Integer.MIN_VALUE;
         int dim = Integer.MIN_VALUE;
-        do {
+
+        // (k1 <= node.k1: go left) ; (k1 > node.k1: go right)
+        // height <0,h>
+        while (currentNode != null && currentNode.canExistInSubtree(key)) {
             dim = (height++ % this.k) + 1;
             cmp = currentNode.compareTo(key, dim);
             if (cmp == 0) {
-                System.out.println("level: " + height);
+                currentHeight.setVal(height - 1); // send back where you have ended
                 return currentNode; // node with searched data found
             } else if (cmp == 1) {
                 currentNode = currentNode.getLeftSon();
@@ -153,10 +171,48 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
                 else if (cmp == Error.NULL_PARAMETER.getErrCode())
                     throw new NullPointerException("Node.compareTo(): NULL argument!");
             }
-        } while (currentNode != null);
+        }
 
         return currentNode;
     }
+//    /**
+//     * Tries to search in (sub)tree for the first occurrence of node with data, that are searched for.
+//     * @param key key to found
+//     * @param startingNode node(subtree) from which will be searched node with data on the way down
+//     * @return node with searched data | null if there's no node with wanted data in the given subtree
+//     */
+//    private KdNode<E,K,M> findNodeWithKey(K key, KdNode<E,K,M> startingNode) {
+//        if (startingNode == null)
+//            return null;
+////            throw new NullPointerException("findNodeWithKey: starting node is null, cannot launch searching for data");
+//
+//        KdNode<E,K,M> currentNode = startingNode;
+//        /* (k1 <= node.k1: go left) ; (k1 > node.k1: go right)
+//         * height <0,h> */
+//        int height = 0  ; // from 0, in order to start with dim = 1, which is the lowest number of dim
+//        int cmp = Integer.MIN_VALUE;
+//        int dim = Integer.MIN_VALUE;
+//        do {
+//            dim = (height++ % this.k) + 1;
+//            cmp = currentNode.compareTo(key, dim);
+//            if (cmp == 0) {
+//                System.out.println("level: " + height);
+//                return currentNode; // node with searched data found
+//            } else if (cmp == 1) {
+//                currentNode = currentNode.getLeftSon();
+//            } else if (cmp == -1) {
+//                currentNode = currentNode.getRightSon();
+//            } else {
+//                currentNode = null;
+//                if (cmp == Error.INVALID_DIMENSION.getErrCode())
+//                    throw new java.lang.IllegalArgumentException("Node.compareTo(): Not a valid dimension");
+//                else if (cmp == Error.NULL_PARAMETER.getErrCode())
+//                    throw new NullPointerException("Node.compareTo(): NULL argument!");
+//            }
+//        } while (currentNode != null);
+//
+//        return currentNode;
+//    }
 
     private void inOrderProcessing(IOperation<E,K,M> operation, boolean printHierarchy) {
         ArrayList<Boolean> llb = new ArrayList<>();
