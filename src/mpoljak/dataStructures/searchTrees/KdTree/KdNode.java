@@ -5,15 +5,15 @@ import java.util.List;
 
 //public class KdNode <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > { // T type must implement IKdComparable interface, K is anything
 //public class KdNode <T extends IKdComparableII<K, M>, K, M extends Comparable<M> > {
-public class KdNode <T, K extends IKdComparableII<K, M>, M extends Comparable<M> > {
+public class KdNode <T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
     private KdNode<T,K,M> parent;
     private KdNode<T,K,M> leftSon;
     private KdNode<T,K,M> rightSon;
     private final T data;
     private final K usedKey;
-    private List<M> lMaximums;
+    private K maxDimValues;
 
-    public KdNode(KdNode<T,K,M> parent, KdNode<T,K,M> leftSon, KdNode<T,K,M> rightSon, T data, int dim, K usedKey) {
+    public KdNode(KdNode<T,K,M> parent, KdNode<T,K,M> leftSon, KdNode<T,K,M> rightSon, T data, K usedKey) {
         this.parent = parent;
         this.leftSon = leftSon;
         this.rightSon = rightSon;
@@ -21,10 +21,21 @@ public class KdNode <T, K extends IKdComparableII<K, M>, M extends Comparable<M>
             throw new NullPointerException("Data in KdNode is null");
         this.data = data;
         this.usedKey = usedKey;
-        this.lMaximums = new ArrayList<M>(dim);
-//        for (int i = 0; i < dim; i++) {
-//            this.upperBounds.add(data.getUpperBound(i + 1));
-//        }
+        this.maxDimValues = usedKey.copyConstruct();
+    }
+
+    /**
+     * Determines it's worth to search for some key in a subtree.
+     * @param wantedKey key that it is being searched for
+     * @return
+     */
+    public boolean canExistInSubtree(K wantedKey) {
+        return wantedKey.fallsInto(this.maxDimValues);
+    }
+
+    /** Updates max key values of all dimensions that are lower than values in given composite key. */
+    public void updateMaxKeyValues(K wantedKey) {
+        this.maxDimValues.mapGreaterValues(wantedKey);
     }
 
     /***
@@ -70,18 +81,10 @@ public class KdNode <T, K extends IKdComparableII<K, M>, M extends Comparable<M>
     public boolean hasLeftSon() { return this.leftSon != null; }
     public boolean hasRightSon() { return this.rightSon != null; }
 
-    public M getUpperBound(int dim) {
-        if (this.lMaximums == null)
-            return null;
-        return this.lMaximums.get(dim - 1);
-    }
-    public void setUpperBound(M upperBound, int dim) {
-        this.lMaximums.set(dim - 1, upperBound);
-    }
-
     @Override
     public String toString() {
         return "V{key=" + this.usedKey + "; data=" + data.toString() + '}';
+//        return "V{key=" + this.usedKey + "; maxKey=" + this.maxDimValues + "; data= " + this.data + "}";
     }
 
 }

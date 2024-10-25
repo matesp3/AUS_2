@@ -1,18 +1,18 @@
 package mpoljak.data;
 
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
-import mpoljak.dataStructures.searchTrees.KdTree.IKdComparableII;
+import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
 import mpoljak.utilities.DoubleComparator;
 
-public class GPS implements IKdComparableII<GPS, Double> {
+public class GPS implements IKdComparable<GPS, Double> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 
-    private final char latitude;    // zem. sirka {N, S}
-    private final double latDeg;    // if 'S', represent as negative
-    private final char longitude;   // zem. dlzka {E, W}
-    private final double longDeg;   // if 'W' represent as negative
+    private char latitude;    // zem. sirka {N, S}
+    private double latDeg;    // if 'S', represent as negative
+    private char longitude;   // zem. dlzka {E, W}
+    private double longDeg;   // if 'W' represent as negative
 
     public GPS(char latitude, double latDeg, char longitude, double longDeg) {
         if (latitude != 'N' && latitude != 'S')
@@ -61,6 +61,32 @@ public class GPS implements IKdComparableII<GPS, Double> {
     }
 
     @Override
+    public GPS copyConstruct() {
+        return new GPS(this);
+    }
+
+    @Override
+    public boolean fallsInto(GPS other) {
+        DoubleComparator dc = DoubleComparator.getInstance();
+        return dc.compare(this.convertLatitude(), other.convertLatitude()) != 1
+                && dc.compare(this.convertLongitude(), other.convertLongitude()) != 1;
+    }
+
+    @Override
+    public void mapGreaterValues(GPS other) {
+        DoubleComparator dc = DoubleComparator.getInstance();
+        // if other is greater, then update yourself by mapping other's greater values
+        if (dc.compare(other.convertLatitude(), this.convertLatitude()) == 1) {
+            this.latDeg = other.latDeg;
+            this.latitude = other.latitude;
+        }
+        if (dc.compare(other.convertLongitude(), this.convertLongitude()) == 1) {
+            this.longDeg = other.longDeg;
+            this.longitude = other.longitude;
+        }
+    }
+
+    @Override
     public int compareTo(GPS other, int dim) {
         if (dim == 1) {
             return DoubleComparator.getInstance().compare(this.convertLatitude(), other.convertLatitude());
@@ -71,13 +97,20 @@ public class GPS implements IKdComparableII<GPS, Double> {
         return Error.INVALID_DIMENSION.getErrCode();
     }
 
+//    @Override
+//    public Double getDimensionKey(int dim) {
+//        if (dim == 1)
+//            return this.convertLatitude();
+//        else if (dim == 2)
+//            return this.convertLongitude();
+//        return null;
+//    }
+
     @Override
-    public Double getDimensionKey(int dim) {
-        if (dim == 1)
-            return this.convertLatitude();
-        else if (dim == 2)
-            return this.convertLongitude();
-        return null;
+    public String toString() {
+        int c1 = this.latitude == 'N' ? 1 : -1;
+        int c2 = this.longitude == 'E' ? 1 : -1;
+        return String.format("[%.2f;%.2f]", c1 * this.latDeg, c2 * this.longDeg);
     }
 
     private double convertLatitude() {
@@ -85,54 +118,28 @@ public class GPS implements IKdComparableII<GPS, Double> {
     }
 
     private double convertLongitude() {
-        return (this.longitude == 'W' ? 1 : -1) * this.longDeg;
+        return (this.longitude == 'E' ? 1 : -1) * this.longDeg;
     }
 
+    public static void testFallingIntoGPS() {
+        System.out.println(" Test FALLING INTO GPS (falling into means that all key values of first GPS are less" +
+                                     " or equal to second GPS key values)\n");
 
-//    @Override
-//    public int compareTo(GPS other, int dim, int otherKeySetId) {
-//        return compareTo(other, dim);
-////        throw new UnsupportedOperationException("Not supported for GPS instance.");
-//    }
-//
-//    @Override
-//    public Double getUpperBound(int dim) {
-//        if (dim == 1)
-//            return this.latDeg * (this.latitude == 'N' ? 1 : -1);
-//        if (dim == 2)
-//            return this.longDeg * (this.longitude == 'W' ? 1 : -1);
-//        return null;
-//    }
-//
-//    @Override
-//    public void toggleComparedKeySet() {
-//        // nothing to toggle
-//    }
-//
-//    @Override
-//    public void setComparedKeySet(int key) {
-//        // not changeable set
-//    }
-//
-//    @Override
-//    public int getKeySetsCount() {
-//        return 1;
-//    }
-//
-//    @Override
-//    public int getCurrentKeySet() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public String getKeySetsDescription() {
-//        return "Key - latitude degrees X direction, longitude degrees X direction";
-//    }
+        GPS g1 = new GPS('N', 24.5, 'E', 5.0);
+        GPS g3 = new GPS('N', 5.5, 'E', 5.0);
+        GPS g4 = new GPS('N', 23.5, 'E', 4.0);
+        GPS g5 = new GPS('N', 24.5, 'W', 5.0);
+        GPS g6 = new GPS('S', 25.5, 'W', 5.0);
+        GPS g7 = new GPS('S', 25.5, 'E', 7.0);
+        GPS g8 = new GPS('N', 25.5, 'E', 7.0);
+        GPS g9 = new GPS('N', 25.5, 'E', 4.0);
 
-    @Override
-    public String toString() {
-        int c1 = this.latitude == 'N' ? 1 : -1;
-        int c2 = this.longitude == 'W' ? 1 : -1;
-        return String.format("[%.2f;%.2f]", c1 * this.latDeg, c2 * this.longDeg);
+        System.out.println(g3 + " falls into " + g1 + ":" + g3.fallsInto(g1));
+        System.out.println(g4 + " falls into " + g1 + ":" + g4.fallsInto(g1));
+        System.out.println(g5 + " falls into " + g1 + ":" + g5.fallsInto(g1));
+        System.out.println(g6 + " falls into " + g1 + ":" + g6.fallsInto(g1));
+        System.out.println(g7 + " falls into " + g1 + ":" + g7.fallsInto(g1));
+        System.out.println(g8 + " falls into " + g1 + ":" + g8.fallsInto(g1));
+        System.out.println(g9 + " falls into " + g1 + ":" + g9.fallsInto(g1));
     }
 }
