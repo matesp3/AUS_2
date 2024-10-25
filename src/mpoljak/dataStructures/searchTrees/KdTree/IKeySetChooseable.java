@@ -13,6 +13,8 @@ public interface IKeySetChooseable {
     public void setComparedKeySet(int key);
     /** Informs about number of available equivalent keys to choose from. Always should be higher than 1. */
     public int getKeySetsCount();
+    /** Returns id of key set, which is currently chosen. */
+    public int getCurrentKeySet();
     /** Gives info about all available keys with their id within some key order */
     public String getKeySetsDescription();
 }

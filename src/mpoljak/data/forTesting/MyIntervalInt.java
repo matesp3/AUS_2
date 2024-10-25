@@ -1,10 +1,7 @@
 package mpoljak.data.forTesting;
 
-import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
-import javax.naming.OperationNotSupportedException;
-
-public class MyIntervalInt implements IKdComparable<MyIntervalInt, Integer> {
+public class MyIntervalInt {
     private int min;
     private int max;
     public MyIntervalInt(int min, int max) {
@@ -20,22 +17,22 @@ public class MyIntervalInt implements IKdComparable<MyIntervalInt, Integer> {
         return min;
     }
 
-    @Override
-    public int compareTo(MyIntervalInt other, int dim) {
-        if (dim == 1)
-            return Integer.compare(this.min, other.min);
-        return 0;
-    }
-
-    @Override
-    public int compareTo(MyIntervalInt other, int dim, int otherKeySetId) {
-        return compareTo(other, dim);
-    }
-
-    @Override
-    public Integer getUpperBound(int dim) {
-        return this.max;
-    }
+//    @Override
+//    public int compareTo(MyIntervalInt other, int dim) {
+//        if (dim == 1)
+//            return Integer.compare(this.min, other.min);
+//        return 0;
+//    }
+//
+//    @Override
+//    public int compareTo(MyIntervalInt other, int dim, int otherKeySetId) {
+//        return compareTo(other, dim);
+//    }
+//
+//    @Override
+//    public Integer getUpperBound(int dim) {
+//        return this.max;
+//    }
 
     @Override
     public String toString() {

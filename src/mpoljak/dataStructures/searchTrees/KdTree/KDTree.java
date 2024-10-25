@@ -4,70 +4,47 @@ import java.lang.Integer;
 import java.util.List;
 
 /** functional interface */
-interface IOperation <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
-    void doSomething(KdNode<T, K> node);
+interface IOperation <T, K extends IKdComparableII<K, M>, M extends Comparable<M> > {
+    void doSomething(KdNode<T,K,M> node);
 }
 
-/** functional interface */
-interface IComparison <T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
-    int compareTo(T data, T otherData, int dim);
-}
-
-public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
-
-    public static final int ONLY_ONE_KEY_SET_AVAILABLE = -1;
+//public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
+//public class KDTree<E extends IKdComparableII<K, M>, K, M extends Comparable<M> > {
+public class KDTree<E, K extends IKdComparableII<K, M>, M extends Comparable<M> > {
     private static final int ROW_NODE_MAX = 30;
     private static final int PREFIX_LENGTH = 6;
 
     private final int k;    // dimension of tree, k is from {1,2,...,n}
-    private final int keySetIdForTreeBuilding;
 
-    private final IOperation<T, K> operationPrint = (node) -> {
+    private final IOperation<E,K,M> operationPrint = (node) -> {
         System.out.println("[" + node.toString() + "], ");
     };
 
-    private final IComparison<T, K> operationCompare;
-
-    private KdNode<T,K> root;
-
-
-    /**
-     * Use when there are at least two equivalent key sets in data by which should be data inserted into the tree.
-     * @param k defines how many dimensions will tree work with
-     * @param keySetIdForTreeBuilding by which key from object's key set will tree be built. Starts from 1.
-     */
-    public KDTree(int k, int keySetIdForTreeBuilding) {
-        if ((keySetIdForTreeBuilding != ONLY_ONE_KEY_SET_AVAILABLE && keySetIdForTreeBuilding < 1) || k < 1)
-            throw new IllegalArgumentException("Parameters 'k' and 'keyId' must be positive number greater than zero");
-
-        this.k = k;
-        this.keySetIdForTreeBuilding = keySetIdForTreeBuilding - 1;
-
-        this.operationCompare = (keySetIdForTreeBuilding == ONLY_ONE_KEY_SET_AVAILABLE)
-                ? ( (data, otherData, dim) -> data.compareTo(otherData, dim) )
-                : ( (data, otherData, dim) -> data.compareTo(otherData, dim, this.keySetIdForTreeBuilding) );
-    }
+    private KdNode<E,K,M> root;
 
     /**
      * Use in case, inserted data has only one key set. No two equivalent key sets in data.
      * @param k defines how many dimensions will tree work with
      */
     public KDTree(int k) {
-        this(k, ONLY_ONE_KEY_SET_AVAILABLE);
+        if (k < 1)
+            throw new IllegalArgumentException("Parameter 'k' must be positive number greater than zero");
+
+        this.k = k;
     }
 
-    public void insert(T data) {
+    public void insert(K key, E data) {
         /*
-            * k1 <= node.k1: go left
+            * k1 <= node.k1: go left+
             * if k1 > node.k1: go right
             * height <0,h>, h+1 levels
          */
         if (this.root == null) {
-            this.root = new KdNode<T,K>(null, null, null, data, 1);
+            this.root = new KdNode<E,K,M>(null, null, null, data, 1, key);
             return;
         }
 
-        KdNode<T,K> currentNode = this.root;
+        KdNode<E,K,M> currentNode = this.root;
         boolean inserted = false;
         int height = 0; // from 0, in order to start with dim = 1, which is the lowest acceptable number of dim
         int dim = Integer.MIN_VALUE;    // undefined
@@ -77,18 +54,20 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
             dim = (height % this.k) + 1;
 //            cmp = data.compareTo(currentNode.getData(), dim);
 //            cmp = data.compareTo(currentNode.getData(), dim, this.keySetIdForTreeBuilding);
-            cmp = operationCompare.compareTo(data, currentNode.getData(), dim);
-            if (cmp == -1 || cmp == 0) { // v------ go to the left subtree
+//            cmp = operationCompare.compareTo(data, currentNode.getData(), dim);
+//            cmp = data.compare(data.getCompositeKey(), currentNode.getData().getCompositeKey(), dim);
+            cmp = currentNode.compareTo(key, dim);
+            if (cmp == 0 || cmp == 1) { // v------ go to the left subtree (currentNode has same or greater value of key)
                 if (!currentNode.hasLeftSon()) {
-                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data, dim);
+                    KdNode<E,K,M> leafNode = new KdNode<E,K,M>(currentNode, null, null, data, dim, key);
                     currentNode.setLeftSon(leafNode);
                     inserted = true;
                 }
                 currentNode = currentNode.getLeftSon();
                 height++;
-            } else if (cmp == 1) {      // v------- go to the right subtree
+            } else if (cmp == -1) {      // v------- go to the right subtree (currentNode has lower value of key)
                 if (!currentNode.hasRightSon()) {
-                    KdNode<T,K> leafNode = new KdNode<T,K>(currentNode, null, null, data, dim);
+                    KdNode<E,K,M> leafNode = new KdNode<E,K,M>(currentNode, null, null, data, dim, key);
                     currentNode.setRightSon(leafNode);
                     inserted = true;
                 }
@@ -101,6 +80,7 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
                     throw new NullPointerException("KdNode.compareTo(): NULL argument!");
             }
         }
+
         if (currentNode == null) throw new NullPointerException("CurrentNode should be inserted leaf, but is null.");
 
 //        KdNode<T, K> parent = currentNode.getParent();
@@ -119,44 +99,70 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
 //        }
     }
 
-    public void find(T data) {
-//        KdNode<T> currentNode = this.root;
-        // k1 <= node.k1: go left
-        // k1 > node.k1: go right
-        // if level down => height++; else height--; height <0,h>
-//        int height = 0; // from 0, in order to start with dim = 1, which is the lowest number of dim
-//
-//        while (currentNode != null) {
-//
-//            int dim = (height % this.k) + 1;
-//            int cmp = data.compareTo(currentNode.getData(), dim);
-//            if (cmp == -1 || cmp == 0) {
-//                currentNode = currentNode.getLeftSon();
-//                height++;
-//            } else if (cmp == 1 ) {
-//                currentNode = currentNode.getRightSon();
-//                height++;
-//            } else {
-//                if (cmp == Error.INVALID_DIMENSION.getErrCode())
-//                    throw new java.lang.IllegalArgumentException("Node.compareTo(): Not a valid dimension");
-//                else if (cmp == Error.NULL_PARAMETER.getErrCode())
-//                    throw new NullPointerException("Node.compareTo(): NULL argument!");
-//            }
-//        }
+    public List<E> find(K key) {
+        KdNode<E,K,M> resultNode = findNodeWithKey(key, this.root);
+        if (resultNode == null)
+            return null;
+        List<E> foundNodes = new ArrayList<>();
+        do {
+            foundNodes.add(resultNode.getData());
+            resultNode = findNodeWithKey(key, resultNode.getLeftSon());
+        } while (resultNode != null);
+
+        return foundNodes;
     }
 
-    public void remove(T data) {}
+    public void remove(K key) {}
 
     public void printTree() {
 //        inOrderProcessing(operationPrint, false);    // in-order for 1-dimension
         inOrderProcessing(null, true);      // general hierarchical structure
     }
 
-    private void inOrderProcessing(IOperation<T, K> operation, boolean printHierarchy) {
+    /**
+     * Tries to search in (sub)tree for the first occurrence of node with data, that are searched for.
+     * @param key key to found
+     * @param startingNode node(subtree) from which will be searched node with data on the way down
+     * @return node with searched data | null if there's no node with wanted data in the given subtree
+     */
+    private KdNode<E,K,M> findNodeWithKey(K key, KdNode<E,K,M> startingNode) {
+        if (startingNode == null)
+            return null;
+//            throw new NullPointerException("findNodeWithKey: starting node is null, cannot launch searching for data");
+
+        KdNode<E,K,M> currentNode = startingNode;
+        /* (k1 <= node.k1: go left) ; (k1 > node.k1: go right)
+         * height <0,h> */
+        int height = 0  ; // from 0, in order to start with dim = 1, which is the lowest number of dim
+        int cmp = Integer.MIN_VALUE;
+        int dim = Integer.MIN_VALUE;
+        do {
+            dim = (height++ % this.k) + 1;
+            cmp = currentNode.compareTo(key, dim);
+            if (cmp == 0) {
+                return currentNode; // node with searched data found
+            } else if (cmp == 1) {
+                currentNode = currentNode.getLeftSon();
+            } else if (cmp == -1) {
+                currentNode = currentNode.getRightSon();
+            } else {
+                currentNode = null;
+                if (cmp == Error.INVALID_DIMENSION.getErrCode())
+                    throw new java.lang.IllegalArgumentException("Node.compareTo(): Not a valid dimension");
+                else if (cmp == Error.NULL_PARAMETER.getErrCode())
+                    throw new NullPointerException("Node.compareTo(): NULL argument!");
+            }
+        } while (currentNode != null);
+
+        return currentNode;
+    }
+
+    private void inOrderProcessing(IOperation<E,K,M> operation, boolean printHierarchy) {
         ArrayList<Boolean> llb = new ArrayList<>();
         int level = 0;
-        KdNode<T,K> current = this.root;
-        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
+        KdNode<E,K,M> current = this.root;
+//        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
+        if (printHierarchy) printNode(level, current.toString(), false, llb);
         boolean isLeftSubTreeProcessed = false;
         while (current != null) {
             if (!isLeftSubTreeProcessed) {
@@ -166,8 +172,8 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
                         level++;
                     }
                     current = current.getLeftSon();
-                    if (printHierarchy) printNode(level, current.getData().toString(), true, llb);
-
+//                    if (printHierarchy) printNode(level, current.getData().toString(), true, llb);
+                    if (printHierarchy) printNode(level, current.toString(), true, llb);
                 } else { // hasRightSon
                     if (operation != null) operation.doSomething(current);
                     if (current.hasRightSon()) {
@@ -176,11 +182,11 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
                             llb.add(current.hasLeftSon());  // if current has both sons
                         }
                         current = current.getRightSon();
-                        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
-
+//                        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
+                        if (printHierarchy) printNode(level, current.toString(), false, llb);
                     }
                     else { // hasNoneSon
-                        KdNode<T,K> parent = current.getParent();
+                        KdNode<E,K,M> parent = current.getParent();
                         while (parent != null && !parent.isLeftSon(current)) {
                             if (printHierarchy) {
                                 llb.remove(llb.size() - 1);
@@ -207,7 +213,8 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
                        llb.add(false);// left surely exists, because it was processed && after right son is no other son
                    }
                    current = current.getRightSon();
-                   if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
+//                   if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
+                   if (printHierarchy) printNode(level, current.toString(), false, llb);
                    isLeftSubTreeProcessed = false;  // continue processing left subtree of right son
                }
                else {
@@ -218,8 +225,8 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
                        }
                        current = current.getParent();
                    }
-                   if (current.getParent() == null) // this could be true only for returning back to the root from
-                                                    // right subtree
+                   if (current.getParent() == null) /* this could be true only for returning back to the root from
+                                                       right subtree */
                        return;
                    else {
                        if (printHierarchy) {
@@ -233,7 +240,7 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
         }
     }
 
-    private boolean isRoot(KdNode<T,K> node) { return this.root == node; }
+    private boolean isRoot(KdNode<E,K,M> node) { return this.root == node; }
 
     private static void printNode(int level, String nodeRepr, boolean isLeftSon, ArrayList<Boolean> llb) {
         nodeRepr = nodeRepr == null ? "?" : nodeRepr;
@@ -245,7 +252,7 @@ public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends
             int minIdx;
             int remaining = nodeRepr.length();
             //  v------replacing last char for case of wrapping nodeRepr-----v
-            String alterPrefix = (prefix.length() == 0) ? ""
+            String alterPrefix = (prefix.isEmpty()) ? ""
                     : (prefix.substring(0, prefix.length() - 1) + (llb.get(level - 1) ? '|' : ' ') );
             String currExpr;
             while (remaining > 0) {

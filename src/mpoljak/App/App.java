@@ -6,15 +6,14 @@ import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.dataStructures.searchTrees.KdTree.Tester;
 import mpoljak.utilities.DoubleComparator;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 public class App {
 
     public static void main(String[] args) {
         DoubleComparator.getInstance().setEpsilon(0.0001);
         Tester tester = new Tester();
-        tester.testRandomInsert(2,2);
+        tester.testManualInsertion();
+//        tester.testRandomInsert(2,2);
+// ---------------------------------------------------------------------------------------------------------------------
 
 //        MyInt i1 = new MyInt(5);
 //        MyInt i2 = new MyInt(1);
@@ -30,52 +29,27 @@ public class App {
 //        MyInt i12 = new MyInt(2);
 //        MyInt i13 = new MyInt(2);
 //
-//        KDTree<MyInt, Integer> kdTree = new KDTree<MyInt, Integer>(1);
-//        kdTree.insert(i1);
-//        kdTree.insert(i2);
-//        kdTree.insert(i3);
-//        kdTree.insert(i4);
-//        kdTree.insert(i5);
-//        kdTree.insert(i6);
-//        kdTree.insert(i7);
-//        kdTree.insert(i8);
-//        kdTree.insert(i9);
-//        kdTree.insert(i10);
-//        kdTree.insert(i11);
-//        kdTree.insert(i12);
-//        kdTree.insert(i13);
+//        KDTree<MyInt, MyInt, Integer> kdTree = new KDTree<MyInt, MyInt, Integer>(1);
+//        kdTree.insert(i1, i1);
+//        kdTree.insert(i2, i2);
+//        kdTree.insert(i3, i3);
+//        kdTree.insert(i4, i4);
+//        kdTree.insert(i5, i5);
+//        kdTree.insert(i6, i6);
+//        kdTree.insert(i7, i7);
+//        kdTree.insert(i8, i8);
+//        kdTree.insert(i9, i9);
+//        kdTree.insert(i10, i10);
+//        kdTree.insert(i11, i11);
+//        kdTree.insert(i12, i12);
+//        kdTree.insert(i13, i13);
 //
 //        kdTree.printTree();
 
 //        Integer i_1 = new Integer(5);
 //        Integer i_2 = new Integer(4);
 //        System.out.println("Vysledok >> " + i_1.compareTo(i_2));
-//--------------------------------------------------------------
-//        MyIntervalInt ii1 = new MyIntervalInt(5, 12);
-//        MyIntervalInt ii2 = new MyIntervalInt(1, 5);
-//        MyIntervalInt ii3 = new MyIntervalInt(8, 17);
-//        MyIntervalInt ii4 = new MyIntervalInt(3, 4);
-//        MyIntervalInt ii5 = new MyIntervalInt(4, 75);
-//        MyIntervalInt ii6 = new MyIntervalInt(21, 27);
-//        MyIntervalInt ii7 = new MyIntervalInt(13, 30);
-//        MyIntervalInt ii8 = new MyIntervalInt(2, 8);
-//        MyIntervalInt ii9 = new MyIntervalInt(6, 12);
-//        MyIntervalInt ii10 = new MyIntervalInt(18, 41);
-//
-//        KDTree<MyIntervalInt, Integer> kdTree = new KDTree<MyIntervalInt, Integer>(1);
-//
-//        kdTree.insert(ii1);
-//        kdTree.insert(ii2);
-//        kdTree.insert(ii3);
-//        kdTree.insert(ii4);
-//        kdTree.insert(ii5);
-//        kdTree.insert(ii6);
-//        kdTree.insert(ii7);
-//        kdTree.insert(ii8);
-//        kdTree.insert(ii9);
-//        kdTree.insert(ii10);
-//
-//        kdTree.printTree();
+
 //--------------------------------------------------------------
 //        GPS g1 = new GPS('N', 15, 'W', 4);
 //        GPS g2 = new GPS('N', 30, 'W', 5);
