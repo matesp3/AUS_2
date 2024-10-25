@@ -6,7 +6,7 @@ import mpoljak.dataStructures.searchTrees.KdTree.IKeySetChooseable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parcel implements IKdComparable<Parcel, Double>, IKeySetChooseable {
+public class Parcel {
     private int parcelId;
     private String description;
     private GPS[] positions;
@@ -52,41 +52,46 @@ public class Parcel implements IKdComparable<Parcel, Double>, IKeySetChooseable 
         this.properties.add(property);
     }
 
-    @Override
-    public int compareTo(Parcel other, int dim) {
-        return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim);//always compare with first key set
-    }
-
-    @Override
-    public int compareTo(Parcel other, int dim, int otherKeySetId) {
-        return this.positions[this.currentKeySetId].compareTo(other.positions[otherKeySetId], dim);
-    }
-
-    @Override
-    public Double getUpperBound(int dim) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void toggleComparedKeySet() {
-        this.currentKeySetId = (this.currentKeySetId + 1) % this.positions.length;
-    }
-
-    @Override
-    public void setComparedKeySet(int key) {
-        if (key > 0 && key < (this.positions.length + 1))
-            this.currentKeySetId = key - 1;
-    }
-
-    @Override
-    public int getKeySetsCount() {
-        return this.positions.length;
-    }
-
-    @Override
-    public String getKeySetsDescription() {
-        return " * KeySet1 - GPS position 1 [keySetId=1],\n * KeySet2 - GPS position 2 [keySetId=2]";
-    }
+//    @Override
+//    public int compareTo(Parcel other, int dim) {
+//        return this.positions[this.currentKeySetId].compareTo(other.positions[0], dim);//always compare with first key set
+//    }
+//
+//    @Override
+//    public int compareTo(Parcel other, int dim, int otherKeySetId) {
+//        return this.positions[this.currentKeySetId].compareTo(other.positions[otherKeySetId], dim);
+//    }
+//
+//    @Override
+//    public Double getUpperBound(int dim) {
+//        throw new UnsupportedOperationException("Not supported yet.");
+//    }
+//
+//    @Override
+//    public void toggleComparedKeySet() {
+//        this.currentKeySetId = (this.currentKeySetId + 1) % this.positions.length;
+//    }
+//
+//    @Override
+//    public void setComparedKeySet(int key) {
+//        if (key > 0 && key < (this.positions.length + 1))
+//            this.currentKeySetId = key - 1;
+//    }
+//
+//    @Override
+//    public int getKeySetsCount() {
+//        return this.positions.length;
+//    }
+//
+//    @Override
+//    public int getCurrentKeySet() {
+//        return this.currentKeySetId;
+//    }
+//
+//    @Override
+//    public String getKeySetsDescription() {
+//        return " * KeySet1 - GPS position 1 [keySetId=1],\n * KeySet2 - GPS position 2 [keySetId=2]";
+//    }
 
     @Override
     public String toString() {

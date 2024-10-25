@@ -32,4 +32,15 @@ public interface IKdComparable<T, K extends Comparable<K>> { // super means
     public K getUpperBound(int dim);
 
 //    public int compare(int dim, D data, D otherData);
+
+    /**
+     *
+     * @param k1 key of first instance
+     * @param k2 key of second instance
+     * @param dim by which dimension are keys compared
+     * @return (k1 < k2) => -1; (k1 = k2) => 0; (k1 > k2) => 1;
+     */
+    public int compare(K k1, K k2, int dim);
+
+    public K getCompositeKey();
 }
