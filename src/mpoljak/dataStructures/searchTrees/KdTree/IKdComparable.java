@@ -20,7 +20,7 @@ public interface IKdComparable<K, M extends Comparable<M>> {
      * Determines if keys of calling instance are in all dimensions lower or equal to compared key values of other
      * instance.
      * @param other other key
-     * @return false if at least in one dimension is key value of calling instance greater than value of other instance.
+     * @return false if at least in one dimension of calling instance is key value greater than value of other instance.
      *          Else true.
      */
     public boolean fallsInto(K other);

@@ -1,11 +1,22 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 import java.util.ArrayList;
 import java.lang.Integer;
+import java.util.LinkedList;
 import java.util.List;
 
 /** functional interface */
-interface IOperation <T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
-    void doSomething(KdNode<T,K,M> node);
+interface INodeEvaluation<T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
+    boolean evaluateNode(KdNode<T,K,M> node);
+}
+
+/** functional interface */
+interface INodeProcessing<T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
+    void processNode(KdNode<T,K,M> node);
+}
+
+/** functional interface */
+interface INodeRetrieving<T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
+    KdNode<T,K,M> retrieveNode(KdNode<T,K,M> node);
 }
 
 //public class KDTree<T extends IKdComparable<T, K> & IKeySetChooseable, K extends Comparable<K> > {
@@ -16,7 +27,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
 
     private final int k;    // dimension of tree, k is from {1,2,...,n}
 
-    private final IOperation<E,K,M> operationPrint = (node) -> {
+    private final INodeProcessing<E,K,M> operationPrint = (node) -> {
         System.out.println("[" + node.toString() + "], ");
     };
 
@@ -53,10 +64,6 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         while (!inserted) {
             currentNode.updateMaxKeyValues(key);
             dim = (height % this.k) + 1;
-//            cmp = data.compareTo(currentNode.getData(), dim);
-//            cmp = data.compareTo(currentNode.getData(), dim, this.keySetIdForTreeBuilding);
-//            cmp = operationCompare.compareTo(data, currentNode.getData(), dim);
-//            cmp = data.compare(data.getCompositeKey(), currentNode.getData().getCompositeKey(), dim);
             cmp = currentNode.compareTo(key, dim);
             if (cmp == 0 || cmp == 1) { // v------ go to the left subtree (currentNode has same or greater value of key)
                 if (!currentNode.hasLeftSon()) {
@@ -82,22 +89,8 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
             }
         }
 
-        if (currentNode == null) throw new NullPointerException("CurrentNode should be inserted leaf, but is null.");
-
-//        KdNode<T, K> parent = currentNode.getParent();
-//        while (parent != null) {
-////            dim = (height % this.k) + 1;
-//            for (int i = 1; i <= this.k; i++) {
-//                cmp = currentNode.getUpperBound(i).compareTo( parent.getUpperBound(i) );
-//                if (cmp == 1) { // current.upper > parent.upper
-//                    parent.setUpperBound( currentNode.getUpperBound(i), i);
-//                }
-//            }
-//
-//            currentNode = parent;
-//            parent = parent.getParent();
-//            height--;
-//        }
+        if (currentNode == null)
+            throw new NullPointerException("CurrentNode should be inserted leaf, but is null.");
     }
 
     private class MyInteger {
@@ -175,46 +168,58 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
 
         return currentNode;
     }
-//    /**
-//     * Tries to search in (sub)tree for the first occurrence of node with data, that are searched for.
-//     * @param key key to found
-//     * @param startingNode node(subtree) from which will be searched node with data on the way down
-//     * @return node with searched data | null if there's no node with wanted data in the given subtree
-//     */
-//    private KdNode<E,K,M> findNodeWithKey(K key, KdNode<E,K,M> startingNode) {
-//        if (startingNode == null)
-//            return null;
-////            throw new NullPointerException("findNodeWithKey: starting node is null, cannot launch searching for data");
-//
-//        KdNode<E,K,M> currentNode = startingNode;
-//        /* (k1 <= node.k1: go left) ; (k1 > node.k1: go right)
-//         * height <0,h> */
-//        int height = 0  ; // from 0, in order to start with dim = 1, which is the lowest number of dim
-//        int cmp = Integer.MIN_VALUE;
-//        int dim = Integer.MIN_VALUE;
-//        do {
-//            dim = (height++ % this.k) + 1;
-//            cmp = currentNode.compareTo(key, dim);
-//            if (cmp == 0) {
-//                System.out.println("level: " + height);
-//                return currentNode; // node with searched data found
-//            } else if (cmp == 1) {
-//                currentNode = currentNode.getLeftSon();
-//            } else if (cmp == -1) {
-//                currentNode = currentNode.getRightSon();
-//            } else {
-//                currentNode = null;
-//                if (cmp == Error.INVALID_DIMENSION.getErrCode())
-//                    throw new java.lang.IllegalArgumentException("Node.compareTo(): Not a valid dimension");
-//                else if (cmp == Error.NULL_PARAMETER.getErrCode())
-//                    throw new NullPointerException("Node.compareTo(): NULL argument!");
-//            }
-//        } while (currentNode != null);
-//
-//        return currentNode;
-//    }
 
-    private void inOrderProcessing(IOperation<E,K,M> operation, boolean printHierarchy) {
+    private class NodeToProcess {
+        final int height;
+        final KdNode<E,K,M> nodeToProcess;
+
+        NodeToProcess(KdNode<E,K,M> node, int height) {
+            this.height = height;
+            this.nodeToProcess = node;
+        }
+    }
+
+    public void findMin() {
+        findExtreme(1, this.root.getRightSon(), new MyInteger(0 + 1),
+                        (node) -> node.hasRightSon(), (node) -> node.getRightSon(), (node) -> node.getLeftSon());
+    }
+
+    public void findMax() {
+        findExtreme(1, this.root.getLeftSon(), new MyInteger(0 + 1),
+                (node) -> node.hasLeftSon(), (node) -> node.getLeftSon(), (node) -> node.getRightSon());
+    }
+
+    private KdNode<E,K,M> findExtreme(int wantedDim, KdNode<E,K,M> startingNode, MyInteger currentHeight,
+                                  INodeEvaluation<E,K,M> otherSonCheck,
+                                  INodeRetrieving<E,K,M> otherSon, INodeRetrieving<E,K,M> baseSon) {
+        KdNode<E,K,M> currentNode = startingNode;
+        LinkedList<NodeToProcess> lNotProcessed = new LinkedList<NodeToProcess>();
+        int dim;
+        int height = currentHeight.getVal();
+
+        while (currentNode != null) {
+//            spracujNODE
+            System.out.println("height= " + height + "; node=" +currentNode.toString());
+            dim = (height % this.k) + 1;
+//            if (dim != wantedDim && currentNode.hasLeftSon())  // other dim, must search trough both sons
+            if (dim != wantedDim && otherSonCheck.evaluateNode(currentNode))  // other dim, must search trough both sons
+                lNotProcessed.addLast(new NodeToProcess(otherSon.retrieveNode(currentNode), height + 1));
+//                lNotProcessed.addLast(new NodeToProcess(currentNode.getLeftSon(), height + 1));
+            currentNode = baseSon.retrieveNode(currentNode);
+//            currentNode = currentNode.getRightSon();
+            if (currentNode != null)
+                height++;
+            else if (!lNotProcessed.isEmpty()) {
+                height = lNotProcessed.getLast().height;
+                currentNode = lNotProcessed.removeLast().nodeToProcess;
+            }
+        }
+
+        currentHeight.setVal(height);
+        return null;
+    }
+
+    private void inOrderProcessing(INodeProcessing<E,K,M> operation, boolean printHierarchy) {
         ArrayList<Boolean> llb = new ArrayList<>();
         int level = 0;
         KdNode<E,K,M> current = this.root;
@@ -232,7 +237,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
 //                    if (printHierarchy) printNode(level, current.getData().toString(), true, llb);
                     if (printHierarchy) printNode(level, current.toString(), true, llb);
                 } else { // hasRightSon
-                    if (operation != null) operation.doSomething(current);
+                    if (operation != null) operation.processNode(current);
                     if (current.hasRightSon()) {
                         if (printHierarchy) {
                             level++;
@@ -263,7 +268,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
                 }
             }
            else { // left subtree is processed
-                if (operation != null) operation.doSomething(current);
+                if (operation != null) operation.processNode(current);
                if (current.hasRightSon()) {
                    if (printHierarchy) {
                        level++;
@@ -350,4 +355,5 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         }
         System.out.println();
     }
+
 }
