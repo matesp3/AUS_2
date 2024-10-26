@@ -4,7 +4,9 @@ import mpoljak.data.GPS;
 import mpoljak.data.IGpsLocalizable;
 import mpoljak.data.Parcel;
 import mpoljak.data.Property;
+import mpoljak.data.forTesting.MyCoupleInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
+import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
 
 import java.util.List;
 import java.util.Random;
@@ -216,4 +218,84 @@ public class Tester {
         }
     }
 
+    public void printMaxForRoot() {
+        MyCoupleInt i1 = new MyCoupleInt(110,4);
+        MyCoupleInt i2 = new MyCoupleInt(215,2);
+        MyCoupleInt i3 = new MyCoupleInt(178,9);
+        MyCoupleInt i4 = new MyCoupleInt(105,2);
+        MyCoupleInt i5 = new MyCoupleInt(305,3);
+        MyCoupleInt i6 = new MyCoupleInt(110,3);
+        MyCoupleInt i7 = new MyCoupleInt(255,3);
+        MyCoupleInt i8 = new MyCoupleInt(110,4);
+        MyCoupleInt i9 = new MyCoupleInt(305,3);
+        MyCoupleInt i10 = new MyCoupleInt(174,7);
+        MyCoupleInt i11 = new MyCoupleInt(180,6);
+        MyCoupleInt i12 = new MyCoupleInt(115,5);
+        MyCoupleInt i13 = new MyCoupleInt(175,8);
+        MyCoupleInt i14 = new MyCoupleInt(179,5);
+        MyCoupleInt i15 = new MyCoupleInt(120,5);
+        MyCoupleInt i16 = new MyCoupleInt(180,5);
+
+        KDTree<MyCoupleInt, MyCoupleInt, Integer> kdTree = new KDTree<MyCoupleInt, MyCoupleInt, Integer>(2);
+        kdTree.insert(i1, i1);
+        kdTree.insert(i2, i2);
+        kdTree.insert(i3, i3);
+        kdTree.insert(i4, i4);
+        kdTree.insert(i5, i5);
+        kdTree.insert(i6, i6);
+        kdTree.insert(i7, i7);
+        kdTree.insert(i8, i8);
+        kdTree.insert(i9, i9);
+        kdTree.insert(i10, i10);
+        kdTree.insert(i11, i11);
+        kdTree.insert(i12, i12);
+        kdTree.insert(i13, i13);
+        kdTree.insert(i14, i14);
+        kdTree.insert(i15, i15);
+        kdTree.insert(i16, i16);
+
+        kdTree.printTree();
+        System.out.println("--MAX--");
+//        kdTree.findMax(); // public no more
+        System.out.println("\n--MIN--");
+//        kdTree.findMin(); // public no more
+
+    }
+
+//        MyInt i1 = new MyInt(5);
+//        MyInt i2 = new MyInt(1);
+//        MyInt i3 = new MyInt(8);
+//        MyInt i4 = new MyInt(3);
+//        MyInt i5 = new MyInt(4);
+//        MyInt i6 = new MyInt(21);
+//        MyInt i7 = new MyInt(13);
+//        MyInt i8 = new MyInt(6);
+//        MyInt i9 = new MyInt(6);
+//        MyInt i10 = new MyInt(18);
+//        MyInt i11 = new MyInt(15);
+//        MyInt i12 = new MyInt(2);
+//        MyInt i13 = new MyInt(2);
+//
+//        KDTree<MyInt, MyInt, Integer> kdTree = new KDTree<MyInt, MyInt, Integer>(1);
+//        kdTree.insert(i1, i1);
+//        kdTree.insert(i2, i2);
+//        kdTree.insert(i3, i3);
+//        kdTree.insert(i4, i4);
+//        kdTree.insert(i5, i5);
+//        kdTree.insert(i6, i6);
+//        kdTree.insert(i7, i7);
+//        kdTree.insert(i8, i8);
+//        kdTree.insert(i9, i9);
+//        kdTree.insert(i10, i10);
+//        kdTree.insert(i11, i11);
+//        kdTree.insert(i12, i12);
+//        kdTree.insert(i13, i13);
+//
+//        kdTree.printTree();
+
+//        Integer i_1 = new Integer(5);
+//        Integer i_2 = new Integer(4);
+//        System.out.println("Vysledok >> " + i_1.compareTo(i_2));
+
 }
+
