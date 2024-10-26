@@ -34,7 +34,7 @@ public class Tester {
             System.out.println(String.format("\n    ----------------------------------------------------\n" +
                     "Iteration %d: seed=%s; gpsSeed=%s; directionSeed=%s", a+ 1, "" + seedSeed, "" + gpsSeed, "" + dirSeed));
 //            -----------------------------------------
-            KDTree<Property, GPS, Double> kdTree = new KDTree<Property, GPS, Double>(2);
+            KDTree<Property, GPS> kdTree = new KDTree<Property, GPS>(2);
             GPS myGps1 = generateGPS(gpsGen, dirGen);
             GPS myGps2 = generateGPS(gpsGen, dirGen);
             Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2);
@@ -72,7 +72,7 @@ public class Tester {
         dirGen.setSeed(dirSeed);
         System.out.println("Iteration " + (a+ 1) + ". seed=" +  seedSeed + "; gpsSeed=" + gpsSeed + "; directionSeed=" + dirSeed);
 //            -----------------------------------------
-        KDTree<Property, GPS, Double> kdTree = new KDTree<Property, GPS, Double>(2);
+        KDTree<Property, GPS> kdTree = new KDTree<Property, GPS>(2);
         GPS myGps1 = generateGPS(gpsGen, dirGen);
         GPS myGps2 = generateGPS(gpsGen, dirGen);
         Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2);
@@ -104,7 +104,7 @@ public class Tester {
         System.out.println("        INSERTING '" + className + "' based on GPS positions, tree built by GPS_1\n         " +
                 "---------------------------------------------------------");
         int id = 1;
-        KDTree<Property, GPS, Double> kdTree = new KDTree<Property, GPS, Double>(2);
+        KDTree<Property, GPS> kdTree = new KDTree<Property, GPS>(2);
 //        KDTree<Parcel, Double> kdTree = new KDTree<Parcel, Double>(2, 1);
 //        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
         for (int a = 0; a < seedCount; a++) {
@@ -148,7 +148,7 @@ public class Tester {
         GPS g5 = generateGPS(gpsGen, dirGen);
         GPS g6 = generateGPS(gpsGen, dirGen);
 
-        KDTree<GPS, GPS, Double> kdTree = new KDTree<>(2);
+        KDTree<GPS, GPS> kdTree = new KDTree<>(2);
         kdTree.insert(g1, g1);
         kdTree.insert(g2,g2);
         kdTree.insert(g3,g3);
@@ -181,7 +181,7 @@ public class Tester {
     }
 
     private static void testInsertingBothParcelsAndProperties() {
-        KDTree<IGpsLocalizable, GPS, Double> kdTreeBoth = new KDTree<>(2);
+        KDTree<IGpsLocalizable, GPS> kdTreeBoth = new KDTree<>(2);
         GPS g1 = new GPS('N', 27.87, 'W', 25.4);
         GPS g2 = new GPS('S', 79.87, 'E', 52.4);
         Parcel par = new Parcel(1, "", g1, g2);
@@ -204,7 +204,7 @@ public class Tester {
         return new GPS(chLat, lat, chLon, lon);
     }
 
-    private static void insertElements(long insertionsCount, KDTree<Property, GPS, Double> kdTree, Random dirGenerator, Random
+    private static void insertElements(long insertionsCount, KDTree<Property, GPS> kdTree, Random dirGenerator, Random
             valGenerator, int nextId) {
         for (int i = 0; i < insertionsCount; i++) {
             GPS g1 = generateGPS(valGenerator, dirGenerator);
@@ -219,24 +219,24 @@ public class Tester {
     }
 
     public void printMaxForRoot() {
-        MyCoupleInt i1 = new MyCoupleInt(110,4);
-        MyCoupleInt i2 = new MyCoupleInt(215,2);
-        MyCoupleInt i3 = new MyCoupleInt(178,9);
-        MyCoupleInt i4 = new MyCoupleInt(105,2);
-        MyCoupleInt i5 = new MyCoupleInt(305,3);
-        MyCoupleInt i6 = new MyCoupleInt(110,3);
-        MyCoupleInt i7 = new MyCoupleInt(255,3);
-        MyCoupleInt i8 = new MyCoupleInt(110,4);
-        MyCoupleInt i9 = new MyCoupleInt(305,3);
-        MyCoupleInt i10 = new MyCoupleInt(174,7);
-        MyCoupleInt i11 = new MyCoupleInt(180,6);
-        MyCoupleInt i12 = new MyCoupleInt(115,5);
-        MyCoupleInt i13 = new MyCoupleInt(175,8);
-        MyCoupleInt i14 = new MyCoupleInt(179,5);
-        MyCoupleInt i15 = new MyCoupleInt(120,5);
-        MyCoupleInt i16 = new MyCoupleInt(180,5);
+        MyCoupleInt i1 = new MyCoupleInt(110,4, "");
+        MyCoupleInt i2 = new MyCoupleInt(215,2, "");
+        MyCoupleInt i3 = new MyCoupleInt(178,9, "");
+        MyCoupleInt i4 = new MyCoupleInt(105,2, "");
+        MyCoupleInt i5 = new MyCoupleInt(305,3, "");
+        MyCoupleInt i6 = new MyCoupleInt(110,3, "");
+        MyCoupleInt i7 = new MyCoupleInt(255,3, "");
+        MyCoupleInt i8 = new MyCoupleInt(110,4, "");
+        MyCoupleInt i9 = new MyCoupleInt(305,3, "");
+        MyCoupleInt i10 = new MyCoupleInt(174,7, "");
+        MyCoupleInt i11 = new MyCoupleInt(180,6, "");
+        MyCoupleInt i12 = new MyCoupleInt(115,5, "");
+        MyCoupleInt i13 = new MyCoupleInt(175,8, "");
+        MyCoupleInt i14 = new MyCoupleInt(179,5, "");
+        MyCoupleInt i15 = new MyCoupleInt(120,5, "");
+        MyCoupleInt i16 = new MyCoupleInt(180,5, "");
 
-        KDTree<MyCoupleInt, MyCoupleInt, Integer> kdTree = new KDTree<MyCoupleInt, MyCoupleInt, Integer>(2);
+        KDTree<MyCoupleInt, MyCoupleInt> kdTree = new KDTree<MyCoupleInt, MyCoupleInt>(2);
         kdTree.insert(i1, i1);
         kdTree.insert(i2, i2);
         kdTree.insert(i3, i3);
@@ -259,6 +259,41 @@ public class Tester {
 //        kdTree.findMax(); // public no more
         System.out.println("\n--MIN--");
 //        kdTree.findMin(); // public no more
+
+    }
+
+
+    public void testVillages() {
+        MyCoupleInt i1 = new MyCoupleInt(23,35, "Nitra");
+        MyCoupleInt i2 = new MyCoupleInt(22,39, "Senica");
+        MyCoupleInt i3 = new MyCoupleInt(22,31, "Senica - skola");
+        MyCoupleInt i4 = new MyCoupleInt(22,42, "Senica - stanica");
+        MyCoupleInt i5 = new MyCoupleInt(22,32, "Senica - urad");
+        MyCoupleInt i6 = new MyCoupleInt(12,41, "Hodonin");
+        MyCoupleInt i7 = new MyCoupleInt(24,36, "Tlmace - urad");
+        MyCoupleInt i8 = new MyCoupleInt(24,34, "Tlmace");
+        MyCoupleInt i9 = new MyCoupleInt(24,40, "Tlmace - parkovisko");
+        MyCoupleInt i10 = new MyCoupleInt(24,35, "Tlmace - nem.");
+        MyCoupleInt i11 = new MyCoupleInt(30,33, "Levice");
+        MyCoupleInt i12 = new MyCoupleInt(29,46, "Bojnice");
+        MyCoupleInt i13 = new MyCoupleInt(27,43, "Novaky");
+
+        KDTree<MyCoupleInt, MyCoupleInt> kdTree = new KDTree<MyCoupleInt, MyCoupleInt>(2);
+        kdTree.insert(i1, i1);
+        kdTree.insert(i2, i2);
+        kdTree.insert(i3, i3);
+        kdTree.insert(i4, i4);
+        kdTree.insert(i5, i5);
+        kdTree.insert(i6, i6);
+        kdTree.insert(i7, i7);
+        kdTree.insert(i8, i8);
+        kdTree.insert(i9, i9);
+        kdTree.insert(i10, i10);
+        kdTree.insert(i11, i11);
+        kdTree.insert(i12, i12);
+        kdTree.insert(i13, i13);
+
+        kdTree.printTree();
 
     }
 

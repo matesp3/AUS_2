@@ -1,5 +1,7 @@
 package mpoljak.data;
 
+import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,5 +57,15 @@ public class Property implements IGpsLocalizable {
 //        return String.format("Prop[id=%d;g1%s;g2%s]", this.propertyId, this.positions[0], this.positions[1]);
         return String.format("Prop[id=%d;g1%s]", this.propertyId, this.positions[0]);
 //        return String.format("Prop[id=%d]", this.propertyId); // temporally
+    }
+
+    @Override
+    public boolean isSame(IGpsLocalizable other) {
+        if (!(other instanceof Property)) return false;
+        Property otherProp = (Property) other;
+        return this.propertyId == otherProp.propertyId &&
+                this.positions[0].isSame(otherProp.positions[0]) && this.positions[1].isSame(otherProp.positions[1]);
+//                && (this.description == null ? "" : this.description).
+//                    compareTo(other.description == null ? "" : other.description) == 0;
     }
 }

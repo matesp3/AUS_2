@@ -1,9 +1,12 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
+
+import java.util.Comparator;
+
 /**
  * This interface represents types, which can behave like data and could be compared by more than one duplicate key.
  * @param <K> Type of key
  */
-public interface IKdComparable<K, M extends Comparable<M>> {
+public interface IKdComparable<K> {
     /**
      * Comparing calling instance with other instance of the same type for specific dimension (attributes of keys).
      * @param other other instance
@@ -31,6 +34,12 @@ public interface IKdComparable<K, M extends Comparable<M>> {
      */
     public void mapGreaterValues(K other);
 
+    /**
+     * Determines, whether both key instances have equal values of keys in all dimensions.
+     * @param other
+     * @return true if both instances have equal key values in all dimensions
+     */
+    public boolean isSameKey(K other);
 
 //    /**
 //     * Comparing two keys for specific dimension (attributes of keys).

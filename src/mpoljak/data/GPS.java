@@ -3,9 +3,10 @@ package mpoljak.data;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
+import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
 import mpoljak.utilities.DoubleComparator;
 
-public class GPS implements IKdComparable<GPS, Double> {
+public class GPS implements IKdComparable<GPS>, ISimilar<GPS> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 
@@ -97,20 +98,24 @@ public class GPS implements IKdComparable<GPS, Double> {
         return Error.INVALID_DIMENSION.getErrCode();
     }
 
-//    @Override
-//    public Double getDimensionKey(int dim) {
-//        if (dim == 1)
-//            return this.convertLatitude();
-//        else if (dim == 2)
-//            return this.convertLongitude();
-//        return null;
-//    }
-
     @Override
     public String toString() {
         int c1 = this.latitude == 'N' ? 1 : -1;
         int c2 = this.longitude == 'E' ? 1 : -1;
         return String.format("[%.2f;%.2f]", c1 * this.latDeg, c2 * this.longDeg);
+    }
+
+    @Override
+    public boolean isSameKey(GPS other) {
+        if (this == other) return true;
+        DoubleComparator dc = DoubleComparator.getInstance();
+        return dc.compare(other.convertLatitude(), this.convertLatitude()) == 0
+                && dc.compare(other.convertLongitude(), this.convertLongitude()) == 0;
+    }
+
+    @Override
+    public boolean isSame(GPS other) {
+        return this.isSameKey(other);       // because GPS instance can behave as key and as data at the same time
     }
 
     private double convertLatitude() {
