@@ -10,6 +10,11 @@ interface INodeEvaluation<T, K extends IKdComparable<K, M>, M extends Comparable
 }
 
 /** functional interface */
+interface INodeComparison<T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
+    boolean compareNodes(KdNode<T,K,M> node, KdNode<T,K,M> nodeWithExtreme);
+}
+
+/** functional interface */
 interface INodeProcessing<T, K extends IKdComparable<K, M>, M extends Comparable<M> > {
     void processNode(KdNode<T,K,M> node);
 }
@@ -180,33 +185,45 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
     }
 
     public void findMin() {
-        findExtreme(1, this.root.getRightSon(), new MyInteger(0 + 1),
-                        (node) -> node.hasRightSon(), (node) -> node.getRightSon(), (node) -> node.getLeftSon());
+        int wantedDim = 1;
+        KdNode<E,K,M> foundMin = findExtreme(wantedDim, this.root.getRightSon(), new MyInteger(0 + 1),
+                (node1, node2) -> node1.compareTo(node2, wantedDim) == -1,
+                (node) -> node.hasRightSon(),
+                (node) -> node.getRightSon(),
+                (node) -> node.getLeftSon());
+        System.out.println("Found Min=" + foundMin);
     }
 
     public void findMax() {
-        findExtreme(1, this.root.getLeftSon(), new MyInteger(0 + 1),
-                (node) -> node.hasLeftSon(), (node) -> node.getLeftSon(), (node) -> node.getRightSon());
+        int wantedDim = 1;
+        KdNode<E,K,M> foundMax = findExtreme(wantedDim, this.root.getLeftSon(), new MyInteger(0 + 1),
+                (node1, node2) -> node1.compareTo(node2, wantedDim) == 1,
+                (node) -> node.hasLeftSon(),
+                (node) -> node.getLeftSon(),
+                (node) -> node.getRightSon());
+        System.out.println("Found Max=" + foundMax);
     }
 
     private KdNode<E,K,M> findExtreme(int wantedDim, KdNode<E,K,M> startingNode, MyInteger currentHeight,
-                                  INodeEvaluation<E,K,M> otherSonCheck,
+                                  INodeComparison<E,K,M> comparator, INodeEvaluation<E,K,M> otherSonCheck,
                                   INodeRetrieving<E,K,M> otherSon, INodeRetrieving<E,K,M> baseSon) {
         KdNode<E,K,M> currentNode = startingNode;
+        KdNode<E,K,M> nodeWithExtreme = startingNode;
         LinkedList<NodeToProcess> lNotProcessed = new LinkedList<NodeToProcess>();
         int dim;
         int height = currentHeight.getVal();
 
         while (currentNode != null) {
-//            spracujNODE
-            System.out.println("height= " + height + "; node=" +currentNode.toString());
             dim = (height % this.k) + 1;
-//            if (dim != wantedDim && currentNode.hasLeftSon())  // other dim, must search trough both sons
+            if (comparator.compareNodes(currentNode, nodeWithExtreme)) {
+                nodeWithExtreme = currentNode;
+                currentHeight.setVal(height);
+            }
+            System.out.println("height= " + height + "; node=" +currentNode.toString());
             if (dim != wantedDim && otherSonCheck.evaluateNode(currentNode))  // other dim, must search trough both sons
                 lNotProcessed.addLast(new NodeToProcess(otherSon.retrieveNode(currentNode), height + 1));
-//                lNotProcessed.addLast(new NodeToProcess(currentNode.getLeftSon(), height + 1));
+
             currentNode = baseSon.retrieveNode(currentNode);
-//            currentNode = currentNode.getRightSon();
             if (currentNode != null)
                 height++;
             else if (!lNotProcessed.isEmpty()) {
@@ -216,7 +233,7 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         }
 
         currentHeight.setVal(height);
-        return null;
+        return nodeWithExtreme;
     }
 
     private void inOrderProcessing(INodeProcessing<E,K,M> operation, boolean printHierarchy) {

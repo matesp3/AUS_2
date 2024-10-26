@@ -65,6 +65,10 @@ public class KdNode <T, K extends IKdComparable<K, M>, M extends Comparable<M> >
         return this.usedKey.compareTo(otherKey, dim);
     }
 
+    public int compareTo(KdNode<T,K,M> otherNode, int dim) {
+        return this.compareTo(otherNode.usedKey, dim);
+    }
+
     public void setParent(KdNode<T,K,M> parent) { this.parent = parent; }
     public void setLeftSon(KdNode<T,K,M> leftSon) { this.leftSon = leftSon; }
     public void setRightSon(KdNode<T,K,M> rightSon) { this.rightSon = rightSon; }
