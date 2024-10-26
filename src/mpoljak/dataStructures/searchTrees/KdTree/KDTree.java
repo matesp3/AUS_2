@@ -98,19 +98,6 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
             throw new NullPointerException("CurrentNode should be inserted leaf, but is null.");
     }
 
-    private class MyInteger {
-        private int intVal;
-        MyInteger(int val) { this.intVal = val; }
-
-        public int getVal() {
-            return this.intVal;
-        }
-
-        public void setVal(int val) {
-            this.intVal = val;
-        }
-    }
-
     public List<E> find(K key) {
         MyInteger height = new MyInteger(0);
         KdNode<E,K,M> resultNode = findNodeWithKey(key, this.root, height);
@@ -134,6 +121,28 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         inOrderProcessing(null, true);      // general hierarchical structure
     }
 
+    private class MyInteger {
+        private int intVal;
+        MyInteger(int val) { this.intVal = val; }
+
+        public int getVal() {
+            return this.intVal;
+        }
+
+        public void setVal(int val) {
+            this.intVal = val;
+        }
+    }
+
+    private class NodeToProcess {
+        final int height;
+        final KdNode<E,K,M> nodeToProcess;
+
+        NodeToProcess(KdNode<E,K,M> node, int height) {
+            this.height = height;
+            this.nodeToProcess = node;
+        }
+    }
 
     /**
      * Tries to search in (sub)tree for the first occurrence of node with data, that are searched for.
@@ -174,36 +183,52 @@ public class KDTree<E, K extends IKdComparable<K, M>, M extends Comparable<M> > 
         return currentNode;
     }
 
-    private class NodeToProcess {
-        final int height;
-        final KdNode<E,K,M> nodeToProcess;
-
-        NodeToProcess(KdNode<E,K,M> node, int height) {
-            this.height = height;
-            this.nodeToProcess = node;
-        }
-    }
-
-    public void findMin() {
-        int wantedDim = 1;
-        KdNode<E,K,M> foundMin = findExtreme(wantedDim, this.root.getRightSon(), new MyInteger(0 + 1),
+    /**
+     * By defined node, which represents subtree, searches for the first occurrence of node with maximum in wanted
+     * dimension.
+     * @param wantedDim specifies for which dimension is minimum searched
+     * @param startingNode from which node (included) is minimum searched
+     * @param currentHeight height of startingNode
+     * @return first occurrence of node with found minimum
+     */
+    private KdNode<E,K,M> findMin(int wantedDim, KdNode<E,K,M> startingNode, MyInteger currentHeight) {
+        return findExtreme(wantedDim, startingNode, currentHeight,
                 (node1, node2) -> node1.compareTo(node2, wantedDim) == -1,
                 (node) -> node.hasRightSon(),
                 (node) -> node.getRightSon(),
                 (node) -> node.getLeftSon());
-        System.out.println("Found Min=" + foundMin);
     }
 
-    public void findMax() {
-        int wantedDim = 1;
-        KdNode<E,K,M> foundMax = findExtreme(wantedDim, this.root.getLeftSon(), new MyInteger(0 + 1),
+    /**
+     * By defined node, which represents subtree, searches for the first occurrence of node with maximum in wanted
+     * dimension.
+     * @param wantedDim specifies for which dimension is maximum searched
+     * @param startingNode from which node (included) is maximum searched
+     * @param currentHeight height of startingNode
+     * @return first occurrence of node with found maximum
+     */
+    private KdNode<E,K,M> findMax(int wantedDim, KdNode<E,K,M> startingNode, MyInteger currentHeight) {
+        return findExtreme(wantedDim, startingNode, currentHeight,
                 (node1, node2) -> node1.compareTo(node2, wantedDim) == 1,
                 (node) -> node.hasLeftSon(),
                 (node) -> node.getLeftSon(),
                 (node) -> node.getRightSon());
-        System.out.println("Found Max=" + foundMax);
     }
 
+    /**
+     * By defined node, which represents subtree, searches for the first occurrence of node with extreme in wanted
+     * dimension. Extreme is defined by operations with nodes given in parameters.
+     * @param wantedDim specifies for which dimension is extreme searched
+     * @param startingNode from which node (included) is extreme searched
+     * @param currentHeight height of startingNode
+     * @param comparator defines if currently evaluated node should be lower, equal or greater than currently highest
+     *                   found extreme
+     * @param otherSonCheck defines if left's or right's son existence should be checked (as son of node, that has
+     *                      dimension != wantedDim
+     * @param otherSon defines if left or right son should be retrieved as other son in dimension != wantedDim
+     * @param baseSon defines if left or right son should be retrieved as son in dimension = wantedDim
+     * @return first occurrence of node with found extreme
+     */
     private KdNode<E,K,M> findExtreme(int wantedDim, KdNode<E,K,M> startingNode, MyInteger currentHeight,
                                   INodeComparison<E,K,M> comparator, INodeEvaluation<E,K,M> otherSonCheck,
                                   INodeRetrieving<E,K,M> otherSon, INodeRetrieving<E,K,M> baseSon) {

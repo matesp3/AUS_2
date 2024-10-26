@@ -256,9 +256,9 @@ public class Tester {
 
         kdTree.printTree();
         System.out.println("--MAX--");
-        kdTree.findMax();
+//        kdTree.findMax(); // public no more
         System.out.println("\n--MIN--");
-        kdTree.findMin();
+//        kdTree.findMin(); // public no more
 
     }
 
