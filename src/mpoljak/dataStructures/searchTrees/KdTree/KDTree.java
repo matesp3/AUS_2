@@ -150,6 +150,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                     v.setParent(null);
                 } else {       // substituteNode will be root
                     vSubstitute.setParent(null);
+                    this.root =vSubstitute;
                 }
 //         ============= HANDSHAKE OF SUBSTITUTE AND V.RIGHT SON ==============
                 if (v.hasRightSon()) {
@@ -168,7 +169,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                 }
                 v.setLeftSon(null);
 //                if (vSubstitute.hasNoneSons()) {}
-
+                reinsertionNeeded = true; //TODO TO LEN DOCASNE
             } else {  // v.hasOnlyRightSon
                 vSubstitute = findMin(wantedDim, v.getRightSon(), heightRef);
                 if (!reinsertionNeeded)
@@ -177,7 +178,8 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                     //TODO lToReinsert.add(v);
                 // TODO checkDuplicateKeysInRightSubtree
             }
-        } while (!vSubstitute.hasNoneSons());
+//        } while (!vSubstitute.hasNoneSons());
+        } while (!reinsertionNeeded); //TODO TO LEN DOCASNE
     }
 //  ------------------------------------- V I S U A L I Z A T I O N --------------------------------------------------
     public void printTree() {
