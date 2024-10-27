@@ -302,7 +302,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
             if (!isLeftSubTreeProcessed) {
                 if (current.hasLeftSon()) {
                     if (printHierarchy) {
-                        llb.add(current.hasRightSon());  // if current has both sons
+                        llb.add(new Boolean(current.hasRightSon()));  // if current has both sons
                         level++;
                     }
                     current = current.getLeftSon();
@@ -313,7 +313,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                     if (current.hasRightSon()) {
                         if (printHierarchy) {
                             level++;
-                            llb.add(current.hasLeftSon());  // if current has both sons
+                            llb.add(new Boolean(current.hasLeftSon()));  // if current has both sons
                         }
                         current = current.getRightSon();
 //                        if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
@@ -344,7 +344,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                if (current.hasRightSon()) {
                    if (printHierarchy) {
                        level++;
-                       llb.add(false);// left surely exists, because it was processed && after right son is no other son
+                       llb.add(new Boolean(false));// left surely exists, because it was processed && after right son is no other son
                    }
                    current = current.getRightSon();
 //                   if (printHierarchy) printNode(level, current.getData().toString(), false, llb);
@@ -378,7 +378,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
 
     private static void printNode(int level, String nodeRepr, boolean isLeftSon, ArrayList<Boolean> llb) {
         nodeRepr = nodeRepr == null ? "?" : nodeRepr;
-        String nodeType = String.format("_>(%c):", level == 0 ? 'O' : (isLeftSon) ? 'L' : 'R');   // Root | Left | Right
+        String nodeType = String.format("_>(%s):", (level == 0 ? "O" : (isLeftSon) ? "L" : "R"));   // Root | Left | Right
         String prefix = buildTreePrefix(level, llb, '|' );
         if (!isLeftSon) System.out.println(prefix);
         if (nodeRepr.length() > ROW_NODE_MAX) {
