@@ -3,13 +3,23 @@ package mpoljak.data.forTesting;
 
 import mpoljak.data.GPS;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
+import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
 
-public class MyCoupleInt  implements IKdComparable<MyCoupleInt, Integer>  {
+import java.util.Comparator;
+import java.util.Objects;
+
+public class MyCoupleInt implements IKdComparable<MyCoupleInt>, ISimilar<MyCoupleInt> {
     private int x;
     private int y;
-    public MyCoupleInt(int x, int y) {
+    private String description;
+    public MyCoupleInt(int x, int y, String desc) {
         this.x = x;
         this.y = y;
+        this.description = desc;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public int getX() {
@@ -39,21 +49,21 @@ public class MyCoupleInt  implements IKdComparable<MyCoupleInt, Integer>  {
 
     @Override
     public String toString() {
-        return "[" + x + ", " + y + ']';
+        return "[" + x + ", " + y + "; desc=" + description + "]";
     }
 
     @Override
     public int compareTo(MyCoupleInt other, int dim) {
         if (dim == 1)
-            return Integer.compare(y, other.y);
-        if (dim == 2)
             return Integer.compare(x, other.x);
+        if (dim == 2)
+            return Integer.compare(y, other.y);
         return 0;
     }
 
     @Override
     public MyCoupleInt copyConstruct() {
-        return new MyCoupleInt(x, y);
+        return new MyCoupleInt(x, y, description);
     }
 
     @Override
@@ -66,4 +76,19 @@ public class MyCoupleInt  implements IKdComparable<MyCoupleInt, Integer>  {
         if (other.x > x) x = other.x;
         if (other.y > y) y = other.y;
     }
+
+    @Override
+    public boolean isSameKey(MyCoupleInt other) {
+        if (this == other) return true;
+
+        return x == other.x && y == other.y &&
+                (description == null ? "" : description).compareTo(
+                        other.description == null ? "" : other.description) == 0;
+    }
+
+    @Override
+    public boolean isSame(MyCoupleInt other) {
+        return isSameKey(other);                // because it can behave as key and as data at the same time
+    }
+
 }
