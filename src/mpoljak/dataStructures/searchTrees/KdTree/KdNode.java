@@ -21,6 +21,14 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
     }
 
     /**
+     * Shallow copy of other node
+     * @param other instance of which is shallow copy done
+     */
+    public KdNode(KdNode<D,T,K> other) {
+        this(other.parent, other.leftSon, other.rightSon, other.data, other.usedKey);
+    }
+
+    /**
      * Determines it's worth to search for some key in a subtree.
      * @param wantedKey key that it is being searched for
      * @return

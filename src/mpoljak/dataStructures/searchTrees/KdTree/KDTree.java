@@ -131,14 +131,19 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         int wantedDim = (nodeTP.height % this.k) + 1;   // by which dim it is compared at height of node to delete
         heightRef.setVal(heightRef.intVal() + 1);   // going to the level of left son
 
+        KdNode<E,T,K> subsParent;      // substitute's original parent
+        KdNode<E,T,K> subsLeftSon;    // substitute's original left son
+        KdNode<E,T,K> subsRightSon;  // substitute's original right son
+        KdNode<E,T,K> newParentOfEmptyNode = null;
+
         do {
             if (v.hasLeftSon()) {   // if there's possibility going left, go left
                 vSubstitute = findMax(wantedDim, v.getLeftSon(), heightRef);
+                nodeTP = new NodeToProcess(new KdNode<>(vSubstitute) , heightRef.intVal()); // remember values
                 // need to remember substitute's relationships
-                KdNode<E,T,K> subsParent = vSubstitute.getParent();      // substitute's original parent
-                KdNode<E,T,K> subsLeftSon = vSubstitute.getLeftSon();    // substitute's original left son
-                KdNode<E,T,K> subsRightSon = vSubstitute.getRightSon();  // substitute's original right son
-                KdNode<E,T,K> newParentOfEmptyNode;
+                subsParent = vSubstitute.getParent();
+                subsLeftSon = vSubstitute.getLeftSon();
+                subsRightSon = vSubstitute.getRightSon();
 
                 vSubstitute.setLeftSon(null);
                 vSubstitute.setRightSon(null);
@@ -161,15 +166,23 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                 if (v == subsParent) {
                     newParentOfEmptyNode = vSubstitute;     // ref prepared for new child
                 } else {
-                    newParentOfEmptyNode = subsParent;     // ref prepared for new child
                     subsParent.removeChild(vSubstitute);
+                    newParentOfEmptyNode = subsParent;     // ref prepared for new child
 //         ============= HANDSHAKE OF SUBSTITUTE AND V.LEFT SON ==============
                     v.getLeftSon().setParent(vSubstitute);
                     vSubstitute.setLeftSon(v.getLeftSon());
                 }
                 v.setLeftSon(null);
-//                if (vSubstitute.hasNoneSons()) {}
+
                 reinsertionNeeded = true; //TODO TO LEN DOCASNE
+                v = nodeTP.nodeToProcess;
+                v.setParent(newParentOfEmptyNode);
+                v.setLeftSon(subsLeftSon);
+                v.setRightSon(subsRightSon);
+//                if (v.hasNoneSons())
+//                    break;
+//                heightRef = nodeTP.height;
+
             } else {  // v.hasOnlyRightSon
                 vSubstitute = findMin(wantedDim, v.getRightSon(), heightRef);
                 if (!reinsertionNeeded)
