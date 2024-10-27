@@ -193,7 +193,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
             }
         }
 
-        return currentNode;
+        return null; // out of the cycle there's no more node that meets criteria for equality
     }
 
     /**

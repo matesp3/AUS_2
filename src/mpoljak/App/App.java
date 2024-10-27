@@ -11,11 +11,11 @@ public class App {
         DoubleComparator.getInstance().setEpsilon(0.001);
 
         Tester tester = new Tester();
-        tester.testVillages();
+//        tester.testVillages();
 //        tester.printMaxForRoot();
 //        tester.testSearchOfGPS(100, 10, 25);
 //        tester.debugSearchOfGPS(100,10, 25, 1188562444, -884246284, 1129907258);
-//        tester.testManualInsertion();
+        tester.testManualInsertion();
 //        tester.testRandomInsert(2,2);
 //--------------------------------------------------------------
     }
