@@ -80,11 +80,21 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
     public boolean hasParent() { return this.parent != null; }
     public boolean hasLeftSon() { return this.leftSon != null; }
     public boolean hasRightSon() { return this.rightSon != null; }
+    public boolean hasNoneSons() { return this.leftSon == null && this.rightSon == null; }
 
+    public void removeChild(KdNode<D, T, K> node) {
+        if (node == null)
+            return;
+        if (this.leftSon == node)
+            this.leftSon = null;
+        else if (this.rightSon == node)
+            this.rightSon = null;
+    }
     @Override
     public String toString() {
         return "V{key=" + this.usedKey + "; data=" + data.toString() + '}';
 //        return "V{key=" + this.usedKey + "; maxKey=" + this.maxDimValues + "; data= " + this.data + "}";
     }
+
 
 }

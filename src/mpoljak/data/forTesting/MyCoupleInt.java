@@ -68,7 +68,7 @@ public class MyCoupleInt implements IKdComparable<MyCoupleInt>, ISimilar<MyCoupl
 
     @Override
     public boolean fallsInto(MyCoupleInt other) {
-        return x < other.x && y < other.y;
+        return x <= other.x && y <= other.y;
     }
 
     @Override

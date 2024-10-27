@@ -47,7 +47,7 @@ public class Tester {
 
             System.out.println("    SEARCHING FOR " + myGps1 + " ...\n");
             System.out.println("    ** was inserted " + insertedTimes + "x");
-            printFoundElements(kdTree.find(myGps1));
+            printFoundElements(kdTree.findAll(myGps1));
 //            -----------------------------------------
         }
 
@@ -87,7 +87,7 @@ public class Tester {
 
         System.out.println("    SEARCHING FOR " + myGps1 + " ...\n");
         System.out.println("    ** was inserted " + insertedTimes + "x");
-        printFoundElements(kdTree.find(myGps1));
+        printFoundElements(kdTree.findAll(myGps1));
 //            -----------------------------------------
 
 
@@ -161,37 +161,37 @@ public class Tester {
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g1.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
-        printFoundElements(kdTree.find(g1));
+        printFoundElements(kdTree.findAll(g1));
 
         System.out.println("\n ---------------------------------------------------------------------------- ");
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g2.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
-        printFoundElements(kdTree.find(g2));
+        printFoundElements(kdTree.findAll(g2));
 
         System.out.println("\n ---------------------------------------------------------------------------- ");
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g3.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
-        printFoundElements(kdTree.find(g3));
+        printFoundElements(kdTree.findAll(g3));
 
         System.out.println("\n ---------------------------------------------------------------------------- ");
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g4.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
-        printFoundElements(kdTree.find(g4));
+        printFoundElements(kdTree.findAll(g4));
 
         System.out.println("\n ---------------------------------------------------------------------------- ");
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g5.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
-        printFoundElements(kdTree.find(g5));
+        printFoundElements(kdTree.findAll(g5));
 
         System.out.println("\n ---------------------------------------------------------------------------- ");
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g6.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
-        printFoundElements(kdTree.find(g6));
+        printFoundElements(kdTree.findAll(g6));
     }
 
     public void testFindingExtremes(int insertionsCount, int seedSeed, int gpsSeed, int dirSeed) {
@@ -367,7 +367,22 @@ public class Tester {
         kdTree.insert(i12, i12);
         kdTree.insert(i13, i13);
 
-        kdTree.printTree();
+//      ----------- DELETING LEAVES: OK..
+//        kdTree.printTree();
+//        System.out.println("    -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -");
+//        kdTree.delete(i13, i13);
+//        System.out.println(" > DELETED NODE [KEY=" + i13 + "; DATA=" + i13 + "]");
+//        kdTree.printTree();
+//        System.out.println("    -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -");
+//        kdTree.delete(i12, i12);
+//        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
+//        kdTree.printTree();
+//        System.out.println("    -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -");
+//        kdTree.delete(i5, i5);
+//        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
+//        kdTree.printTree();
+
+//      ----------- DELETING AND REPLACING FROM LEFT SUBTREE... in progress..
 
     }
 
