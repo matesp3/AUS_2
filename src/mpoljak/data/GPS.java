@@ -6,6 +6,8 @@ import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
 import mpoljak.utilities.DoubleComparator;
 
+import java.util.Comparator;
+
 public class GPS implements IKdComparable<GPS>, ISimilar<GPS> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
@@ -147,4 +149,5 @@ public class GPS implements IKdComparable<GPS>, ISimilar<GPS> {
         System.out.println(g8 + " falls into " + g1 + ":" + g8.fallsInto(g1));
         System.out.println(g9 + " falls into " + g1 + ":" + g9.fallsInto(g1));
     }
+
 }

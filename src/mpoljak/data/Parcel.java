@@ -3,6 +3,7 @@ package mpoljak.data;
 import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Parcel implements IGpsLocalizable {
@@ -56,13 +57,40 @@ public class Parcel implements IGpsLocalizable {
         return String.format("Par[id=%d;g1%s;g2%s]", this.parcelId, this.positions[0], this.positions[1]);
     }
 
+//    @Override
+//    public boolean isSame(IGpsLocalizable other) {
+//        if (!(other instanceof Parcel)) return false;
+//        Parcel otherParcel = (Parcel) other;
+//        return this.parcelId == otherParcel.parcelId &&
+//                this.positions[0].isSame(otherParcel.positions[0]) && this.positions[1].isSame(otherParcel.positions[1]);
+////                && (this.description == null ? "" : this.description).
+////                    compareTo(other.description == null ? "" : other.description) == 0;
+//    }
+
+
+//    @Override
+//    public int compare(Parcel o1, Parcel o2) {
+//        return 0;
+//    }
+//
+//    @Override
+//    public int compare(GeoData o1, GeoData o2) {
+//        return 0;
+//    }
+
+
     @Override
-    public boolean isSame(IGpsLocalizable other) {
-        if (!(other instanceof Parcel)) return false;
-        Parcel otherParcel = (Parcel) other;
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Parcel)) return false;
+        Parcel otherParcel = (Parcel) obj;
         return this.parcelId == otherParcel.parcelId &&
                 this.positions[0].isSame(otherParcel.positions[0]) && this.positions[1].isSame(otherParcel.positions[1]);
 //                && (this.description == null ? "" : this.description).
 //                    compareTo(other.description == null ? "" : other.description) == 0;
+    }
+
+    @Override
+    public boolean isSame(IGpsLocalizable other) {
+        return false;
     }
 }

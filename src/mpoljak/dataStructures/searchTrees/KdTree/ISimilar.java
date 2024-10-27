@@ -9,5 +9,5 @@ public interface ISimilar<D> {
      * @return  true, if both instances are the same or their all inner values are same (as it was done deep copy of one
      * of them).
      */
-    public boolean isSame(D other);
+    public  boolean isSame(D other);
 }

@@ -1,9 +1,6 @@
 package mpoljak.dataStructures.searchTrees.KdTree.Testing;
 
-import mpoljak.data.GPS;
-import mpoljak.data.IGpsLocalizable;
-import mpoljak.data.Parcel;
-import mpoljak.data.Property;
+import mpoljak.data.*;
 import mpoljak.data.forTesting.MyCoupleInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
@@ -34,7 +31,7 @@ public class Tester {
             System.out.println(String.format("\n    ----------------------------------------------------\n" +
                     "Iteration %d: seed=%s; gpsSeed=%s; directionSeed=%s", a+ 1, "" + seedSeed, "" + gpsSeed, "" + dirSeed));
 //            -----------------------------------------
-            KDTree<Property, GPS> kdTree = new KDTree<Property, GPS>(2);
+            KDTree<Property, IGpsLocalizable, GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
             GPS myGps1 = generateGPS(gpsGen, dirGen);
             GPS myGps2 = generateGPS(gpsGen, dirGen);
             Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2);
@@ -72,7 +69,9 @@ public class Tester {
         dirGen.setSeed(dirSeed);
         System.out.println("Iteration " + (a+ 1) + ". seed=" +  seedSeed + "; gpsSeed=" + gpsSeed + "; directionSeed=" + dirSeed);
 //            -----------------------------------------
-        KDTree<Property, GPS> kdTree = new KDTree<Property, GPS>(2);
+        KDTree<Property, IGpsLocalizable, GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
+//        KDTree<Parcel, GPS> kdTree = new KDTree<>(2);
+//        KDTree<GeoData, GPS> kdTree = new KDTree<>(2);
         GPS myGps1 = generateGPS(gpsGen, dirGen);
         GPS myGps2 = generateGPS(gpsGen, dirGen);
         Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2);
@@ -104,7 +103,7 @@ public class Tester {
         System.out.println("        INSERTING '" + className + "' based on GPS positions, tree built by GPS_1\n         " +
                 "---------------------------------------------------------");
         int id = 1;
-        KDTree<Property, GPS> kdTree = new KDTree<Property, GPS>(2);
+        KDTree<Property, IGpsLocalizable,  GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
 //        KDTree<Parcel, Double> kdTree = new KDTree<Parcel, Double>(2, 1);
 //        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
         for (int a = 0; a < seedCount; a++) {
@@ -115,7 +114,7 @@ public class Tester {
                 GPS g2 = generateGPS(gpsGen, dirGen);
 
                 Property p = new Property(id++, null, g1, g2);
-//                Parcel p = new Parcel(id++, null, g1, g2);
+                Parcel par = new Parcel(id++, null, g1, g2);
 
                 kdTree.insert(p.getPositions()[0], p); // inserted by first GPS
                 System.out.println("\n ---------------------------------------------------------------------------- ");
@@ -148,7 +147,7 @@ public class Tester {
         GPS g5 = generateGPS(gpsGen, dirGen);
         GPS g6 = generateGPS(gpsGen, dirGen);
 
-        KDTree<GPS, GPS> kdTree = new KDTree<>(2);
+        KDTree<GPS, GPS, GPS> kdTree = new KDTree<>(2);
         kdTree.insert(g1, g1);
         kdTree.insert(g2,g2);
         kdTree.insert(g3,g3);
@@ -181,7 +180,7 @@ public class Tester {
     }
 
     private static void testInsertingBothParcelsAndProperties() {
-        KDTree<IGpsLocalizable, GPS> kdTreeBoth = new KDTree<>(2);
+        KDTree<IGpsLocalizable, IGpsLocalizable, GPS> kdTreeBoth = new KDTree<>(2);
         GPS g1 = new GPS('N', 27.87, 'W', 25.4);
         GPS g2 = new GPS('S', 79.87, 'E', 52.4);
         Parcel par = new Parcel(1, "", g1, g2);
@@ -204,7 +203,7 @@ public class Tester {
         return new GPS(chLat, lat, chLon, lon);
     }
 
-    private static void insertElements(long insertionsCount, KDTree<Property, GPS> kdTree, Random dirGenerator, Random
+    private static void insertElements(long insertionsCount, KDTree<Property, IGpsLocalizable, GPS> kdTree, Random dirGenerator, Random
             valGenerator, int nextId) {
         for (int i = 0; i < insertionsCount; i++) {
             GPS g1 = generateGPS(valGenerator, dirGenerator);
@@ -236,7 +235,7 @@ public class Tester {
         MyCoupleInt i15 = new MyCoupleInt(120,5, "");
         MyCoupleInt i16 = new MyCoupleInt(180,5, "");
 
-        KDTree<MyCoupleInt, MyCoupleInt> kdTree = new KDTree<MyCoupleInt, MyCoupleInt>(2);
+        KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt> kdTree = new KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt>(2);
         kdTree.insert(i1, i1);
         kdTree.insert(i2, i2);
         kdTree.insert(i3, i3);
@@ -278,7 +277,7 @@ public class Tester {
         MyCoupleInt i12 = new MyCoupleInt(29,46, "Bojnice");
         MyCoupleInt i13 = new MyCoupleInt(27,43, "Novaky");
 
-        KDTree<MyCoupleInt, MyCoupleInt> kdTree = new KDTree<MyCoupleInt, MyCoupleInt>(2);
+        KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt> kdTree = new KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt>(2);
         kdTree.insert(i1, i1);
         kdTree.insert(i2, i2);
         kdTree.insert(i3, i3);

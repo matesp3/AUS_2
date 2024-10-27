@@ -5,9 +5,10 @@ import mpoljak.data.GPS;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
 
+import java.util.Comparator;
 import java.util.Objects;
 
-public class MyCoupleInt  implements IKdComparable<MyCoupleInt>, ISimilar<MyCoupleInt> {
+public class MyCoupleInt implements IKdComparable<MyCoupleInt>, ISimilar<MyCoupleInt> {
     private int x;
     private int y;
     private String description;
@@ -89,4 +90,5 @@ public class MyCoupleInt  implements IKdComparable<MyCoupleInt>, ISimilar<MyCoup
     public boolean isSame(MyCoupleInt other) {
         return isSameKey(other);                // because it can behave as key and as data at the same time
     }
+
 }
