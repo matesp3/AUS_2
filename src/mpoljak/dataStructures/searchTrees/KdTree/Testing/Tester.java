@@ -233,9 +233,9 @@ public class Tester {
 //        kdTree.printTree();
         System.out.println("MIN=" + min + "; MAX=" + max);
         System.out.println("  >>>  FOUND:");
-        System.out.println(" - - - M I N I M U M - - - ");
+        System.out.println(" ===== M I N I M U M ===== ");
         kdTree.printRootMin();
-        System.out.println(" - - - M A X I M U M - - - ");
+        System.out.println(" ===== M A X I M U M ===== ");
         kdTree.printRootMax();
     }
 
