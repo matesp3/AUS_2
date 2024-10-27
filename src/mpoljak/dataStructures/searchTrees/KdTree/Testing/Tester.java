@@ -194,6 +194,51 @@ public class Tester {
         printFoundElements(kdTree.find(g6));
     }
 
+    public void testFindingExtremes(int insertionsCount, int seedSeed, int gpsSeed, int dirSeed) {
+        Random seedGen = new Random();
+        Random gpsGen = new Random();
+        Random dirGen = new Random();
+        int seedCount = 1;
+        int id = 1;
+        int a = 0;
+        KDTree<Property, IGpsLocalizable, GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
+        GPS max = new GPS('S', 90.0, 'W', 180); // starting from minimum
+        GPS min = new GPS('N', 90.0, 'E', 180); // starting from maximum
+
+//        for (int a = 0; a < seedCount; a++) {
+        if (seedSeed < 0)
+            seedSeed = seedGen.nextInt();
+        if (gpsSeed < 0)
+            gpsSeed = seedGen.nextInt();
+        if (dirSeed < 0)
+            dirSeed = seedGen.nextInt();
+        seedGen.setSeed(seedSeed);
+        gpsGen.setSeed(gpsSeed);
+        dirGen.setSeed(dirSeed);
+        System.out.println(String.format("\n    ----------------------------------------------------\n" +
+                "Iteration %d: seed=%s; gpsSeed=%s; directionSeed=%s", a+ 1, "" + seedSeed, "" + gpsSeed, "" + dirSeed));
+//            -----------------------------------------
+
+        for (int i = 0; i < insertionsCount; i++) {
+            GPS g1 = generateGPS(gpsGen, dirGen);
+            GPS g2 = generateGPS(gpsGen, dirGen);
+            Property p = new Property(id++, null, g1, g2);
+            kdTree.insert(g1, p); // inserted by first GPS
+            if (g1.compareTo(min, 1) == -1)
+                min = g1;
+            if (g1.compareTo(max, 1) == 1)
+                max = g1;
+        }
+//        }
+//        kdTree.printTree();
+        System.out.println("MIN=" + min + "; MAX=" + max);
+        System.out.println("  >>>  FOUND:");
+        System.out.println(" - - - M I N I M U M - - - ");
+        kdTree.printRootMin();
+        System.out.println(" - - - M A X I M U M - - - ");
+        kdTree.printRootMax();
+    }
+
 //    |
 //   |_>-----------------------> PRIVATE >---------------------v
 //                                                             |

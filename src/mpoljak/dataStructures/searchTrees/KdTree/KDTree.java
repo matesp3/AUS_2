@@ -196,6 +196,23 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         return null; // out of the cycle there's no more node that meets criteria for equality
     }
 
+    public void printRootMin() {
+        KdNode<E,T,K> min = findMin(1,this.root.getLeftSon(),new MyInteger(1));
+        System.out.println("  -  MIN to the root's LEFT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
+
+        min = findMin(1,this.root.getRightSon(),new MyInteger(1));
+        System.out.println("  -  MIN to the root's RIGHT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
+    }
+
+    public void printRootMax() {
+        System.out.println(root);
+        KdNode<E,T,K> max = findMax(1,this.root.getLeftSon(),new MyInteger(1));
+        System.out.println("  +  MAX to the root's LEFT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
+
+        max = findMax(1,this.root.getRightSon(),new MyInteger(1));
+        System.out.println("  +  MAX to the root's RIGHT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
+    }
+
     /**
      * By defined node, which represents subtree, searches for the first occurrence of node with maximum in wanted
      * dimension.
@@ -257,7 +274,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                 nodeWithExtreme = currentNode;
                 currentHeight.setVal(height);
             }
-            System.out.println("height= " + height + "; node=" +currentNode.toString());
+//            System.out.println("height= " + height + "; node=" +currentNode.toString());
             if (dim != wantedDim && otherSonCheck.evaluateNode(currentNode))  // other dim, must search trough both sons
                 lNotProcessed.addLast(new NodeToProcess(otherSon.retrieveNode(currentNode), height + 1));
 
