@@ -382,8 +382,8 @@ public class Tester {
 //        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
 //        kdTree.printTree();
 
-//      ----------- DELETING AND REPLACING FROM LEFT SUBTREE... in progress..
-
+//      ----------- TODO - DELETING AND REPLACING FROM LEFT SUBTREE... in progress..
+        kdTree.delete(i9, i9);
     }
 
 //        MyInt i1 = new MyInt(5);
