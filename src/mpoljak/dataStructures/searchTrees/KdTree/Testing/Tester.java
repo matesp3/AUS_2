@@ -158,10 +158,40 @@ public class Tester {
         kdTree.printTree();
 
         System.out.println("\n ---------------------------------------------------------------------------- ");
+        System.out.println(" SEARCHING FOR NODE WITH DATA: " + g1.toString());
+        System.out.println(" ---------------------------------------------------------------------------- ");
+
+        printFoundElements(kdTree.find(g1));
+
+        System.out.println("\n ---------------------------------------------------------------------------- ");
+        System.out.println(" SEARCHING FOR NODE WITH DATA: " + g2.toString());
+        System.out.println(" ---------------------------------------------------------------------------- ");
+
+        printFoundElements(kdTree.find(g2));
+
+        System.out.println("\n ---------------------------------------------------------------------------- ");
+        System.out.println(" SEARCHING FOR NODE WITH DATA: " + g3.toString());
+        System.out.println(" ---------------------------------------------------------------------------- ");
+
+        printFoundElements(kdTree.find(g3));
+
+        System.out.println("\n ---------------------------------------------------------------------------- ");
+        System.out.println(" SEARCHING FOR NODE WITH DATA: " + g4.toString());
+        System.out.println(" ---------------------------------------------------------------------------- ");
+
+        printFoundElements(kdTree.find(g4));
+
+        System.out.println("\n ---------------------------------------------------------------------------- ");
         System.out.println(" SEARCHING FOR NODE WITH DATA: " + g5.toString());
         System.out.println(" ---------------------------------------------------------------------------- ");
 
         printFoundElements(kdTree.find(g5));
+
+        System.out.println("\n ---------------------------------------------------------------------------- ");
+        System.out.println(" SEARCHING FOR NODE WITH DATA: " + g6.toString());
+        System.out.println(" ---------------------------------------------------------------------------- ");
+
+        printFoundElements(kdTree.find(g6));
     }
 
 //    |
