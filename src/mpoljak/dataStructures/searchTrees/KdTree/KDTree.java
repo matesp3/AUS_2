@@ -1,4 +1,6 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
+import mpoljak.data.forTesting.MyCoupleInt;
+
 import java.util.ArrayList;
 import java.lang.Integer;
 import java.util.Comparator;
@@ -53,16 +55,12 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
     }
 
     public void insert(K key, E data) {
-        /*
-            * k1 <= node.k1: go left+
-            * if k1 > node.k1: go right
-            * height <0,h>, h+1 levels
-         */
         if (this.root == null) {
             this.root = new KdNode<E,T,K>(null, null, null, data, key);
             return;
         }
-
+//        * k1 <= node.k1: go left; if k1 > node.k1: go right
+//        * height <0,h>, h+1 levels
         KdNode<E,T,K> currentNode = this.root;
         boolean inserted = false;
         int height = 0; // from 0, in order to start with dim = 1, which is the lowest acceptable number of dim
@@ -101,39 +99,58 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
             throw new NullPointerException("CurrentNode should be inserted leaf, but is null.");
     }
 
-    public List<KdNode<E,T,K>> find(K key) {
-        MyInteger height = new MyInteger(0);
-        KdNode<E,T,K> resultNode = findNodeWithKey(key, this.root, height);
-
-        if (resultNode == null)
+    /**
+     * Finds all nodes, whose key value is equal to wanted key value
+     * @param key wanted key
+     * @return nodes with wanted key value
+     */
+    public List<E> findAll(K key) {
+        List<NodeToProcess> lFound = this.findDuplicates(key);
+        if (lFound == null)
             return null;
-        List<KdNode<E,T,K>> foundNodes = new ArrayList<>();
-        do {
-            foundNodes.add(resultNode);
-            height.setVal(height.getVal() + 1); // because i'm passing left son as parameter, so height has changed
-            resultNode = findNodeWithKey(key, resultNode.getLeftSon(), height);
-        } while (resultNode != null);
 
-        return foundNodes;
+        List<E> lToReturn = new LinkedList<>();
+        for (NodeToProcess n : lFound)
+            lToReturn.add(n.nodeToProcess.getData());
+        return lToReturn;
     }
 
-    public void remove(K key) {}
+    public void delete(K key, E data) {
+        NodeToProcess nodeTP = this.findUnique(key, data);
+        if (nodeTP == null)
+            return;
+        KdNode<E,T,K> v = nodeTP.nodeToProcess;
+        MyInteger height = new MyInteger(nodeTP.height);
 
+        if (v.hasNoneSons()) {
+            v.getParent().removeChild(v);
+            return;
+        }
+    }
+//  ------------------------------------- V I S U A L I Z A T I O N --------------------------------------------------
     public void printTree() {
 //        inOrderProcessing(operationPrint, false);    // in-order for 1-dimension
         inOrderProcessing(null, true);      // general hierarchical structure
     }
 
-    public void deleteFromLefSubtree(K key, E data, int height) {
-        List<KdNode<E,T,K>> lFound = this.find(key);
-        KdNode<E,T,K> foundNode = null;
-        for (KdNode<E,T,K> node : lFound) {
-            if (data.isSame(node.getData())) {
+    public void printRootMin() {
+        KdNode<E,T,K> min = findMin(1,this.root.getLeftSon(),new MyInteger(1));
+        System.out.println("  -  MIN to the root's LEFT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
 
-            }
-        }
+        min = findMin(1,this.root.getRightSon(),new MyInteger(1));
+        System.out.println("  -  MIN to the root's RIGHT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
     }
 
+    public void printRootMax() {
+        System.out.println(root);
+        KdNode<E,T,K> max = findMax(1,this.root.getLeftSon(),new MyInteger(1));
+        System.out.println("  +  MAX to the root's LEFT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
+
+        max = findMax(1,this.root.getRightSon(),new MyInteger(1));
+        System.out.println("  +  MAX to the root's RIGHT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
+    }
+
+// -------------------------------------------- P R I V A T E -------------------------------------------------------
     private class MyInteger {
         private int intVal;
         MyInteger(int val) { this.intVal = val; }
@@ -155,6 +172,48 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
             this.height = height;
             this.nodeToProcess = node;
         }
+    }
+
+    /**
+     * Finds node with unique combination of key and data
+     * @param key wanted key
+     * @param data wanted data
+     * @return wrapping type for wanted node with its height in the tree
+     */
+    private NodeToProcess findUnique(K key, E data) {
+        List<NodeToProcess> lFound = this.findDuplicates(key);
+        if (lFound == null)
+            return null;
+
+        NodeToProcess foundNode = null;
+        for (NodeToProcess v : lFound) {
+            if (data.isSame(v.nodeToProcess.getData())) {
+                foundNode = v;
+                break;
+            }
+        }
+        return foundNode;
+    }
+
+    /**
+     * Finds all nodes, whose key value is equal to wanted key value
+     * @param key wanted key
+     * @return nodes with wanted key value
+     */
+    private List<NodeToProcess> findDuplicates(K key) {
+        MyInteger height = new MyInteger(0);
+        KdNode<E,T,K> resultNode = findNodeWithKey(key, this.root, height);
+
+        if (resultNode == null)
+            return null;
+        List<NodeToProcess> foundNodes = new ArrayList<>();
+        do {
+            foundNodes.add(new NodeToProcess(resultNode, height.getVal()));
+            height.setVal(height.getVal() + 1); // because i'm passing left son as parameter, so height has changed
+            resultNode = findNodeWithKey(key, resultNode.getLeftSon(), height);
+        } while (resultNode != null);
+
+        return foundNodes;
     }
 
     /**
@@ -194,23 +253,6 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         }
 
         return null; // out of the cycle there's no more node that meets criteria for equality
-    }
-
-    public void printRootMin() {
-        KdNode<E,T,K> min = findMin(1,this.root.getLeftSon(),new MyInteger(1));
-        System.out.println("  -  MIN to the root's LEFT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
-
-        min = findMin(1,this.root.getRightSon(),new MyInteger(1));
-        System.out.println("  -  MIN to the root's RIGHT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
-    }
-
-    public void printRootMax() {
-        System.out.println(root);
-        KdNode<E,T,K> max = findMax(1,this.root.getLeftSon(),new MyInteger(1));
-        System.out.println("  +  MAX to the root's LEFT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
-
-        max = findMax(1,this.root.getRightSon(),new MyInteger(1));
-        System.out.println("  +  MAX to the root's RIGHT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
     }
 
     /**
