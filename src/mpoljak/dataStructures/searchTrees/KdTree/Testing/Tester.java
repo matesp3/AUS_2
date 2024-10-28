@@ -382,27 +382,31 @@ public class Tester {
 //        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
 //        kdTree.printTree();
 
-//      ----------- DELETING AND REPLACING FROM LEFT SUBTREE: OK...
-//        kdTree.printTree(); // tlmace -urad <= Tlmace - nem.
-//        kdTree.delete(i7, i7);
-//        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
-//        kdTree.printTree();
+//      ----------- DELETING AND REPLACING FROM LEFT SUBTREE: OK..
+        kdTree.printTree();     // Nitra <= Senica
+        kdTree.delete(i1, i1);
+        System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
 
-//        kdTree.printTree();     // Nitra <= Senica
-//        kdTree.delete(i1, i1);
-//        System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
-//        kdTree.printTree();
+        kdTree.printTree();     // Senica - stanica <= Hodonin
+        kdTree.delete(i4, i4);
+        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
 
+        kdTree.printTree();     // Hodonin
+        kdTree.delete(i6, i6);
+        System.out.println(" > DELETED NODE [KEY=" + i6 + "; DATA=" + i6 + "]");
+
+        kdTree.printTree();     // Senica - urad
+        kdTree.delete(i5, i5);
+        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
+
+        kdTree.printTree();     // Senica - skola
+        kdTree.delete(i3, i3);
+        System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
+
+//        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
 //        kdTree.printTree();     // Senica <= Senica - urad
 //        kdTree.delete(i2, i2);
 //        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
-//        kdTree.printTree();
-
-//        kdTree.printTree();     // Senica - stanica <= Hodonin
-//        kdTree.delete(i4, i4);
-//        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
-//        kdTree.printTree();
-//        kdTree.delete(i9, i9);
     }
 
 //        MyInt i1 = new MyInt(5);
