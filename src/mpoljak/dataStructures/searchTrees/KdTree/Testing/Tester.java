@@ -382,7 +382,7 @@ public class Tester {
 //        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
 //        kdTree.printTree();
 
-//      ----------- TODO - DELETING AND REPLACING FROM LEFT SUBTREE... in progress..
+//      ----------- DELETING AND REPLACING FROM LEFT SUBTREE: OK...
 //        kdTree.printTree(); // tlmace -urad <= Tlmace - nem.
 //        kdTree.delete(i7, i7);
 //        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
@@ -398,10 +398,10 @@ public class Tester {
 //        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
 //        kdTree.printTree();
 
-        kdTree.printTree();     // Senica - stanica <= Hodonin
-        kdTree.delete(i4, i4);
-        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
-        kdTree.printTree();
+//        kdTree.printTree();     // Senica - stanica <= Hodonin
+//        kdTree.delete(i4, i4);
+//        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
+//        kdTree.printTree();
 //        kdTree.delete(i9, i9);
     }
 
