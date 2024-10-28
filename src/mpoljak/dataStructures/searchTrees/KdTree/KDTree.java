@@ -133,6 +133,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         }
 
         boolean reinsertionNeeded = false;
+        LinkedList<KdNode<E,T,K>> lToDelete = new LinkedList<>();
         List<KdNode<E,T,K>> lToReinsert = new LinkedList<>(); //nodes deleted from right subtree that need to be reins.
         KdNode<E,T,K> vSubstitute;
 
@@ -196,11 +197,9 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
 
             } else {  // v.hasOnlyRightSon
                 vSubstitute = findMin(wantedDim, vForRepl.getRightSon(), heightRef);
-                if (!reinsertionNeeded)
-                    reinsertionNeeded = true;
-//                else
-                    //TODO lToReinsert.add(v);
-                // TODO checkDuplicateKeysInRightSubtree
+                nodeTP = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
+                this.findAllEqualInDim(vForRepl, wantedDim, vSubstitute.getUsedKey(), lToDelete);
+//                TODO deleting from the right subtree
             }
         } while (!vForRepl.hasNoneSons());
     }
@@ -248,6 +247,27 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         NodeToProcess(KdNode<E,T,K> node, int height) {
             this.height = height;
             this.nodeToProcess = node;
+        }
+    }
+
+    /**
+     * Finds all nodes which are equal for key in given dimension
+     * @param startingNode node, where search starts
+     * @param lFound adds found elements to this list
+     */
+    private void findAllEqualInDim(KdNode<E,T,K> startingNode, int dim, K key, LinkedList<KdNode<E,T,K>> lFound) {
+        KdNode<E,T,K> currentNode = startingNode;
+        LinkedList<KdNode<E,T,K>> lNotProcessed = new LinkedList<>();
+
+        while (currentNode != null) {
+            if (currentNode.compareTo(key, dim) == 0)
+                lFound.addLast(currentNode);
+            if (currentNode.hasRightSon())
+                lNotProcessed.addLast(currentNode.getRightSon());
+
+            currentNode = currentNode.getLeftSon();
+            if (currentNode == null && !lNotProcessed.isEmpty())
+                currentNode = lNotProcessed.removeLast();
         }
     }
 

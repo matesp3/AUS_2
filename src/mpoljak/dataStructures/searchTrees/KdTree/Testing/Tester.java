@@ -387,10 +387,6 @@ public class Tester {
         kdTree.delete(i1, i1);
         System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
 
-//        kdTree.printTree();     // Senica <= Senica - urad
-//        kdTree.delete(i2, i2);
-//        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
-
         kdTree.printTree();     // Senica - stanica <= Hodonin
         kdTree.delete(i4, i4);
         System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
@@ -408,7 +404,9 @@ public class Tester {
         System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
 
 //        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
-        kdTree.printTree();
+//        kdTree.printTree();     // Senica <= Senica - urad
+//        kdTree.delete(i2, i2);
+//        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
     }
 
 //        MyInt i1 = new MyInt(5);
