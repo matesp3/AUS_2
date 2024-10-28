@@ -404,9 +404,15 @@ public class Tester {
         System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
 
 //        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
-//        kdTree.printTree();     // Senica <= Senica - urad
-//        kdTree.delete(i2, i2);
-//        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
+//        kdTree.printTree();     // Bojnice
+//        kdTree.delete(i12, i12);
+//        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i2, i2);
+        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
+
+        kdTree.printTree();
     }
 
 //        MyInt i1 = new MyInt(5);
