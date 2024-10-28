@@ -1,9 +1,7 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
-import mpoljak.data.forTesting.MyCoupleInt;
 
 import java.util.ArrayList;
 import java.lang.Integer;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -115,17 +113,96 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         return lToReturn;
     }
 
+
+
+
+
     public void delete(K key, E data) {
         NodeToProcess nodeTP = this.findUnique(key, data);
         if (nodeTP == null)
             return;
-        KdNode<E,T,K> v = nodeTP.nodeToProcess;
-        MyInteger height = new MyInteger(nodeTP.height);
+        KdNode<E,T,K> vForRepl = nodeTP.nodeToProcess; // node to delete
+        MyInteger heightRef = new MyInteger(nodeTP.height);
 
-        if (v.hasNoneSons()) {
-            v.getParent().removeChild(v);
+        if (vForRepl.hasNoneSons()) {
+            if (vForRepl == this.root)
+                this.root = null;
+            else
+                vForRepl.getParent().removeChild(vForRepl);
             return;
         }
+
+        boolean reinsertionNeeded = false;
+        List<KdNode<E,T,K>> lToReinsert = new LinkedList<>(); //nodes deleted from right subtree that need to be reins.
+        KdNode<E,T,K> vSubstitute;
+
+        KdNode<E,T,K> subsParent;      // substitute's original parent
+        KdNode<E,T,K> subsLeftSon;    // substitute's original left son
+        KdNode<E,T,K> subsRightSon;  // substitute's original right son
+        KdNode<E,T,K> newParentOfEmptyNode = null;
+
+        do {
+            int wantedDim = (nodeTP.height % this.k) + 1;   // by which dim it is compared at height of node to delete
+            heightRef.setVal(heightRef.intVal() + 1);   // going to the level of left/right son
+
+            if (vForRepl.hasLeftSon()) {   // if there's possibility going left, go left
+                vSubstitute = findMax(wantedDim, vForRepl.getLeftSon(), heightRef);
+                nodeTP = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
+                // need to remember substitute's relationships
+                subsParent = vSubstitute.getParent();
+                subsLeftSon = vSubstitute.getLeftSon();
+                subsRightSon = vSubstitute.getRightSon();
+
+                vSubstitute.setLeftSon(null);
+                vSubstitute.setRightSon(null);
+
+//         ============= HANDSHAKE OF SUBSTITUTE AND V.PARENT ==============
+                if (vForRepl.getParent() != null) {
+                    vSubstitute.setParent(vForRepl.getParent());               // set newNode as parent's child
+
+                    if (vForRepl.getParent().isRightSon(vForRepl))
+                        vForRepl.getParent().setRightSon(vSubstitute);
+                    else
+                        vForRepl.getParent().setLeftSon(vSubstitute);
+
+                    vForRepl.setParent(null);
+                } else {       // substituteNode will be root
+                    vSubstitute.setParent(null);
+                    this.root =vSubstitute;
+                }
+//         ============= HANDSHAKE OF SUBSTITUTE AND V.RIGHT SON ==============
+                if (vForRepl.hasRightSon()) {
+                    vForRepl.getRightSon().setParent(vSubstitute);
+                    vSubstitute.setRightSon(vForRepl.getRightSon());
+                    vForRepl.setRightSon(null);
+                }
+                if (vForRepl == subsParent) {
+                    newParentOfEmptyNode = vSubstitute;     // ref prepared for new child
+                    vSubstitute.setLeftSon(subsLeftSon);    // reassigning original left son
+                } else {
+                    subsParent.removeChild(vSubstitute);
+                    newParentOfEmptyNode = subsParent;     // ref prepared for new child
+//         ============= HANDSHAKE OF SUBSTITUTE AND V.LEFT SON ==============
+                    vForRepl.getLeftSon().setParent(vSubstitute);
+                    vSubstitute.setLeftSon(vForRepl.getLeftSon());
+                }
+                vForRepl.setLeftSon(null);
+//         ============= UPDATE OF NODE TO PROCESS ==============
+                heightRef.setVal(nodeTP.height);
+                vForRepl = nodeTP.nodeToProcess;
+                vForRepl.setParent(newParentOfEmptyNode);
+                vForRepl.setLeftSon(subsLeftSon);
+                vForRepl.setRightSon(subsRightSon);
+
+            } else {  // v.hasOnlyRightSon
+                vSubstitute = findMin(wantedDim, vForRepl.getRightSon(), heightRef);
+                if (!reinsertionNeeded)
+                    reinsertionNeeded = true;
+//                else
+                    //TODO lToReinsert.add(v);
+                // TODO checkDuplicateKeysInRightSubtree
+            }
+        } while (!vForRepl.hasNoneSons());
     }
 //  ------------------------------------- V I S U A L I Z A T I O N --------------------------------------------------
     public void printTree() {
@@ -155,7 +232,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         private int intVal;
         MyInteger(int val) { this.intVal = val; }
 
-        public int getVal() {
+        public int intVal() {
             return this.intVal;
         }
 
@@ -208,8 +285,8 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
             return null;
         List<NodeToProcess> foundNodes = new ArrayList<>();
         do {
-            foundNodes.add(new NodeToProcess(resultNode, height.getVal()));
-            height.setVal(height.getVal() + 1); // because i'm passing left son as parameter, so height has changed
+            foundNodes.add(new NodeToProcess(resultNode, height.intVal()));
+            height.setVal(height.intVal() + 1); // because i'm passing left son as parameter, so height has changed
             resultNode = findNodeWithKey(key, resultNode.getLeftSon(), height);
         } while (resultNode != null);
 
@@ -227,13 +304,14 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
             return null;
 
         KdNode<E,T,K> currentNode = startingNode;
-        int height = currentHeight.getVal();
+        int height = currentHeight.intVal();
         int cmp = Integer.MIN_VALUE;
         int dim = Integer.MIN_VALUE;
 
         // (k1 <= node.k1: go left) ; (k1 > node.k1: go right)
         // height <0,h>
-        while (currentNode != null && currentNode.canExistInSubtree(key)) {
+//        while (currentNode != null && currentNode.canExistInSubtree(key)) { // TODO docasne zakomentovane
+        while (currentNode != null) {
             dim = (height++ % this.k) + 1;
             cmp = currentNode.compareTo(key, dim);
             if (cmp == 0) {
@@ -308,11 +386,11 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
         KdNode<E,T,K> nodeWithExtreme = startingNode;
         LinkedList<NodeToProcess> lNotProcessed = new LinkedList<NodeToProcess>();
         int dim;
-        int height = currentHeight.getVal();
+        int height = currentHeight.intVal();
 
         while (currentNode != null) {
             dim = (height % this.k) + 1;
-            if (comparator.compareNodes(currentNode, nodeWithExtreme)) {
+            if (comparator.compareNodes(currentNode, nodeWithExtreme)) {    // can be evaluated for any level of tree
                 nodeWithExtreme = currentNode;
                 currentHeight.setVal(height);
             }
@@ -328,8 +406,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
                 currentNode = lNotProcessed.removeLast().nodeToProcess;
             }
         }
-
-        currentHeight.setVal(height);
+//        currentHeight.setVal(height);
         return nodeWithExtreme;
     }
 

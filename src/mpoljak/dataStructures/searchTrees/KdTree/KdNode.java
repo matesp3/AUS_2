@@ -5,7 +5,7 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
     private KdNode<D,T,K> parent;
     private KdNode<D,T,K> leftSon;
     private KdNode<D,T,K> rightSon;
-    private final D  data;
+    private final D data;
     private final K usedKey;
     private final K maxDimValues; // but values inside will be modified
 
@@ -18,6 +18,14 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
         this.data = data;
         this.usedKey = usedKey;
         this.maxDimValues = usedKey.copyConstruct();
+    }
+
+    /**
+     * Shallow copy of other node
+     * @param other instance of which is shallow copy done
+     */
+    public KdNode(KdNode<D,T,K> other) {
+        this(other.parent, other.leftSon, other.rightSon, other.data, other.usedKey);
     }
 
     /**
@@ -83,13 +91,50 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
     public boolean hasNoneSons() { return this.leftSon == null && this.rightSon == null; }
 
     public void removeChild(KdNode<D, T, K> node) {
-        if (node == null)
-            return;
-        if (this.leftSon == node)
-            this.leftSon = null;
-        else if (this.rightSon == node)
-            this.rightSon = null;
+        this.replaceChild(node, null);
     }
+
+    public void replaceChild(KdNode<D, T, K> originNode, KdNode<D,T,K> newNode) {
+        if (originNode == null)
+            return;
+        if (this.leftSon == originNode)
+            this.leftSon = newNode;
+        else if (this.rightSon == originNode)
+            this.rightSon = newNode;
+    }
+
+
+    /**
+     * Replaces calling instance on its position with other node - substitute - by replacing all related connections.
+     * The condition that substitute exists in the subtree of the node, that is going to be replaced, must be true!
+     * All connections of calling instance will be removed.
+     * @param substitute
+     * @return self
+     */
+    public KdNode<D,T,K> selfsubstitute(KdNode<D, T, K> substitute) {
+        if (substitute == null)
+            throw new NullPointerException("Substitute node cannot be null");
+        KdNode<D,T,K> subsParent = substitute.getParent();      // substitute's original parent
+        KdNode<D,T,K> subsLeftSon = substitute.getLeftSon();    // substitute's original left son
+        KdNode<D,T,K> subsRightSon = substitute.getRightSon();  // substitute's original right son
+
+        //  v--- changing my parent's reference on me and substitute's parent
+        if (this.parent != null) {
+            this.parent.replaceChild(this, substitute); // remove myself as a child
+            substitute.setParent(this.parent);                  // set newNode as parent's child
+        } else {       // substituteNode will be root
+            substitute.setParent(null);
+        }
+        this.parent = null;                                     // I don't have parent from now
+
+        if (subsParent == this) {                               // there was direct relation between me and substitute
+
+        } else {                                                // between me and substitute was someone else
+
+        }
+        return this;
+    }
+
     @Override
     public String toString() {
         return "V{key=" + this.usedKey + "; data=" + data.toString() + '}';
