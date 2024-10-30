@@ -404,9 +404,40 @@ public class Tester {
         System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
 
 //        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
-//        kdTree.printTree();     // Senica <= Senica - urad
-//        kdTree.delete(i2, i2);
-//        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i2, i2);
+        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i8, i8);
+        System.out.println(" > DELETED NODE [KEY=" + i8 + "; DATA=" + i8 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i9, i9);
+        System.out.println(" > DELETED NODE [KEY=" + i9 + "; DATA=" + i9 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i7, i7);
+        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i10, i10);
+        System.out.println(" > DELETED NODE [KEY=" + i10 + "; DATA=" + i10 + "]");
+
+        kdTree.printTree();
+        kdTree.delete(i11, i11);
+        System.out.println(" > DELETED NODE [KEY=" + i11 + "; DATA=" + i11 + "]");
+
+        kdTree.printTree();
+        kdTree.delete(i13, i13);
+        System.out.println(" > DELETED NODE [KEY=" + i13 + "; DATA=" + i13 + "]");
+
+        kdTree.printTree();     // Bojnice
+        kdTree.delete(i12, i12);
+        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
+        System.out.println("FINAL RESULT TREE:");
+        kdTree.printTree();
     }
 
 //        MyInt i1 = new MyInt(5);

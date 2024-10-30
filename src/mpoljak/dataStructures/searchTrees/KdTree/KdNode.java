@@ -90,10 +90,20 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
     public boolean hasRightSon() { return this.rightSon != null; }
     public boolean hasNoneSons() { return this.leftSon == null && this.rightSon == null; }
 
+    /**
+     * Node removes its child if it is his left or right son (determines internally)
+     * @param node
+     */
     public void removeChild(KdNode<D, T, K> node) {
         this.replaceChild(node, null);
     }
 
+    /**
+     * Assigns new son value (determines internally if left or right son should be replaced. No other relationships
+     * changed.
+     * @param originNode son to replace (left or right)
+     * @param newNode substituting son
+     */
     public void replaceChild(KdNode<D, T, K> originNode, KdNode<D,T,K> newNode) {
         if (originNode == null)
             return;
