@@ -4,12 +4,19 @@ import mpoljak.data.GPS;
 import mpoljak.data.forTesting.Data4D;
 import mpoljak.data.forTesting.MyCoupleInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
+import mpoljak.dataStructures.searchTrees.KdTree.Testing.OperationsGenerator;
 import mpoljak.dataStructures.searchTrees.KdTree.Testing.Tester;
 import mpoljak.utilities.DoubleComparator;
+
+import java.util.Random;
 
 public class App {
 
     public static void main(String[] args) {
+        OperationsGenerator og = new OperationsGenerator();
+        og.doAlg();
+
+
         DoubleComparator.getInstance().setEpsilon(0.00001);
         Tester tester = new Tester();
 //        tester.testFindingExtremes(1000000, -1, -1, -1);
@@ -25,29 +32,36 @@ public class App {
 //--------------------------------------------------------------
 
 
-        Data4D d1 = new Data4D(5.2, "v", 5, 5.4);
-        Data4D d2 = new Data4D(8.6, "avdca", -5, 55.4);
-        Data4D d3 = new Data4D(-5.2, "sdvasa", 5, -0.4);
-        Data4D d4 = new Data4D(16.2, "csadb", -24, 23.4);
-        Data4D d5 = new Data4D(7.2, "cryw", 5, -5.4);
-        Data4D d6 = new Data4D(-5.2, "cymuy", 18, 31.4);
-        Data4D d7 = new Data4D(5.2, "kc fsa", -5, 5.4);
-//        System.out.println(d1.compareTo(d2,1));
-//        System.out.println(d1.compareTo(d2,2));
-//        System.out.println(d1.compareTo(d2,3));
-//        System.out.println(d1.compareTo(d2,4));
+//        Data4D d1 = new Data4D(5.2, "v", 5, 5.4);
+//        Data4D d2 = new Data4D(8.6, "avdca", -5, 55.4);
+//        Data4D d3 = new Data4D(-5.2, "sdvasa", 5, -0.4);
+//        Data4D d4 = new Data4D(16.2, "csadb", -24, 23.4);
+//        Data4D d5 = new Data4D(7.2, "cryw", 5, -5.4);
+//        Data4D d6 = new Data4D(-5.2, "cymuy", 18, 31.4);
+//        Data4D d7 = new Data4D(5.2, "kc fsa", -5, 5.4);
+////        System.out.println(d1.compareTo(d2,1));
+////        System.out.println(d1.compareTo(d2,2));
+////        System.out.println(d1.compareTo(d2,3));
+////        System.out.println(d1.compareTo(d2,4));
+//
+//
+//        KDTree<Data4D, Data4D, Data4D> kdTree = new KDTree<Data4D, Data4D, Data4D>(4);
+//
+//        kdTree.insert(d1,d1);
+//        kdTree.insert(d2,d2);
+//        kdTree.insert(d3,d3);
+//        kdTree.insert(d4,d4);
+//        kdTree.insert(d5,d5);
+//        kdTree.insert(d6,d6);
+//        kdTree.insert(d7,d7);
+//
+//        kdTree.printTree();
+//
+//        System.out.println(" >> Deleting " + d1 + ":");
+//
+//        kdTree.delete(d1, d1);
 
 
-        KDTree<Data4D, Data4D, Data4D> kdTree = new KDTree<Data4D, Data4D, Data4D>(4);
-
-        kdTree.insert(d1,d1);
-        kdTree.insert(d2,d2);
-        kdTree.insert(d3,d3);
-        kdTree.insert(d4,d4);
-        kdTree.insert(d5,d5);
-        kdTree.insert(d6,d6);
-        kdTree.insert(d7,d7);
-
-        kdTree.printTree();
+//        kdTree.printTree();
     }
 }

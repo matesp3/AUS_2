@@ -147,7 +147,8 @@ public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<
 
     @Override
     public String toString() {
-        return "V{key=" + this.usedKey + "; data=" + data.toString() + '}';
+        return "V{key=" + this.usedKey + '}';
+//        return "V{key=" + this.usedKey + "; data=" + data.toString() + '}';
 //        return "V{key=" + this.usedKey + "; maxKey=" + this.maxDimValues + "; data= " + this.data + "}";
     }
 

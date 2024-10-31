@@ -36,30 +36,25 @@ public class Data4D implements IKdComparable<Data4D>, ISimilar<Data4D> {
 
     @Override
     public String toString() {
-        return "4D[" +
-                "a=" + a +
-                ", b='" + b + '\'' +
-                ", c=" + c +
-                ", d=" + d +
-                ']';
+        return String.format("4D[a=%.4f;b='%s';c=%d;d=%.4f]", a, b, c, d);
     }
 
     @Override
     public int compareTo(Data4D other, int dim) {
-        if (dim == 1) {
+        if (dim == 1) { // comp A, if equal -> comp B
             int cmp = DoubleComparator.getInstance().compare(a, other.a);
             if (cmp != 0)
                 return cmp;
             cmp = this.b.compareTo(other.b); // if previous equal, compare strings
             return Integer.compare(cmp, 0);
         }
-        else if (dim == 2) {
+        else if (dim == 2) {    // comp C
             return Integer.compare(this.c, other.c);
         }
-        else if (dim == 3) {
+        else if (dim == 3) {    // comp D
             return DoubleComparator.getInstance().compare(this.d, other.d);
         }
-        else if (dim == 4) {
+        else if (dim == 4) {    // comp B, if equal -> comp C
             int cmp = Integer.compare(this.b.compareTo(other.b), 0); // if greater than then could be other value than 1
             return cmp != 0 ? cmp : Integer.compare(this.c, other.c);
 
