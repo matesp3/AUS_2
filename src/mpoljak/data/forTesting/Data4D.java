@@ -55,7 +55,7 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
 
     @Override
     public String toString() {
-        return String.format("4D[a=%.4f;b='%s';c=%d;d=%.4f; ID=%d]", a, b, c, d, id);
+        return String.format("4D[a=%.0f;b='%s';c=%d;d=%.4f; ID=%d]", a, b, c, d, id);
     }
 
 /*

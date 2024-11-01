@@ -14,7 +14,7 @@ public class App {
 
     public static void main(String[] args) {
         OperationsGenerator og = new OperationsGenerator();
-        og.doAlg();
+        og.testSearchFunctionality(12,100, 0.05, 3);
 
 
         DoubleComparator.getInstance().setEpsilon(0.00001);
