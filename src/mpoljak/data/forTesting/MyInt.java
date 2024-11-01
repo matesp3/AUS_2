@@ -1,9 +1,9 @@
 package mpoljak.data.forTesting;
 
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
+import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 
-public class MyInt implements IKdComparable<MyInt>, ISimilar<MyInt> {
+public class MyInt implements IKdComparable<MyInt>, ISame<MyInt> {
     private int value;
     public MyInt(int value) {
         this.value = value;

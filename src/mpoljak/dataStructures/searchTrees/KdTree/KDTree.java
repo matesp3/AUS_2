@@ -8,29 +8,29 @@ import java.util.NoSuchElementException;
 
 /** functional interface */
 //interface INodeEvaluation<T extends ISimilar<?>, K extends IKdComparable<K> > {
-interface INodeEvaluation<E extends T, T extends ISimilar<T>, K extends IKdComparable<K> > {
+interface INodeEvaluation<E extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     boolean evaluateNode(KdNode<E,T,K> node);
 }
 
 /** functional interface */
 //interface INodeComparison<T extends ISimilar<?>, K extends IKdComparable<K> > {
-interface INodeComparison<E extends T, T extends ISimilar<T>, K extends IKdComparable<K> > {
+interface INodeComparison<E extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     boolean compareNodes(KdNode<E,T,K> node, KdNode<E,T,K> nodeWithExtreme);
 }
 
 /** functional interface */
 //interface INodeProcessing<T extends ISimilar<?>, K extends IKdComparable<K> > {
-interface INodeProcessing<E extends T, T extends ISimilar<T>, K extends IKdComparable<K> > {
+interface INodeProcessing<E extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     void processNode(KdNode<E,T,K> node);
 }
 
 /** functional interface */
 //interface INodeRetrieving<T extends ISimilar<?>, K extends IKdComparable<K> > {
-interface INodeRetrieving<E extends T, T extends ISimilar<T>, K extends IKdComparable<K> > {
+interface INodeRetrieving<E extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     KdNode<E,T,K> retrieveNode(KdNode<E,T,K> node);
 }
 
-public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<K> > {
+public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     private static final int ROW_NODE_MAX = 30;
     private static final int PREFIX_LENGTH = 6;
 
@@ -101,7 +101,7 @@ public class KDTree<E extends T, T extends ISimilar<T>, K extends IKdComparable<
     /**
      * Finds all nodes, whose key value is equal to wanted key value
      * @param key wanted key
-     * @return nodes with wanted key value
+     * @return nodes with wanted key value | null if nothing was found
      */
     public List<E> findAll(K key) {
         List<NodeToProcess> lFound = this.findDuplicates(key);

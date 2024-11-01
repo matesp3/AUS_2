@@ -1,9 +1,6 @@
 package mpoljak.data;
 
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Parcel implements IGpsLocalizable {

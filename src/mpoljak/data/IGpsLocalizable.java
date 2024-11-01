@@ -1,7 +1,7 @@
 package mpoljak.data;
 
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
+import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 
 /** marker interface */
-public interface IGpsLocalizable extends ISimilar<IGpsLocalizable> {
+public interface IGpsLocalizable extends ISame<IGpsLocalizable> {
 }
