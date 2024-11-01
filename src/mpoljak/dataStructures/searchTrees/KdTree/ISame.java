@@ -1,6 +1,6 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 
-public interface ISimilar<D> {
+public interface ISame<D> {
 
     /**
      * If both instances are the same instance or both instances have all inner values equal (as it was done deep copy

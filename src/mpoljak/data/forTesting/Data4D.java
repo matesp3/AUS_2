@@ -2,20 +2,39 @@ package mpoljak.data.forTesting;
 
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
+import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 import mpoljak.utilities.DoubleComparator;
 
-public class Data4D implements IKdComparable<Data4D>, ISimilar<Data4D> {
-    private double a;
-    private String b;
-    private int c;
-    private double d;
+import java.util.Comparator;
 
-    public Data4D(double a, String b, int c, double d) {
+public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
+    private final int id;
+    private int c;
+    private double a;
+    private double d;
+    private String b;
+
+    public static  class Data4DComparator implements Comparator<Data4D> {
+        @Override
+        public int compare(Data4D o1, Data4D o2) {
+            return Integer.compare(o1.id, o2.id);
+        }
+    }
+
+    public Data4D(double a, String b, int c, double d, int id) {
+        this.id = id;
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
+    }
+
+    public Data4D(Data4D other, int uniqueId) {
+        this(other.a, other.b, other.c, other.d, uniqueId);
+    }
+
+    public int getId() {
+        return id;
     }
 
     public double getA() {
@@ -36,9 +55,15 @@ public class Data4D implements IKdComparable<Data4D>, ISimilar<Data4D> {
 
     @Override
     public String toString() {
-        return String.format("4D[a=%.4f;b='%s';c=%d;d=%.4f]", a, b, c, d);
+        return String.format("4D[a=%.4f;b='%s';c=%d;d=%.4f; ID=%d]", a, b, c, d, id);
     }
 
+/*
+ 1. dim  -  comp A(else then B)
+ 2. dim  -  comp C
+ 3. dim  -  comp D
+ 4. dim  -  comp B(else then C)
+*/
     @Override
     public int compareTo(Data4D other, int dim) {
         if (dim == 1) { // comp A, if equal -> comp B
@@ -64,7 +89,7 @@ public class Data4D implements IKdComparable<Data4D>, ISimilar<Data4D> {
 
     @Override
     public Data4D copyConstruct() {
-        return new Data4D(a, b, c, d);
+        return new Data4D(a, b, c, d, id);
     }
 
     @Override
@@ -101,6 +126,7 @@ public class Data4D implements IKdComparable<Data4D>, ISimilar<Data4D> {
 
     @Override
     public boolean isSame(Data4D other) {
-        return this.isSameKey(other);
+        return this == other || this.id == other.id;
     }
+
 }

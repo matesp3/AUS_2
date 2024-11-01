@@ -3,12 +3,10 @@ package mpoljak.data;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
+import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 import mpoljak.utilities.DoubleComparator;
 
-import java.util.Comparator;
-
-public class GPS implements IKdComparable<GPS>, ISimilar<GPS> {
+public class GPS implements IKdComparable<GPS>, ISame<GPS> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 

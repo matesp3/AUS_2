@@ -1,7 +1,7 @@
 package mpoljak.dataStructures.searchTrees.KdTree;
 
 //public class KdNode <T extends ISimilar<?>, K extends IKdComparable<K> > {
-public class KdNode<D extends T, T extends ISimilar<T>, K extends IKdComparable<K> > {
+public class KdNode<D extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     private KdNode<D,T,K> parent;
     private KdNode<D,T,K> leftSon;
     private KdNode<D,T,K> rightSon;

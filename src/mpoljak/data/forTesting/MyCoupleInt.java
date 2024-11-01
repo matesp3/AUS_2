@@ -1,14 +1,10 @@
 package mpoljak.data.forTesting;
 
 
-import mpoljak.data.GPS;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
+import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 
-import java.util.Comparator;
-import java.util.Objects;
-
-public class MyCoupleInt implements IKdComparable<MyCoupleInt>, ISimilar<MyCoupleInt> {
+public class MyCoupleInt implements IKdComparable<MyCoupleInt>, ISame<MyCoupleInt> {
     private int x;
     private int y;
     private String description;

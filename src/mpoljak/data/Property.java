@@ -1,7 +1,5 @@
 package mpoljak.data;
 
-import mpoljak.dataStructures.searchTrees.KdTree.ISimilar;
-
 import java.util.ArrayList;
 import java.util.List;
 
