@@ -4,11 +4,12 @@ import mpoljak.data.*;
 import mpoljak.data.forTesting.MyCoupleInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
+import mpoljak.utilities.DoubleComparator;
 
 import java.util.List;
 import java.util.Random;
 
-public class Tester {
+public class MiniTester {
 
     public void testSearchOfGPS(long insertionsCount, int seedCount, int times) {
         Random seedGen = new Random();
@@ -234,9 +235,9 @@ public class Tester {
         System.out.println("MIN=" + min + "; MAX=" + max);
         System.out.println("  >>>  FOUND:");
         System.out.println(" ===== M I N I M U M ===== ");
-        kdTree.printRootMin();
+//        kdTree.printRootMin();
         System.out.println(" ===== M A X I M U M ===== ");
-        kdTree.printRootMax();
+//        kdTree.printRootMax();
     }
 
 //    |
@@ -367,6 +368,12 @@ public class Tester {
         kdTree.insert(i12, i12);
         kdTree.insert(i13, i13);
 
+        KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt>.KdTreeInOrderIterator<MyCoupleInt, MyCoupleInt, MyCoupleInt>
+                it = kdTree.iterator();
+        while (it.hasNext()) {
+            MyCoupleInt data = it.next();
+            System.out.println(data);
+        }
 //      ----------- DELETING LEAVES: OK..
 //        kdTree.printTree();
 //        System.out.println("    -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -");
@@ -383,97 +390,76 @@ public class Tester {
 //        kdTree.printTree();
 
 //      ----------- DELETING AND REPLACING FROM LEFT SUBTREE: OK..
-        kdTree.printTree();     // Nitra <= Senica
-        kdTree.delete(i1, i1);
-        System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
-
-        kdTree.printTree();     // Senica - stanica <= Hodonin
-        kdTree.delete(i4, i4);
-        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
-
-        kdTree.printTree();     // Hodonin
-        kdTree.delete(i6, i6);
-        System.out.println(" > DELETED NODE [KEY=" + i6 + "; DATA=" + i6 + "]");
-
-        kdTree.printTree();     // Senica - urad
-        kdTree.delete(i5, i5);
-        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
-
-        kdTree.printTree();     // Senica - skola
-        kdTree.delete(i3, i3);
-        System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
-
-//        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
-
-        kdTree.printTree();     // Senica (KOREN)
-        kdTree.delete(i2, i2);
-        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
-
-        kdTree.printTree();     // Senica (KOREN)
-        kdTree.delete(i8, i8);
-        System.out.println(" > DELETED NODE [KEY=" + i8 + "; DATA=" + i8 + "]");
-
-        kdTree.printTree();     // Senica (KOREN)
-        kdTree.delete(i9, i9);
-        System.out.println(" > DELETED NODE [KEY=" + i9 + "; DATA=" + i9 + "]");
-
-        kdTree.printTree();     // Senica (KOREN)
-        kdTree.delete(i7, i7);
-        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
-
-        kdTree.printTree();     // Senica (KOREN)
-        kdTree.delete(i10, i10);
-        System.out.println(" > DELETED NODE [KEY=" + i10 + "; DATA=" + i10 + "]");
-
-        kdTree.printTree();
-        kdTree.delete(i11, i11);
-        System.out.println(" > DELETED NODE [KEY=" + i11 + "; DATA=" + i11 + "]");
-
-        kdTree.printTree();
-        kdTree.delete(i13, i13);
-        System.out.println(" > DELETED NODE [KEY=" + i13 + "; DATA=" + i13 + "]");
-
-        kdTree.printTree();     // Bojnice
-        kdTree.delete(i12, i12);
-        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
-        System.out.println("FINAL RESULT TREE:");
-        kdTree.printTree();
-    }
-
-//        MyInt i1 = new MyInt(5);
-//        MyInt i2 = new MyInt(1);
-//        MyInt i3 = new MyInt(8);
-//        MyInt i4 = new MyInt(3);
-//        MyInt i5 = new MyInt(4);
-//        MyInt i6 = new MyInt(21);
-//        MyInt i7 = new MyInt(13);
-//        MyInt i8 = new MyInt(6);
-//        MyInt i9 = new MyInt(6);
-//        MyInt i10 = new MyInt(18);
-//        MyInt i11 = new MyInt(15);
-//        MyInt i12 = new MyInt(2);
-//        MyInt i13 = new MyInt(2);
+//        kdTree.printTree();     // Nitra <= Senica
+//        kdTree.delete(i1, i1);
+//        System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
 //
-//        KDTree<MyInt, MyInt, Integer> kdTree = new KDTree<MyInt, MyInt, Integer>(1);
-//        kdTree.insert(i1, i1);
-//        kdTree.insert(i2, i2);
-//        kdTree.insert(i3, i3);
-//        kdTree.insert(i4, i4);
-//        kdTree.insert(i5, i5);
-//        kdTree.insert(i6, i6);
-//        kdTree.insert(i7, i7);
-//        kdTree.insert(i8, i8);
-//        kdTree.insert(i9, i9);
-//        kdTree.insert(i10, i10);
-//        kdTree.insert(i11, i11);
-//        kdTree.insert(i12, i12);
-//        kdTree.insert(i13, i13);
+//        kdTree.printTree();     // Senica - stanica <= Hodonin
+//        kdTree.delete(i4, i4);
+//        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
+//
+//        kdTree.printTree();     // Hodonin
+//        kdTree.delete(i6, i6);
+//        System.out.println(" > DELETED NODE [KEY=" + i6 + "; DATA=" + i6 + "]");
+//
+//        kdTree.printTree();     // Senica - urad
+//        kdTree.delete(i5, i5);
+//        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
+//
+//        kdTree.printTree();     // Senica - skola
+//        kdTree.delete(i3, i3);
+//        System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
+//
+////        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
+//
+//        kdTree.printTree();     // Senica (KOREN)
+//        kdTree.delete(i2, i2);
+//        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
+//
+//        kdTree.printTree();     // Senica (KOREN)
+//        kdTree.delete(i8, i8);
+//        System.out.println(" > DELETED NODE [KEY=" + i8 + "; DATA=" + i8 + "]");
+//
+//        kdTree.printTree();     // Senica (KOREN)
+//        kdTree.delete(i9, i9);
+//        System.out.println(" > DELETED NODE [KEY=" + i9 + "; DATA=" + i9 + "]");
+//
+//        kdTree.printTree();     // Senica (KOREN)
+//        kdTree.delete(i7, i7);
+//        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
+//
+//        kdTree.printTree();     // Senica (KOREN)
+//        kdTree.delete(i10, i10);
+//        System.out.println(" > DELETED NODE [KEY=" + i10 + "; DATA=" + i10 + "]");
 //
 //        kdTree.printTree();
+//        kdTree.delete(i11, i11);
+//        System.out.println(" > DELETED NODE [KEY=" + i11 + "; DATA=" + i11 + "]");
+//
+//        kdTree.printTree();
+//        kdTree.delete(i13, i13);
+//        System.out.println(" > DELETED NODE [KEY=" + i13 + "; DATA=" + i13 + "]");
+//
+//        kdTree.printTree();     // Bojnice
+//        kdTree.delete(i12, i12);
+//        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
+//        System.out.println("FINAL RESULT TREE:");
+//        kdTree.printTree();
+    }
 
-//        Integer i_1 = new Integer(5);
-//        Integer i_2 = new Integer(4);
-//        System.out.println("Vysledok >> " + i_1.compareTo(i_2));
-
+    public static void main(String[] args) {
+        DoubleComparator.getInstance().setEpsilon(0.00001);
+        MiniTester tester = new MiniTester();
+//        tester.testFindingExtremes(1000000, -1, -1, -1);
+//        tester.testFindingExtremes(1000000, 570413914, -151831802, -165047230);
+//        tester.testFindingExtremes(1_000_000, -1, -1, -1);
+//        tester.testFindingExtremes(10000, -671960820, 1489149674, 1031476793);
+        tester.testVillages();
+//        tester.printMaxForRoot();
+//        tester.testSearchOfGPS(100, 10, 25);
+//        tester.debugSearchOfGPS(100,10, 25, 1188562444, -884246284, 1129907258);
+//        tester.testManualInsertion();
+//        tester.testRandomInsert(2,2);
+    }
 }
 
