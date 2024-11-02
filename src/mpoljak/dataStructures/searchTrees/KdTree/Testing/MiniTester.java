@@ -3,7 +3,6 @@ package mpoljak.dataStructures.searchTrees.KdTree.Testing;
 import mpoljak.data.*;
 import mpoljak.data.forTesting.MyCoupleInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
-import mpoljak.dataStructures.searchTrees.KdTree.KdNode;
 import mpoljak.utilities.DoubleComparator;
 
 import java.util.List;
@@ -367,13 +366,21 @@ public class MiniTester {
         kdTree.insert(i11, i11);
         kdTree.insert(i12, i12);
         kdTree.insert(i13, i13);
-
+        System.out.println("IN-ORDER ITERATION:");
         KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt>.KdTreeInOrderIterator<MyCoupleInt, MyCoupleInt, MyCoupleInt>
-                it = kdTree.iterator();
+                it = kdTree.inOrderIterator();
         while (it.hasNext()) {
             MyCoupleInt data = it.next();
             System.out.println(data);
         }
+        System.out.println("\nLEVEL-ORDER ITERATION:");
+        KDTree<MyCoupleInt, MyCoupleInt, MyCoupleInt>.KdTreeLevelOrderIterator<MyCoupleInt, MyCoupleInt, MyCoupleInt>
+                it2 = kdTree.levelOrderIterator();
+        while (it2.hasNext()) {
+            MyCoupleInt data = it2.next();
+            System.out.println(data);
+        }
+
 //      ----------- DELETING LEAVES: OK..
 //        kdTree.printTree();
 //        System.out.println("    -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -");

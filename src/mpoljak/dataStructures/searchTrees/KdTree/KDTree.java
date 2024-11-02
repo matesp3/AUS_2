@@ -209,7 +209,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 
     public int size() {
         int elementsCount = 0;
-        KdTreeInOrderIterator<E,T,K> iterator = this.iterator();
+        KdTreeInOrderIterator<E,T,K> iterator = this.inOrderIterator();
         while (iterator.hasNext()) {
             iterator.getNextNode();
             elementsCount++;
@@ -218,8 +218,12 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return elementsCount;
     }
 
-    public KdTreeInOrderIterator<E,T,K> iterator() {
+    public KdTreeInOrderIterator<E,T,K> inOrderIterator() {
         return new KdTreeInOrderIterator<E,T,K>(this.root);
+    }
+
+    public KdTreeLevelOrderIterator<E,T,K> levelOrderIterator() {
+        return new KdTreeLevelOrderIterator<E,T,K>(this.root);
     }
 
     public class KdTreeInOrderIterator<D extends B, B extends ISame<B>, Q extends IKdComparable<Q>>
@@ -272,6 +276,45 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                     }
                 }
             }
+        }
+    }
+
+    public class KdTreeLevelOrderIterator<D extends B, B extends ISame<B>, Q extends IKdComparable<Q>>
+            implements Iterator<D> {
+        private LinkedList< KdNode<D,B,Q> > notProcessed;
+        private KdNode<D,B,Q> currentNode;
+
+        private KdTreeLevelOrderIterator(KdNode<D,B,Q> rootNode) {
+            if (rootNode == null)
+                throw new NullPointerException("Cannot make iterator for not existing tree structure");
+            this.currentNode = null;
+            this.notProcessed = new LinkedList<>();
+            this.notProcessed.addLast(rootNode);
+            this.getNextNode();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !this.notProcessed.isEmpty() || this.currentNode != null;
+        }
+
+        @Override
+        public D next() {
+            D currentData = this.currentNode == null ? null : this.currentNode.getData();
+            this.getNextNode(); // prepare next data
+            return currentData;
+        }
+
+        private void getNextNode () {
+            if (this.notProcessed.isEmpty()) {
+                this.currentNode = null;
+                return;
+            }
+            this.currentNode = this.notProcessed.removeFirst();
+            if (this.currentNode.hasLeftSon())
+                this.notProcessed.addLast(this.currentNode.getLeftSon());
+            if (this.currentNode.hasRightSon())
+                this.notProcessed.addLast(this.currentNode.getRightSon());
         }
     }
 
