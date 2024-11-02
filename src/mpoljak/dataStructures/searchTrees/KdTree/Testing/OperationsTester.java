@@ -41,6 +41,25 @@ public class OperationsTester {
     }
 
     /**
+     * Tests whether structure deletes nodes correctly and if remaining data in the structure after deletion are all
+     * in right positions (that means, that they are searchable - need to meet condition that duplicate keys in the
+     * right subtree of the key that replaced deleted node will be reinserted correctly to the k-d tree.
+     * @param iterationsCount
+     * @param treeSize
+     * @param observedDuplicatesCount
+     * @param duplicateInsertionProbability
+     */
+    public void testDeleteFunctionality(int iterationsCount, int treeSize, int observedDuplicatesCount,
+                                        double duplicateInsertionProbability) {
+//        -- 1. STEP: prepare data
+//        -- 2. STEP: remember how many elements were there before deletion
+//        -- 3. STEP: delete element
+//        -- 4. STEP: check size of tree, if its less only by 1 and if there's not the deleted element
+//        -- 5. STEP: check if all duplicates were able to find. If not, it is sign, that they are not on the place\
+//                    where they should be. They are not searchable.
+    }
+
+    /**
      * Tests whether all inserted elements into the k-d tree are present in the structure. Every generated data instance
      * is inserted only once into the structure, so the test is to check if number of insertions is equal to number of
      * found elements in the tree using some type of order going through structure (here is used in-order node visiting)
@@ -105,14 +124,6 @@ public class OperationsTester {
             }
         }
         printOverallResult(overallOk, "INSERTION TEST");
-    }
-
-    private static void getSortedTreeDataById(KDTree<Data4D, Data4D, Data4D> kdTree, ArrayList<Data4D> lData) {
-        KDTree<Data4D, Data4D, Data4D>.KdTreeInOrderIterator<Data4D, Data4D, Data4D> it = kdTree.iterator();
-        while (it.hasNext()) {
-            lData.add(it.next());
-        }
-        lData.sort(new Data4D.Data4DComparator());
     }
 
     /**
@@ -286,6 +297,15 @@ public class OperationsTester {
     private static Data4D generateDataInstance(Random valGen) {
         return new Data4D(valGen.nextDouble() * valGen.nextInt(), nextString(10, valGen),
                 valGen.nextInt(), valGen.nextDouble() * valGen.nextInt(), IdGenerator.getInstance().nextId());
+    }
+
+    private static void getSortedTreeDataById(KDTree<Data4D, Data4D, Data4D> kdTree, ArrayList<Data4D> lData) {
+        KDTree<Data4D, Data4D, Data4D>.KdTreeLevelOrderIterator<Data4D, Data4D, Data4D> it = kdTree.levelOrderIterator();
+//        KDTree<Data4D, Data4D, Data4D>.KdTreeInOrderIterator<Data4D, Data4D, Data4D> it = kdTree.inOrderIterator();
+        while (it.hasNext()) {
+            lData.add(it.next());
+        }
+        lData.sort(new Data4D.Data4DComparator());
     }
 
 //    ------------------------------ L O G G I N G - helper methods ------------------------------------
