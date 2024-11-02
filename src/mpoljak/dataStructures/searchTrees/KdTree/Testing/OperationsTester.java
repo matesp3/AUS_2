@@ -44,14 +44,26 @@ public class OperationsTester {
      * Tests whether structure deletes nodes correctly and if remaining data in the structure after deletion are all
      * in right positions (that means, that they are searchable - need to meet condition that duplicate keys in the
      * right subtree of the key that replaced deleted node will be reinserted correctly to the k-d tree.
-     * @param iterationsCount
-     * @param treeSize
-     * @param observedDuplicatesCount
-     * @param duplicateInsertionProbability
+     * @param iterationsCount how many times will delete test be executed
+     * @param treeSize initial amount of inserted elements to the tree before test is launched
+     * @param observedDuplicatesCount count of generates keys which will be observed in the test and inserted duplicate
+     *                                multiple times. Each key is randomly chosen using even distribution of probability
+     * @param dupInsertProb probability by which will be one of the observed duplicates from generated set inserted
+     *                                      into the k-d tree. Probability of choosing concrete key from set is evenly
+     *                                      distributed.
      */
     public void testDeleteFunctionality(int iterationsCount, int treeSize, int observedDuplicatesCount,
-                                        double duplicateInsertionProbability) {
+                                        double dupInsertProb, int logLevel) {
 //        -- 1. STEP: prepare data
+        KDTree<Data4D, Data4D, Data4D> kdTree = new KDTree<>(4);
+        ArrayList<ArrayList<Data4D>> lObserved = new ArrayList<>(observedDuplicatesCount);
+
+        int seedOfObserved = generateObservedData(observedDuplicatesCount, lObserved, logLevel);
+        int[] seeds = insertData(treeSize, kdTree, lObserved, dupInsertProb, logLevel);
+        boolean ok = true;
+        for (int i = 0; i < lObserved.size(); i++) {
+            ok = ok && searchForDuplicate(i, logLevel, lObserved, kdTree);
+        }
 //        -- 2. STEP: remember how many elements were there before deletion
 //        -- 3. STEP: delete element
 //        -- 4. STEP: check size of tree, if its less only by 1 and if there's not the deleted element
@@ -131,7 +143,8 @@ public class OperationsTester {
      * @param iterationsCount how many times will search test be executed
      * @param observedDuplicatesCount number of generated keys, that will be multiple times inserted to the tree and
      *                                recorded in other structure with its all insertions in order to compare result
-     *                                from k-d tree search
+     *                                from k-d tree search. Each key is randomly chosen from generated set using even
+     *                                distribution of probability.
      * @param insertionCount total number of elements in k-d tree data structure
      * @param duplicateInsertProb probability, by which will be some duplicate key from observed set of duplicates
      *                            inserted to the k-d tree.

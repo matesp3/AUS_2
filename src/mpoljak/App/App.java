@@ -9,7 +9,7 @@ public class App {
     public static void main(String[] args) {
         OperationsTester ot = new OperationsTester();
 //        ot.testSearchFunctionality(10, 10,100, 0.25, 3); // --ok
-        ot.testInsertFunctionality(200000, 200,1);   // --ok
-//        ot.testDeleteFunctionality();
+//        ot.testInsertFunctionality(200000, 200,1);   // --ok
+        ot.testDeleteFunctionality(10, 100, 5, 0.22);
     }
 }
