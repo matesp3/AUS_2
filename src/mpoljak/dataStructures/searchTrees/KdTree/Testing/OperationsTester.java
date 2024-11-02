@@ -50,6 +50,8 @@ public class OperationsTester {
     public void testInsertFunctionality(int insertionsCount, int iterationsCount, int logLevel) {
         boolean overallOk = true;
         for (int iteration = 1; iteration <= iterationsCount; iteration++) {
+            ArrayList<Data4D> lInserted = new ArrayList<>();
+            ArrayList<Data4D> lRetrieved = new ArrayList<>();
             if (logLevel >= 1)
                 printIteration(iteration, "INSERTION TEST");
             int seedForValGen = new Random().nextInt();
@@ -64,28 +66,53 @@ public class OperationsTester {
             for (int i = 0; i < insertionsCount; i++) {
                 nextData = generateDataInstance(valGen);
                 kdTree.insert(nextData, nextData);
+                lInserted.add(nextData);
                 if (logLevel >= 3)
                     printListItem(i + 1, nextData.toString());
             }
-            int size = kdTree.size();
-
+            getSortedTreeDataById(kdTree, lRetrieved);
             if (logLevel >= 1) {
-                printInfo("Inserted " + insertionsCount + " instances generated with SEED=" + seedForValGen);
-                printInfo("Found "+size+" elements in the k-d tree.");
+                printInfo("Inserted " + lInserted.size() + " instances generated with SEED=" + seedForValGen);
+                printInfo("Found "+lRetrieved.size()+" elements in the k-d tree.");
             }
-            boolean ok = (size == insertionsCount);
-            overallOk = overallOk && ok;
-            if (logLevel >= 1) {
-                if (logLevel >= 2) {
-                    if (ok)
-                        printInfo("Size of k-d tree is SAME as number of inserted elements.");
-                    else
-                        printError("Size of k-d tree is DIFFERENT as number of inserted elements.\"");
+//            ----- evaluation
+            boolean ok = true;
+            if (lInserted.size() == lRetrieved.size()) {
+                for (int i = 0; i < lInserted.size(); i++) {
+                    if (logLevel >= 3)
+                        printListItem(i+1, "Comparison: "+lInserted.get(i)+"    VS      "
+                                +lRetrieved.get(i));
+                    if (!lInserted.get(i).isSame(lRetrieved.get(i))) {
+                        if (logLevel >= 2) {
+                            printError("Found difference. Inserted element=" + lInserted.get(i) +
+                                    " != retrieved element=" + lRetrieved.get(i));
+                        }
+                        ok = false;
+                    }
                 }
+                if (logLevel >= 2)
+                    printInfo("Inserted and retrieved elements from k-d tree are same and sizes are same also.");
+            } else {
+                ok = false;
+                if (logLevel >= 2) {
+                        printError("Size of k-d tree is DIFFERENT as number of inserted elements.");
+                }
+            }
+            overallOk = overallOk && ok;
+//            ------ end of evaluation
+            if (logLevel >= 1) {
                 printIterationResult(ok, 1, "Insertion Test");
             }
         }
         printOverallResult(overallOk, "INSERTION TEST");
+    }
+
+    private static void getSortedTreeDataById(KDTree<Data4D, Data4D, Data4D> kdTree, ArrayList<Data4D> lData) {
+        KDTree<Data4D, Data4D, Data4D>.KdTreeInOrderIterator<Data4D, Data4D, Data4D> it = kdTree.iterator();
+        while (it.hasNext()) {
+            lData.add(it.next());
+        }
+        lData.sort(new Data4D.Data4DComparator());
     }
 
     /**
