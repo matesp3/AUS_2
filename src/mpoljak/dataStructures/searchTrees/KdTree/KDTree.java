@@ -110,12 +110,15 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return lToReturn;
     }
 
-    public void delete(K key, E data) {
+    public E delete(K key, E data) {
 //        List<NodeToProcess> lFoundDuplicates = this.findDuplicates(key);
         //TODO AK OBSAHUJE STROM IBA KOREN A TEN CHCEM ODSTRANIT, JE TO OSETRENE?
         NodeToProcess nodeToProcess = this.findUnique(key, data);
         if (nodeToProcess == null)
-            return;
+            return null;
+
+        E deletedData = nodeToProcess.nodeToProcess.getData();
+
         KdNode<E,T,K> vForRepl = nodeToProcess.nodeToProcess; // node to delete
         MyInteger heightRef = new MyInteger(nodeToProcess.height);
 
@@ -124,7 +127,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                 this.root = null;
             else
                 vForRepl.getParent().removeChild(vForRepl);
-            return;
+            return deletedData;
         }
         NodeToProcess hole = null;  // copy of substitute node in its original place
         boolean orderingState = false;  // whe duplicates are ready and node is already deleted
@@ -148,8 +151,11 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 //                //  UPDATE OF NODE TO PROCESS
 //                heightRef.setVal(hole.height);
 //                vForRepl = hole.nodeToProcess;
+                //  UPDATE OF NODE TO PROCESS
+                heightRef.setVal(hole.height);
+                vForRepl = hole.nodeToProcess;
 //                -------------------------------------END
-            } else {  // v.hasOnlyRightSon
+            } else if (vForRepl.hasRightSon()) {  // v.hasOnlyRightSon
 //                if (!orderingState) { // it is pre-ordering state,
                     wantedDim = (heightRef.intVal % this.k) + 1;   // by which dim it is compared at height of node to delete
                     heightOfReplaced = heightRef.intVal();
@@ -158,9 +164,9 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                     vSubstitute = findMin(wantedDim, vForRepl.getRightSon(), heightRef);
                     hole = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
                     // ^--<- need to remember substitute's relationships
-                    if (!orderingState) { // it is pre-ordering state,
+//                    if (!orderingState) { // it is pre-ordering state, // commented 03.11
                         this.findAllEqualInDim(vForRepl, heightOfReplaced, wantedDim, vSubstitute, lToDelete);
-                    }
+//                    }
 //                -------------------------------------BEG
                     doReplacementFromRightSubtree(vForRepl, vSubstitute, hole);
                     if (orderingState) { // must do update, if vSubstitute is to replace node in other place
@@ -171,7 +177,8 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 //                    heightRef.setVal(hole.height);
 //                    vForRepl = hole.nodeToProcess;
 //                -------------------------------------END
-                    if (!vForRepl.hasNoneSons()) // continue replacing nodes
+//                    if (!vForRepl.hasNoneSons()) // continue replacing nodes  todo zak. 03,11
+                    if (!hole.nodeToProcess.hasNoneSons()) // continue replacing nodes  todo pridane. 03,11
                         orderingState = true;
 //                }
 //                else {  // ordering state
@@ -181,12 +188,10 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 //                    heightRef.setVal(hole.height);
 //                    vForRepl = hole.nodeToProcess;
 //                }
-            }
-            //  UPDATE OF NODE TO PROCESS
-            heightRef.setVal(hole.height);
-            vForRepl = hole.nodeToProcess;
-
-            if (vForRepl.hasNoneSons()) {
+                //  UPDATE OF NODE TO PROCESS
+                heightRef.setVal(hole.height);
+                vForRepl = hole.nodeToProcess;
+            } else {    // vForRep.hasNoneSons = true
                 vForRepl.getParent().removeChild(vForRepl); // deleting relationships of helpful node with its parent
                 vForRepl.setParent(null);
                 nodeToProcess = lToDelete.isEmpty() ? null : lToDelete.removeLast();
@@ -200,11 +205,21 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                     lToReinsert.add(vForRepl);
                 orderingState = false;
             }
-        } while (vForRepl != null && !vForRepl.hasNoneSons());
+        } while (vForRepl != null);
+//        } while (vForRepl != null && !vForRepl.hasNoneSons());
 
         for (KdNode<E,T,K> n : lToReinsert) {
             this.insert(n.getUsedKey(), n.getData());
         }
+
+        return deletedData;
+    }
+
+    /**
+     * @return true if tree has not root node.
+     */
+    public boolean isEmpty() {
+        return this.root == null;
     }
 
     public int size() {
@@ -522,7 +537,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
      */
     private KdNode<E,T,K> findMin(int wantedDim, KdNode<E,T,K> startingNode, MyInteger currentHeight) {
         return findExtreme(wantedDim, startingNode, currentHeight,
-                (node1, node2) -> node1.compareTo(node2, wantedDim) == -1,
+                (node1, node2) -> node1.compareTo(node2, wantedDim) < 0,
                 (node) -> node.hasRightSon(),
                 (node) -> node.getRightSon(),
                 (node) -> node.getLeftSon());
@@ -538,7 +553,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
      */
     private KdNode<E,T,K> findMax(int wantedDim, KdNode<E,T,K> startingNode, MyInteger currentHeight) {
         return findExtreme(wantedDim, startingNode, currentHeight,
-                (node1, node2) -> node1.compareTo(node2, wantedDim) == 1,
+                (node1, node2) -> node1.compareTo(node2, wantedDim) > 0,
                 (node) -> node.hasLeftSon(),
                 (node) -> node.getLeftSon(),
                 (node) -> node.getRightSon());

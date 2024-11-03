@@ -55,7 +55,7 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
 
     @Override
     public String toString() {
-        return String.format("4D[a=%.0f;b='%s';c=%d;d=%.4f; ID=%d]", a, b, c, d, id);
+        return String.format("4D[a=%.4f;b='%s';c=%d;d=%.4f; ID=%d]", a, b, c, d, id);
     }
 
 /*
@@ -130,13 +130,15 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
     }
 
     public static void main(String[] args) {
-        Data4D d1 = new Data4D(5.2, "v", 5, 5.4, 1);
-        Data4D d2 = new Data4D(8.6, "avdca", -5, 55.4, 2);
-        Data4D d3 = new Data4D(-5.2, "sdvasa", 5, -0.4, 3);
-        Data4D d4 = new Data4D(16.2, "csadb", -24, 23.4, 4);
-        Data4D d5 = new Data4D(7.2, "cryw", 5, -5.4, 5);
-        Data4D d6 = new Data4D(-5.2, "cymuy", 18, 31.4, 6);
-        Data4D d7 = new Data4D(5.2, "kc fsa", -5, 5.4, 7);
+        Data4D d1 = new Data4D(201599356, "8a65240o2g", 981488427, 165174539.4252, 1);
+        Data4D d2 = new Data4D(233462430, "c6hla0lg55", -734479398, 412380266.6969, 2);
+//        Data4D d1 = new Data4D(5.2, "v", 5, 5.4, 1);
+//        Data4D d2 = new Data4D(8.6, "avdca", -5, 55.4, 2);
+//        Data4D d3 = new Data4D(-5.2, "sdvasa", 5, -0.4, 3);
+//        Data4D d4 = new Data4D(16.2, "csadb", -24, 23.4, 4);
+//        Data4D d5 = new Data4D(7.2, "cryw", 5, -5.4, 5);
+//        Data4D d6 = new Data4D(-5.2, "cymuy", 18, 31.4, 6);
+//        Data4D d7 = new Data4D(5.2, "kc fsa", -5, 5.4, 7);
 
         System.out.println("/* COMPARING RULES for specific dimensions of Data4D.Class\n" +
                 " 1. dim  -  comp A(if equals then comp B)\n" +
@@ -150,6 +152,8 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
         System.out.println("d1.cmp(d2, dim=2) -> " + d1.compareTo(d2,2));
         System.out.println("d1.cmp(d2, dim=3) -> " + d1.compareTo(d2,3));
         System.out.println("d1.cmp(d2, dim=4) -> " + d1.compareTo(d2,4));
+//        :V{key=4D[a=201599356;b='8a65240o2g';c=981488427;d=165174539,4252; ID=25]}
+//        :V{key=4D[a=233462430;b='c6hla0lg55';c=-734479398;d=412380266,6969; ID=36]}
     }
 
 }

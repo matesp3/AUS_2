@@ -3,11 +3,9 @@ package mpoljak.dataStructures.searchTrees.KdTree;
 public interface ISame<D> {
 
     /**
-     * If both instances are the same instance or both instances have all inner values equal (as it was done deep copy
-     * of one of them).
+     * If both instances are the same instance or both instances have values of unique attributes equal.
      * @param other
-     * @return  true, if both instances are the same or their all inner values are same (as it was done deep copy of one
-     * of them).
+     * @return  true, if both instances are the same or their all inner unique attributes are same.
      */
     public  boolean isSame(D other);
 }
