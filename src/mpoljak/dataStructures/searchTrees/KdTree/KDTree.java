@@ -192,6 +192,8 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                 heightRef.setVal(hole.height);
                 vForRepl = hole.nodeToProcess;
             } else {    // vForRep.hasNoneSons = true
+                if (vForRepl.getParent() == null)
+                    throw new RuntimeException("Je root? "+this.isRoot(vForRepl)+ this.size()+",hasNoneSons:"+vForRepl.hasNoneSons());
                 vForRepl.getParent().removeChild(vForRepl); // deleting relationships of helpful node with its parent
                 vForRepl.setParent(null);
                 nodeToProcess = lToDelete.isEmpty() ? null : lToDelete.removeLast();

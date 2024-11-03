@@ -18,7 +18,10 @@ public class App {
 
 //        ot.testDeleteFunctionality(1, 25, 10, 2,0.22, 3); // todo uncomment
 //        ot.testDeleteFunctionality(1000, 15, 5, 7,0.22, 1, false); // found
-        ot.testDeleteFunctionality(1, 6, 4, 5,0.22, 3, true); // found
+        for (int i = 20; i < 10000000; i*=5) {
+            ot.testDeleteFunctionality(100, i, i/4, i/5,0.50, 0, false); // found
+        }
+
     }
 
 
