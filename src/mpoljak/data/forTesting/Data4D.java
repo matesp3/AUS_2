@@ -120,8 +120,8 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
         if (this == other) return true;
         DoubleComparator dc = DoubleComparator.getInstance();
         return this.c == other.c
-                && dc.compare(this.a, other.a) == 1
-                && dc.compare(this.d, other.d) == 1
+                && dc.compare(this.a, other.a) == 0
+                && dc.compare(this.d, other.d) == 0
                 && this.b.compareTo(other.b) == 0;
     }
 
