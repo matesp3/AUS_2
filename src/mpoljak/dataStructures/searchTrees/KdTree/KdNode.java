@@ -89,6 +89,7 @@ public class KdNode<D extends T, T extends ISame<T>, K extends IKdComparable<K> 
     public boolean hasLeftSon() { return this.leftSon != null; }
     public boolean hasRightSon() { return this.rightSon != null; }
     public boolean hasNoneSons() { return this.leftSon == null && this.rightSon == null; }
+    public boolean hasNoRelationships() { return !hasParent() && hasNoneSons();}
 
     /**
      * Node removes its child if it is his left or right son (determines internally)

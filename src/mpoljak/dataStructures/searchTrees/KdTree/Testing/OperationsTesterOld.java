@@ -13,7 +13,7 @@ import java.util.Random;
  * Class for testing main functionalities of K-dimensional(k-d) tree structure.
  */
 //public class OperationsTester<D extends ISame<D> & IKdComparable<D> > {
-public class OperationsTester {
+public class OperationsTesterOld {
 
     private static final int VAL_SEED_IDX = 0;  // standardised index (within seed array) of seed for generating data
     private static final int PROB_SEED_IDX = 1; /* standardised index (within seed array) of seed for generating
@@ -21,11 +21,7 @@ public class OperationsTester {
     private String customCharSet = "abcdefghijklmnopqrstuvwxyz0123456789"; // set of chars entering generation of string
     private final Random genR = new Random(new Random().nextInt());
 
-    private static final int DEBUG_GEN_OBSERVED_SEED = -130083375;      // for testing:
-    private static final int DEBUG_GEN_FOR_INSERTION_SEED = 1296616592; // for testing: SEARCH
-    private static final int DEBUG_PROB_SEED = -1200112902;             // for testing: SEARCH
-    private static final int DEBUG_DECISION_SEED = 1697875354;          // for testing:
-
+    private static final int DEBUG_GEN_FOR_INSERTION_SEED = -130083375; // for testing: search, delete
 
     /**
      * @return set of chars entering generation of string. Example: customCharSet = "abcd1234". This means that string
@@ -89,7 +85,7 @@ public class OperationsTester {
             ArrayList<ArrayList<Data2D>> lObserved = new ArrayList<>(observedDuplicatesCount);
 //            seedOfObserved = generateObservedData(observedDuplicatesCount, lObserved, logLevel, debug);
             ArrayList<Data2D> lInserted = new ArrayList<>(treeSize);
-//            seeds = insertData(treeSize, kdTree, lObserved, lInserted, dupInsertProb, logLevel, debug);
+            seeds = insertData(treeSize, kdTree, lObserved, lInserted, dupInsertProb, logLevel, debug);
 
             if (logLevel >= 3)
                 printIterationOperation("SORTING lists for comparison...");
@@ -113,7 +109,7 @@ public class OperationsTester {
 //                decisionSeed = decisionGen.nextInt(); // TODO uncomm
                 decisionSeed = genR.nextInt(); // TODO uncomm
             else
-                decisionSeed = DEBUG_DECISION_SEED;   // TODO rmv
+                decisionSeed = 1697875354;   // TODO rmv
             decisionGen.setSeed(decisionSeed);
 
             if (logLevel >= 3) {
@@ -291,7 +287,7 @@ public class OperationsTester {
      * @param insertionsCount how many instances of data will be generated and inserted into the k-d tree
      * @param iterationsCount how many times will search test be executed
      */
-    public boolean testInsertFunctionality(int insertionsCount, int iterationsCount, int logLevel) {
+    public void testInsertFunctionality(int insertionsCount, int iterationsCount, int logLevel) {
         boolean overallOk = true;
         for (int iteration = 1; iteration <= iterationsCount; iteration++) {
             ArrayList<Data2D> lInserted = new ArrayList<>();
@@ -348,96 +344,52 @@ public class OperationsTester {
                 printIterationResult(ok, 1, "Insertion Test");
             }
         }
-        if (logLevel >= 0)
-            printOverallResult(overallOk, "INSERTION TEST");
-        return overallOk;
+        printOverallResult(overallOk, "INSERTION TEST");
     }
 
     /**
      * Tests whether k-d tree is able to find all elements in its structure with same key value.
      *
-     * @param iterationsCount    how many times will search test be executed
-     * @param insertionCount     wanted size of k-d tree
-     * @param dupProbability     probability, by which will be generated duplicate key from yet inserted elements.
-     * @param logLevel           level of description printed on the console. From 0, higher number means more detailed
-     *                           logs. {0,3}
+     * @param iterationsCount         how many times will search test be executed
+     * @param observedDuplicatesCount number of generated keys, that could be inserted multiple times to the tree and
+     *                                recorded in other structure with its all insertions in order to compare result
+     *                                from k-d tree search. Each key is randomly chosen from generated set using even
+     *                                distribution of probability.
+     * @param insertionCount          total number of elements in k-d tree data structure
+     * @param duplicateInsertProb     probability, by which will be some(chosen with even distribution of probability)
+     *                                duplicate key from observed set of duplicates inserted to the k-d tree.
+     * @param logLevel                level of description printed on the console. Range <0;2>, where 0 is no information, 1 are main
+     *                                actions and 2 are specific steps of actions and 3 are all insertions to the structure and search
+     *                                results
      */
-    public boolean testSearchFunctionality(int iterationsCount, int insertionCount,
-                                        double dupProbability, int logLevel, boolean debug) {
+    public void testSearchFunctionality(int iterationsCount, int observedDuplicatesCount, int insertionCount,
+                                        double duplicateInsertProb, int logLevel, boolean debug) {
         boolean overallOk = true;
 
         for (int iteration = 1; iteration <= iterationsCount; iteration++) {
             if (logLevel >= 1)
                 printIteration(iteration, "SEARCH TEST");
 
-            KDTree<Data2D, Data2D, Data2D> kdTree = new KDTree<>(2);
-            ArrayList<Data2D> lObserved = new ArrayList<>(insertionCount);
+            KDTree<Data2D, Data2D, Data2D> kdTree = new KDTree<>(4);
+            ArrayList<ArrayList<Data2D>> lObserved = new ArrayList<>(observedDuplicatesCount);
 
-            boolean iterationOk = true;
-            if (logLevel >= 2)
-                printIterationOperation("INSERTING "+insertionCount+" elements to k-d tree:");
-
-            int[] seeds = insertData(insertionCount, kdTree, lObserved, dupProbability, logLevel, debug);
-            if (insertionCount != kdTree.size()) {
-                iterationOk = false;
-                if (logLevel >= 2)
-                    printError("K-d tree after "+insertionCount+" insertions has NOT WANTED size.");
-            } else {
-                if (logLevel >= 2)
-                    printInfo("K-d tree after "+insertionCount+" insertions HAS wanted size.");
+//            int seedOfObserved = generateObservedData(observedDuplicatesCount, lObserved, logLevel, debug);
+            int[] seeds = insertData(insertionCount, kdTree, lObserved, null, duplicateInsertProb, logLevel,
+                    debug);
+            boolean ok = true;
+            for (int i = 0; i < lObserved.size(); i++) {
+                ok = ok && searchForDuplicate(i, logLevel, lObserved, kdTree);
             }
-            if (logLevel >= 2)
-                printIterationOperation("CHECKING EXISTENCE of inserted elements inside the k-d tree...");
-            if (logLevel >= 3)
-                printHeader("RESULTS:");
-            int nr = 0;
-            for (Data2D insertedElement : lObserved) {
-                nr++;
-                boolean found = false;
-                List<Data2D> lFoundDuplicates = kdTree.findAll(insertedElement);
-                if (lFoundDuplicates != null) {
-                    for (Data2D duplicate : lFoundDuplicates) {
-                        if (duplicate.isSame(insertedElement)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                iterationOk = iterationOk && found;
-                if (logLevel >= 3) {
-                    if (found)
-                        printListItem(nr, "Inserted element "+insertedElement+" was FOUND in tree.");
-                    else
-                        printError("Inserted element "+insertedElement+" NOT found in k-d tree.");
-                }
-            }
-            overallOk = overallOk && iterationOk;
+            if (logLevel >= 1)
+                printIterationResult(ok, iteration, "SEARCH test for duplicate keys");
+//        System.out.println("REAL NUMBER OF ELEMENTS in tree: " + kdTree.size());
+            overallOk = overallOk && ok;
         }
-        if (logLevel >= 0)
-            printOverallResult(overallOk, "SEARCH TEST");
-        return overallOk;
+        printOverallResult(overallOk, "SEARCH TEST");
     }
 
 //    ------------------------------------------ P R I V A T E ----------------------------------------------------
 
-    /**
-     *
-     * @param lAll all elements
-     * @param lUnique first occurred elements with unique key
-     */
-    private void retrieveUniqueValues(ArrayList<Data2D> lAll, ArrayList<Data2D> lUnique) {
-        for (Data2D data : lAll) {
-            boolean notFound = true;
-            for (Data2D unique : lUnique) {
-                if (data.isSameKey(unique)) {
-                    notFound = false;
-                    break;
-                }
-            }
-            if (notFound)
-                lUnique.add(data);
-        }
-    }
     /**
      * Generates string of given length by using generator
      *
@@ -565,53 +517,70 @@ public class OperationsTester {
 
     /**
      * Inserts generated data into the k-d tree instance. With probability given through duplicateInsertionProbability
-     * parameter inserts duplicate key from already inserted dataset.
+     * parameter takes randomly element (probability for choosing element is evenly distributed) from list of before
+     * created duplicates and inserts it instead of creating new data
      *
      * @param dataCount                     quantity of elements, that will be inserted into the tree
      * @param kdTree                        instance where data will be inserted
-     * @param lInserted                     generated data are appended to this list
+     * @param lObserved                     final list of keys, from which will duplicates be generated
+     * @param lInserted                     if not null, inserts all elements that have been inserted into the k-d tree. Element are sorted
+     *                                      ascending by unique assigned id.
      * @param duplicateInsertionProbability probability of inserting duplicate instead of creating random key
-     * @param logLevel                      level of details printed on console {0,1,3}. Higher number for more information.
+     * @param logLevel                      level of details printed on console {0,1,2,3}. Higher number for more information.
      * @return seeds {valueSeed, probabilityOfDuplicatesSeed} used for building k-d tree
      */
-    private int[] insertData(int dataCount, KDTree<Data2D, Data2D, Data2D> kdTree, ArrayList<Data2D>
-            lInserted, double duplicateInsertionProbability, int logLevel, boolean debug) {
-
-        if (lInserted == null)
-            return null;
+    private int[] insertData(int dataCount, KDTree<Data2D, Data2D, Data2D> kdTree, ArrayList<ArrayList<Data2D>>
+            lObserved, ArrayList<Data2D> lInserted,
+                             double duplicateInsertionProbability, int logLevel, boolean debug) {
+        Random seedGenerator = new Random();
+        int seedForValGen;
+        if (!debug)
+//            seedForValGen = seedGenerator.nextInt();  // TODO uncomm
+            seedForValGen = genR.nextInt();  // TODO uncomm
         else
-            lInserted.ensureCapacity(dataCount);
-
-        int seedForValGen = debug ? DEBUG_GEN_FOR_INSERTION_SEED : genR.nextInt();
+            seedForValGen = 1296616592;    // TODO rmv
         Random valGen = new Random(seedForValGen);
 
-        int seedForProb = debug ? DEBUG_PROB_SEED : genR.nextInt();
+        int seedForProb;
+        if (!debug)
+//            seedForProb = seedGenerator.nextInt();// TODO uncomm
+            seedForProb = genR.nextInt();// TODO uncomm
+        else
+            seedForProb = -1200112902; // TODO rmv
         Random probGenerator = new Random(seedForProb);
 
         if (logLevel >= 1)
-            printHeader("GENERATED " + dataCount + " values...");
+            printIterationOperation("GENERATING " + dataCount + " VALUES... VALUE_SEED=" + seedForValGen +
+                    "; PROBABILITY_SEED=" + seedForProb);
 
-        // v-- first cannot be generated as duplicate
-        Data2D nextData = generateDataInstance(valGen);
-        lInserted.add(nextData);
-        kdTree.insert(nextData, nextData);
-        if (logLevel >= 3)
-            printListItem(1,"    -> inserting "+String.format("%-9s", "NEW")+" element " + nextData + "...");
-        // first is inserted, now I'll generate duplicate or new element (new element could also be duplicate)
-        for (int i = 0; i < dataCount-1; i++) {
+        for (ArrayList<Data2D> keyDuplicates : lObserved) {
+            if (logLevel >= 3)
+                System.out.println("    => inserting NEW element " + keyDuplicates.get(0) + "...");
+            kdTree.insert(keyDuplicates.get(0), keyDuplicates.get(0)); // original duplicates haven't been inserted yet
+            if (lInserted != null) {
+                lInserted.add(keyDuplicates.get(0));
+            }
+        }
+        if (lInserted != null)
+            lInserted.sort(new Data2D.Data2DComparator()); // must be sorted by unique id
+        Data2D nextData;
+        dataCount = dataCount - lObserved.size();   /* because I need to insert duplicates for the first time and don't
+                                                       want to affect number of inserted elements*/
+        for (int i = 0; i < dataCount; i++) {
             if (probGenerator.nextDouble() < duplicateInsertionProbability) {   // duplicate element
-                int nextIdx = probGenerator.nextInt(lInserted.size());
-                nextData = new Data2D(lInserted.get(nextIdx),
-                                        IdGenerator.getInstance().nextId()); // copy construct, but use new id
+                int nextIdx = probGenerator.nextInt(lObserved.size());
+                nextData = new Data2D(lObserved.get(nextIdx).get(0), IdGenerator.getInstance().nextId());
+                lObserved.get(nextIdx).add(nextData);   // remember newly create duplicate
                 if (logLevel >= 3)
-                    printListItem(i+2, "    => inserting DUPLICATE element " + nextData + "...");
+                    System.out.println("    => inserting DUPLICATE element " + nextData + "...");
             } else {  // new element
                 nextData = generateDataInstance(valGen);
                 if (logLevel >= 3)
-                    printListItem(i+2,"    -> inserting "+String.format("%-9s", "NEW")+" element " + nextData + "...");
+                    System.out.println("    -> inserting NEW element " + nextData + "...");
             }
-            lInserted.add(nextData);
             kdTree.insert(nextData, nextData);
+            if (lInserted != null)
+                lInserted.add(nextData);
         }
         int[] seeds = new int[2];
         seeds[VAL_SEED_IDX] = seedForValGen;
@@ -634,7 +603,7 @@ public class OperationsTester {
 //            seedForValGen = new Random().nextInt(); // TODO by this
             seedForValGen = genR.nextInt(); // TODO by this
         else
-            seedForValGen = DEBUG_GEN_OBSERVED_SEED;   // TODO rmv
+            seedForValGen = DEBUG_GEN_FOR_INSERTION_SEED;   // TODO rmv
 //        Random valGen = new Random();
         Random valGen = new Random(seedForValGen);
         if (logLvl >= 4)
@@ -646,6 +615,30 @@ public class OperationsTester {
             if (logLvl >= 4)
                 printListItem(i + 1, "new data: " + nextData);
             lObserved.add(nextData);
+        }
+        return seedForValGen;
+    }
+
+    private int generateObservedDataOld(int observedCount, ArrayList<ArrayList<Data2D>> lObserved, int logLvl, boolean
+            debug) {
+        int seedForValGen;
+        if (!debug)
+//            seedForValGen = new Random().nextInt(); // TODO by this
+            seedForValGen = genR.nextInt(); // TODO by this
+        else
+            seedForValGen = DEBUG_GEN_FOR_INSERTION_SEED;   // TODO rmv
+//        Random valGen = new Random();
+        Random valGen = new Random(seedForValGen);
+        if (logLvl >= 4)
+            printIterationOperation("GENERATING " + observedCount + " observed data for duplicates " +
+                    "[GEN_FOR_INSERTION_SEED=" + seedForValGen + "]");
+        for (int i = 0; i < observedCount; i++) {
+            Data2D nextData = generateDataInstance(valGen);
+            if (logLvl >= 3)
+                printListItem(i + 1, "new data: " + nextData);
+            ArrayList<Data2D> list = new ArrayList<>();
+            list.add(nextData);
+            lObserved.add(list);
         }
         return seedForValGen;
     }
@@ -662,7 +655,7 @@ public class OperationsTester {
                 IdGenerator.getInstance().nextId(),
                 (1+(Math.abs(valGen.nextInt()) % 3)), // 1-3
                 (1 +(Math.abs(valGen.nextInt() % 3))) // 1-3
-        );
+                );
 //        return new Data2D(valGen.nextDouble() * (valGen.nextInt() % 10),
 //                nextString(5, valGen),
 //                valGen.nextInt() % 100,
@@ -735,54 +728,33 @@ public class OperationsTester {
 
     //    / / / / / / / / / / / / / / / / > M  A  I  N <  / / / / / / / / / / / / / / / / / / / / / / / /
     public static void main(String[] args) {
-        final int INSERT_TEST = 1;
-        final int SEARCH_TEST = 2;
-        final int DELETE_TEST = 3;
-        int chosenOperation = INSERT_TEST;
-        OperationsTester ot = new OperationsTester();
-        boolean debug = false;
-        boolean allOk = true;
+        OperationsTesterOld ot = new OperationsTesterOld();
 //        -----------------------------------------------------
-        if (chosenOperation == INSERT_TEST) {
-            if (!debug) {
-                for (int i = 1; i <= 100000; i*=10) {
-                    System.out.println("\n>---  for params: i=" + i + "  ---v");
-                    boolean ok = ot.testInsertFunctionality(1, i, -1);
-                    System.out.println("..." + (ok ? "SUCCESS" : "FAILED"));
-                    allOk = allOk && ok;
-                }
-            } else {
-                int dbg_i = 50000;
-                boolean ok = ot.testInsertFunctionality(1, dbg_i, -1);
-            }
-        }
-//        -----------------------------------------------------
-        else if (chosenOperation == SEARCH_TEST) {
-            if (!debug) {
-                for (int i = 1; i <= 100000; i*=10) {
-                    for (double p = 0.09; p < 1.0; p += 0.1) {
-                        System.out.println("\n>---  for params: i=" + i + ", p=" + p + "  ---v");
-                        boolean ok = ot.testSearchFunctionality(1, i, p, -1, false);
-                        System.out.println("..." + (ok ? "SUCCESS" : "FAILED"));
-                        allOk = allOk && ok;
-                    }
-                }
-            } else {
-                int dbg_i = 50000;
-                double dbg_p = 0.09;
-                ot.testSearchFunctionality(1, dbg_i, dbg_p, 1, true);
-            }
-        }
-//        -----------------------------------------------------------------------------------
-        else if (chosenOperation == DELETE_TEST) {
-
-        }
-//        -----------------------------------------------------------------------------------
-
-        /*                                          R E S U L T                                                    */
-        System.out.println("\n"+ (chosenOperation == INSERT_TEST ? "INSERT" : (chosenOperation == DELETE_TEST ? "DELETE" :
-                        (chosenOperation == SEARCH_TEST ? "SEARCH" : "UNKNOWN"))) + " TEST - ALL passed: " + allOk +
-                (debug ? " [DEBUG]" : ""));
+        int dupCount = 15;
+        ArrayList<Data2D> lObserved = new ArrayList<>(dupCount);
+        System.out.println("SEED: " + ot.generateObservedData(dupCount, lObserved, 4, true));
+//        int best_i = 50000;
+//        int best_d = 1;
+//        double best_p =0.09;
+//        boolean debug = false;
+//        if (!debug) {
+//            boolean allOk = true;
+////        for (int i = 5; i <= 10; i++) {
+//            for (int i = 10; i <= 12; i++) {
+//                for (int d = 1; d < 10; d++) {
+//                    for (double p = 0.09; p < 1.0; p += 0.1) {
+//                        ot.testSearchFunctionality(1, (i/d) ,i, p, 1, false); // --ok
+////                        boolean oki = ot.testDeleteFunctionality(1, i, i / d, i / 3, p, 0, true); // found
+////                        if (!oki)
+////                            System.out.println("for params: i=" + i + ", d=" + d + ", i/d= " + (i / d) + ", p=" + p + " ---v");
+////                    allOk = allOk && oki;
+//                    }
+//                }
+//            }
+//        } else {
+////        System.out.println("i="+best_i+", d="+best_d+", i/d= "+(best_i/best_d)+", p="+best_p);
+//            ot.testDeleteFunctionality(1, best_i, best_i / best_d, best_i / 3, best_p, 3, true);
+//        }
+//    }
     }
 }
-
