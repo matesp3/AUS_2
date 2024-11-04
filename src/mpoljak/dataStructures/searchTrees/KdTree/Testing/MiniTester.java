@@ -397,61 +397,61 @@ public class MiniTester {
 //        kdTree.printTree();
 
 //      ----------- DELETING AND REPLACING FROM LEFT SUBTREE: OK..
-//        kdTree.printTree();     // Nitra <= Senica
-//        kdTree.delete(i1, i1);
-//        System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
-//
-//        kdTree.printTree();     // Senica - stanica <= Hodonin
-//        kdTree.delete(i4, i4);
-//        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
-//
-//        kdTree.printTree();     // Hodonin
-//        kdTree.delete(i6, i6);
-//        System.out.println(" > DELETED NODE [KEY=" + i6 + "; DATA=" + i6 + "]");
-//
-//        kdTree.printTree();     // Senica - urad
-//        kdTree.delete(i5, i5);
-//        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
-//
-//        kdTree.printTree();     // Senica - skola
-//        kdTree.delete(i3, i3);
-//        System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
-//
-////        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
-//
-//        kdTree.printTree();     // Senica (KOREN)
-//        kdTree.delete(i2, i2);
-//        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
-//
-//        kdTree.printTree();     // Senica (KOREN)
-//        kdTree.delete(i8, i8);
-//        System.out.println(" > DELETED NODE [KEY=" + i8 + "; DATA=" + i8 + "]");
-//
-//        kdTree.printTree();     // Senica (KOREN)
-//        kdTree.delete(i9, i9);
-//        System.out.println(" > DELETED NODE [KEY=" + i9 + "; DATA=" + i9 + "]");
-//
-//        kdTree.printTree();     // Senica (KOREN)
-//        kdTree.delete(i7, i7);
-//        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
-//
-//        kdTree.printTree();     // Senica (KOREN)
-//        kdTree.delete(i10, i10);
-//        System.out.println(" > DELETED NODE [KEY=" + i10 + "; DATA=" + i10 + "]");
-//
-//        kdTree.printTree();
-//        kdTree.delete(i11, i11);
-//        System.out.println(" > DELETED NODE [KEY=" + i11 + "; DATA=" + i11 + "]");
-//
-//        kdTree.printTree();
-//        kdTree.delete(i13, i13);
-//        System.out.println(" > DELETED NODE [KEY=" + i13 + "; DATA=" + i13 + "]");
-//
-//        kdTree.printTree();     // Bojnice
-//        kdTree.delete(i12, i12);
-//        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
-//        System.out.println("FINAL RESULT TREE:");
-//        kdTree.printTree();
+        kdTree.printTree();     // Nitra <= Senica
+        kdTree.delete(i1, i1);
+        System.out.println(" > DELETED NODE [KEY=" + i1 + "; DATA=" + i1 + "]");
+
+        kdTree.printTree();     // Senica - stanica <= Hodonin
+        kdTree.delete(i4, i4);
+        System.out.println(" > DELETED NODE [KEY=" + i4 + "; DATA=" + i4 + "]");
+
+        kdTree.printTree();     // Hodonin
+        kdTree.delete(i6, i6);
+        System.out.println(" > DELETED NODE [KEY=" + i6 + "; DATA=" + i6 + "]");
+
+        kdTree.printTree();     // Senica - urad
+        kdTree.delete(i5, i5);
+        System.out.println(" > DELETED NODE [KEY=" + i5 + "; DATA=" + i5 + "]");
+
+        kdTree.printTree();     // Senica - skola
+        kdTree.delete(i3, i3);
+        System.out.println(" > DELETED NODE [KEY=" + i3 + "; DATA=" + i3 + "]");
+
+//        ----------- TODO - DELETING AND REPLACING FROM RIGHT SUBTREE... in progress..
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i2, i2);
+        System.out.println(" > DELETED NODE [KEY=" + i2 + "; DATA=" + i2 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i8, i8);
+        System.out.println(" > DELETED NODE [KEY=" + i8 + "; DATA=" + i8 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i9, i9);
+        System.out.println(" > DELETED NODE [KEY=" + i9 + "; DATA=" + i9 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i7, i7);
+        System.out.println(" > DELETED NODE [KEY=" + i7 + "; DATA=" + i7 + "]");
+
+        kdTree.printTree();     // Senica (KOREN)
+        kdTree.delete(i10, i10);
+        System.out.println(" > DELETED NODE [KEY=" + i10 + "; DATA=" + i10 + "]");
+
+        kdTree.printTree();
+        kdTree.delete(i11, i11);
+        System.out.println(" > DELETED NODE [KEY=" + i11 + "; DATA=" + i11 + "]");
+
+        kdTree.printTree();
+        kdTree.delete(i13, i13);
+        System.out.println(" > DELETED NODE [KEY=" + i13 + "; DATA=" + i13 + "]");
+
+        kdTree.printTree();     // Bojnice
+        kdTree.delete(i12, i12);
+        System.out.println(" > DELETED NODE [KEY=" + i12 + "; DATA=" + i12 + "]");
+        System.out.println("FINAL RESULT TREE:");
+        kdTree.printTree();
     }
 
     public static void main(String[] args) {

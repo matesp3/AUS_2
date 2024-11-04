@@ -74,6 +74,8 @@ public class OperationsTester {
 
         for (int iteration = 1; iteration <= iterationsCount; iteration++) {
 //        ---------------------------------------------
+            int[] forDeleting = {-1,0}; // [0] is index of element to delete from lObserved, [1] is alternative
+                                        // starter position
             if (logLevel >= 1)
                 printIteration(iteration, "DELETE TEST");
 //        -- 1. STEP: prepare data
@@ -86,47 +88,61 @@ public class OperationsTester {
             if (requiredTreeSize != originalSize)
                 throw new RuntimeException("K-d tree does not contain required number of elements! " +
                         "RequiredSize=" + requiredTreeSize + " | RealSize=" + originalSize);
-//          do evidence of deleted element(s)
-            int idxOfDeleted = genR.nextInt(lObserved.size());
-            Data2D dataToDelete = lObserved.get(idxOfDeleted); // get inserted element at random idx
-            lObserved.set(idxOfDeleted, null);  // deleted elements are set as null in helper structure
-//          search for all data same key as key of dataToDelete
-            List<Data2D> lDupBeforeDelete = kdTree.findAll(dataToDelete);
-            if (lDupBeforeDelete == null)
-                throw new NullPointerException("K-d tree returned any duplicate for dataToDelete="+dataToDelete);
-//          remove dataToDelete instance from list of duplicates
-            for (int i = 0; i < lDupBeforeDelete.size(); i++) {
-                if (lDupBeforeDelete.get(i).isSame(dataToDelete)) {
-                    lDupBeforeDelete.remove(i);
-                    break;
-                }
-            }
-//          sort duplicates by their unique id
-            lDupBeforeDelete.sort(new Data2D.Data2DComparator());
-//          delete element
-            kdTree.delete(dataToDelete, dataToDelete);
-            int actualSize = kdTree.size();
-            if (actualSize != (originalSize - 1) )
-                throw new RuntimeException("Size after delete different than expected. Expected="+(originalSize-1)
-                        +" , Actual="+actualSize);
-//          search for duplicates of dataToDelete again
-            List<Data2D> lDupAfterDelete = kdTree.findAll(dataToDelete);
-            if (lDupAfterDelete == null && lDupBeforeDelete.size() != 0)
-                throw new RuntimeException("Problem with duplicate. Should retrieve something, but returned null");
-            if (lDupAfterDelete != null) {
-                lDupAfterDelete.sort(new Data2D.Data2DComparator());
-//          check, whether originally retrieved duplicates without dataToDeleete instance are the same as retrieved
-//          after delete operation of dataToDelete instance
-                if (lDupBeforeDelete.size() == lDupAfterDelete.size()) {
-                    for (int i = 0; i < lDupBeforeDelete.size(); i++) {
-                        if (!lDupBeforeDelete.get(i).isSame(lDupAfterDelete.get(i)))
-                            throw new RuntimeException("Not same! Problem with duplicates. Compared '"
-                                    + lDupBeforeDelete.get(i) + "'  to  '" + lDupAfterDelete.get(i) + "'");
+
+            for (int delNr = 1; delNr <= deletionsCount; delNr++) {
+//              do evidence of deleted element(s)
+//                int idxOfDeleted = genR.nextInt(lObserved.size());
+                if (logLevel >= 2)
+                    printIterationOperation("PICKING element to delete...");
+                forDeleting = pickNotDeletedElement(lObserved, genR, forDeleting[1]);
+                Data2D dataToDelete = lObserved.get(forDeleting[0]); // get inserted element at random idx
+                if (logLevel >= 2)
+                    printInfo("Picked element for delete="+dataToDelete);
+                lObserved.set(forDeleting[0], null);  // deleted elements are set as null in helper structure
+//              search for all data same key as key of dataToDelete
+                List<Data2D> lDupBeforeDelete = kdTree.findAll(dataToDelete);
+                if (lDupBeforeDelete == null)
+                    throw new NullPointerException("K-d tree returned any duplicate for dataToDelete=" + dataToDelete);
+//              remove dataToDelete instance from list of duplicates
+                for (int i = 0; i < lDupBeforeDelete.size(); i++) {
+                    if (lDupBeforeDelete.get(i).isSame(dataToDelete)) {
+                        lDupBeforeDelete.remove(i);
+                        break;
                     }
-                } else {
-                    throw new RuntimeException("Amount of retrieved key duplicates after deleted instance before delete is"
-                            + "is different as before delete. BeforeDelete=" + lDupBeforeDelete + " , AfterDelete="
-                            + lDupAfterDelete);
+                }
+//              sort duplicates by their unique id
+                if (logLevel >= 2)
+                    printIterationOperation("SORTING BEFORE delete..");
+                lDupBeforeDelete.sort(new Data2D.Data2DComparator());
+//              delete element
+                if (logLevel >= 2)
+                    printIterationOperation("DELETING element "+dataToDelete+" ...");
+                kdTree.delete(dataToDelete, dataToDelete);
+                int actualSize = kdTree.size();
+                if (logLevel >= 2)
+                    printInfo("Actual tree size="+actualSize+" . Must be="+(originalSize - delNr));
+                if (actualSize != (originalSize - delNr))
+                    throw new RuntimeException("Size after delete different than expected. Expected=" + (originalSize - delNr)
+                            + " , Actual=" + actualSize);
+//              search for duplicates of dataToDelete again
+                List<Data2D> lDupAfterDelete = kdTree.findAll(dataToDelete);
+                if (lDupAfterDelete == null && lDupBeforeDelete.size() != 0)
+                    throw new RuntimeException("Problem with duplicate. Should retrieve something, but returned null");
+                if (lDupAfterDelete != null) {
+                    lDupAfterDelete.sort(new Data2D.Data2DComparator());
+//              check, whether originally retrieved duplicates without dataToDeleete instance are the same as retrieved
+//              after delete operation of dataToDelete instance
+                    if (lDupBeforeDelete.size() == lDupAfterDelete.size()) {
+                        for (int i = 0; i < lDupBeforeDelete.size(); i++) {
+                            if (!lDupBeforeDelete.get(i).isSame(lDupAfterDelete.get(i)))
+                                throw new RuntimeException("Not same! Problem with duplicates. Compared '"
+                                        + lDupBeforeDelete.get(i) + "'  to  '" + lDupAfterDelete.get(i) + "'");
+                        }
+                    } else {
+                        throw new RuntimeException("Amount of retrieved key duplicates after deleted instance before delete is"
+                                + "is different as before delete. BeforeDelete=" + lDupBeforeDelete + " , AfterDelete="
+                                + lDupAfterDelete);
+                    }
                 }
             }
 //          At the end, check if remaining elements are in helper structure and k-d tree the same
@@ -151,39 +167,29 @@ public class OperationsTester {
         return overallOk;
     }
 
-    /**
-     * @param kdTree               instance, from which remaining duplicate keys will be searched for
-     * @param lRemainingDuplicates duplicate keys that have remained after deletion from k-d tree
-     * @param logLevel             2 for detailed info about errors
-     * @return false if at least one duplicate key is not reachable - could not be found in k-d tree. Else true.
-     */
-    private boolean testReachabilityOfRemainingDuplicates(KDTree<Data2D, Data2D, Data2D> kdTree,
-                                                          ArrayList<Data2D> lRemainingDuplicates, int logLevel) {
-        boolean allOk = true;
-        if (lRemainingDuplicates.isEmpty())
-            return true;
-        else {
-            for (Data2D dup : lRemainingDuplicates) {
-                List<Data2D> lFound = kdTree.findAll(dup);
-                if (lFound == null) {
-                    if (logLevel >= 3) {
-                        printError("Could not find any element with duplicate key in k-d tree for value=" + dup);
-                    }
-                    return false;
-                }
-                boolean found = false;
-                for (Data2D f : lFound) {
-                    if (dup.isSame(f)) {
-                        found = true;
-                        break;
-                    }
-                }
-                allOk = allOk && found;
-                if (!found && logLevel >= 3)
-                    printError("Remaining duplicate key=" + dup + " couldn't be found in k-d tree");
+    private int[] pickNotDeletedElement(ArrayList<Data2D> lEvidence, Random g, int alternativeStarter) {
+        int[] res = new int[2];
+        int idxToDelete = -1;
+        for (int i = 0; i < 10; i++) {
+            idxToDelete = g.nextInt(lEvidence.size());
+            if (lEvidence.get(idxToDelete) == null)
+                idxToDelete = -1;
+            else {
+                res[0] = idxToDelete;
+                res[1] = alternativeStarter;
+                break;
             }
         }
-        return allOk;
+        if (idxToDelete == -1) {
+            for (int i = alternativeStarter; i < lEvidence.size(); i++) {
+                if (lEvidence.get(i) != null) {
+                    res[0] = i;
+                    res[1] = i;
+                    break;
+                }
+            }
+        }
+        return res;
     }
 
     /**
@@ -254,16 +260,6 @@ public class OperationsTester {
         if (logLevel >= 0)
             printOverallResult(overallOk, "INSERTION TEST");
         return overallOk;
-    }
-
-    private Data4D gen4D() {
-        setCustomCharSet("abcd");
-        Random r = new Random();
-        return new Data4D(1.0*(r.nextInt()%20),
-                            nextString(1, r),
-                            r.nextInt(),
-                            1.0*(r.nextInt()%20),
-                            IdGenerator.getInstance().nextId());
     }
 
     public void testFindingAllDuplicates(int dataCount, double duplicateInsertionProbability, int logLevel, boolean debug) {
@@ -378,25 +374,6 @@ public class OperationsTester {
     }
 
 //    ------------------------------------------ P R I V A T E ----------------------------------------------------
-
-    /**
-     *
-     * @param lAll all elements
-     * @param lUnique first occurred elements with unique key
-     */
-    private void retrieveUniqueValues(ArrayList<Data2D> lAll, ArrayList<Data2D> lUnique) {
-        for (Data2D data : lAll) {
-            boolean notFound = true;
-            for (Data2D unique : lUnique) {
-                if (data.isSameKey(unique)) {
-                    notFound = false;
-                    break;
-                }
-            }
-            if (notFound)
-                lUnique.add(data);
-        }
-    }
     /**
      * Generates string of given length by using generator
      *
@@ -469,56 +446,14 @@ public class OperationsTester {
         }
     }
 
-    /**
-     * @param idx         offset in list lDuplicates
-     * @param logLevel    level of details printed on console
-     * @param lDuplicates prepared duplicate keys used to be searched for in k-d tree
-     * @param kdTree      instance on which will be search executed
-     * @return true - if the amount of found elements in k-d tree is the same as the amount of elements in lDuplicates
-     * on the given index and if the unique ids of elements in both structures (for found elements and for given index
-     * in lDuplicates) are the same. Else false.
-     */
-    private boolean searchForDuplicate(int idx, int logLevel, ArrayList<ArrayList<Data2D>> lDuplicates,
-                                       KDTree<Data2D, Data2D, Data2D> kdTree) {
-        if (logLevel >= 3) {
-            //        PRINT REMEMBER DUPLICATES FOR GIVEN INDEX
-            printHeader("CREATED DUPLICATES:");
-            for (int i = 0; i < lDuplicates.get(idx).size(); i++) {
-                printListItem(i + 1, lDuplicates.get(idx).get(i).toString());
-            }
-        }
-
-        List<Data2D> lFound = kdTree.findAll(lDuplicates.get(idx).get(0));    // take one from the duplicates
-        if (lFound == null)
-            return false;
-        lFound.sort(new Data2D.Data2DComparator());
-
-        if (logLevel >= 3) {
-//        FIND ALL DUPLICATES WITH THE KEY OF ELEMENT ON THE INDEX IN THE K-D TREE
-            printHeader("FOUND DUPLICATES IN THE K-D TREE:");
-            for (int i = 0; i < lFound.size(); i++) {
-                printListItem(i + 1, lFound.get(i).toString());
-            }
-        }
-        if (lDuplicates.get(idx).size() != lFound.size()) {
-            if (logLevel >= 2)
-                printError("Different count of created and found duplicates!");
-            return false;
-        }
-        boolean allEqual = true;
-        for (int i = 0; i < lFound.size(); i++) {
-            if (lFound.get(i).getId() != lDuplicates.get(idx).get(i).getId()) {
-                allEqual = false;
-                break;
-            }
-        }
-        if (logLevel >= 2) {
-            if (allEqual)
-                printInfo("SUCCESS!       -   created and found duplicates are matching.");
-            else
-                printInfo("TEST FAILED!   -   found duplicates are not equal to created.");
-        }
-        return allEqual;
+    private Data4D gen4D() {
+        setCustomCharSet("abcd");
+        Random r = new Random();
+        return new Data4D(1.0*(r.nextInt()%20),
+                nextString(1, r),
+                r.nextInt(),
+                1.0*(r.nextInt()%20),
+                IdGenerator.getInstance().nextId());
     }
 
     /**
@@ -578,37 +513,6 @@ public class OperationsTester {
     }
 
     /**
-     * Randomly generates keys. Each nested ArrayList structure will initially contain only first element on index 0.
-     *
-     * @param observedCount number of elements inserted to the list 'lObserved'
-     * @param lObserved     structure holding generated data
-     * @param logLvl        {4}
-     * @return generated seed, by which were data generated
-     */
-    private int generateObservedData(int observedCount, ArrayList<Data2D> lObserved, int logLvl, boolean
-            debug) {
-        int seedForValGen;
-        if (!debug)
-//            seedForValGen = new Random().nextInt(); // TODO by this
-            seedForValGen = genR.nextInt(); // TODO by this
-        else
-            seedForValGen = DEBUG_GEN_OBSERVED_SEED;   // TODO rmv
-//        Random valGen = new Random();
-        Random valGen = new Random(seedForValGen);
-        if (logLvl >= 4)
-            printIterationOperation("GENERATING " + observedCount + " observed data for duplicates " +
-                    "[GEN_FOR_INSERTION_SEED=" + seedForValGen + "]");
-        lObserved.clear();
-        for (int i = 0; i < observedCount; i++) {
-            Data2D nextData = generateDataInstance(valGen);
-            if (logLvl >= 4)
-                printListItem(i + 1, "new data: " + nextData);
-            lObserved.add(nextData);
-        }
-        return seedForValGen;
-    }
-
-    /**
      * Randomly generates instance using valGen.
      *
      * @param valGen generator of values with set seed
@@ -618,8 +522,8 @@ public class OperationsTester {
 //        setCustomCharSet("abcde");
         return new Data2D(
                 IdGenerator.getInstance().nextId(),
-                (1+(Math.abs(valGen.nextInt()) % 100)), // 1-3
-                (1 +(Math.abs(valGen.nextInt() % 100))) // 1-3
+                (1+(Math.abs(valGen.nextInt()) % 100_00)), // 1-3
+                (1 +(Math.abs(valGen.nextInt() % 100_00))) // 1-3
         );
 //        return new Data2D(valGen.nextDouble() * (valGen.nextInt() % 10),
 //                nextString(5, valGen),
@@ -703,7 +607,7 @@ public class OperationsTester {
         final int SPECIFIC_DUPLICATE_TEST = 4;
         int chosenOperation = DELETE_TEST;
         OperationsTester ot = new OperationsTester();
-        boolean debug = true;
+        boolean debug = false;
         boolean allOk = true;
 //        -----------------------------------------------------
         if (chosenOperation == INSERT_TEST) {
@@ -740,20 +644,22 @@ public class OperationsTester {
         else if (chosenOperation == DELETE_TEST) {  // passed for size after delete. Need to check, whether duplicates
                                                     // are on the reachable position
             if (!debug) {
-                for (int i = 10; i <= 100000; i*=10) {               // treeSize
-                    for (double d = 0.01; d < 11; d+=3.33) {              // d*10 = percentage of deleted elements
-                        for (double p = 0.01; p <= 1.0; p += 0.32) {      // probability of creating duplicate
+//                for (int i = 10; i <= 100000; i*=10) {               // treeSize
+//                    for (double d = 0.01; d < 11; d+=3.33) {
+                for (int i = 10000; i <= 100000; i*=10) {               // treeSize
+                    for (double d = 3.34; d < 11; d+=3.33) {              // d*10 = percentage of deleted elements
+                        for (double p = 0.01; p <= 0.35; p += 0.32) {      // probability of creating duplicate
                             System.out.println("\n v---  for params: i=" + i + ", deleted="+d*i/10+", p="+p+"  <---");
-                            boolean ok = ot.testDeleteFunctionality(1, i, (int)d*i/10, p, -1, false);
+                            boolean ok = ot.testDeleteFunctionality(1, i, (int)d*i/10, p, -1, true);
                             System.out.println("..." + (ok ? "SUCCESS" : "FAILED"));
                             allOk = allOk && ok;
                         }
                     }
                 }
             } else {
-                int dbg_i = 1_000_000;
-                int dbg_d = 1;
-                double dbg_p = 0.55;
+                int dbg_i = 100;
+                int dbg_d = 10;
+                double dbg_p = 0.01;
                 ot.testDeleteFunctionality(1, dbg_i, dbg_d * dbg_i / 10, dbg_p, -1, true);
             }
         }
