@@ -500,8 +500,11 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
             dim = (height++ % this.k) + 1;
             cmp = currentNode.compareTo(key, dim);
             if (cmp == 0) {
-                currentHeight.setVal(height - 1); // send back where you have ended
-                return currentNode; // node with searched data found
+                if (currentNode.hasSameKey(key)) {
+                    currentHeight.setVal(height - 1); // send back where you have ended
+                    return currentNode; // node with searched data found
+                }
+                currentNode = currentNode.getLeftSon();
             } else if (cmp == 1) {
                 currentNode = currentNode.getLeftSon();
             } else if (cmp == -1) {

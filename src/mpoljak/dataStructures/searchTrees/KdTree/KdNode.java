@@ -37,6 +37,15 @@ public class KdNode<D extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return wantedKey.fallsInto(this.maxDimValues);
     }
 
+    /**
+     * Determines whether node's key is same in all dimensions compared to otherKey.
+     * @param otherKey compared key to key of this node
+     * @return true - both keys are same in all dimensions. False else.
+     */
+    public boolean hasSameKey(K otherKey) {
+        return (otherKey != null) && this.usedKey.isSameKey(otherKey);
+    }
+
     /** Updates max key values of all dimensions that are lower than values in given composite key. */
     public void updateMaxKeyValues(K wantedKey) {
         this.maxDimValues.mapGreaterValues(wantedKey);
