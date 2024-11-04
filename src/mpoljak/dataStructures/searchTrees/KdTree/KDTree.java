@@ -148,60 +148,48 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 //                -------------------------------------BEG
                 doReplacementFromLeftSubtree(vForRepl, vSubstitute, hole);
                 updateHeightIfNeeded(vSubstitute, heightOfReplaced, lToDelete); // possibly came here after deleting from right sub
-//                //  UPDATE OF NODE TO PROCESS
-//                heightRef.setVal(hole.height);
-//                vForRepl = hole.nodeToProcess;
                 //  UPDATE OF NODE TO PROCESS
                 heightRef.setVal(hole.height);
                 vForRepl = hole.nodeToProcess;
 //                -------------------------------------END
             } else if (vForRepl.hasRightSon()) {  // v.hasOnlyRightSon
-//                if (!orderingState) { // it is pre-ordering state,
-                    wantedDim = (heightRef.intVal % this.k) + 1;   // by which dim it is compared at height of node to delete
-                    heightOfReplaced = heightRef.intVal();
-                    heightRef.setVal(heightRef.intVal() + 1);   // going to the level of left/right son
+                wantedDim = (heightRef.intVal % this.k) + 1;   // by which dim it is compared at height of node to delete
+                heightOfReplaced = heightRef.intVal();
+                heightRef.setVal(heightRef.intVal() + 1);   // going to the level of left/right son
 
-                    vSubstitute = findMin(wantedDim, vForRepl.getRightSon(), heightRef);
-                    hole = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
-                    // ^--<- need to remember substitute's relationships
+                vSubstitute = findMin(wantedDim, vForRepl.getRightSon(), heightRef);
+                hole = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
+                // ^--<- need to remember substitute's relationships
 //                    if (!orderingState) { // it is pre-ordering state, // commented 03.11
-                        this.findAllEqualInDim(vForRepl, heightOfReplaced, wantedDim, vSubstitute, lToDelete);
+                    this.findAllEqualInDim(vForRepl, heightOfReplaced, wantedDim, vSubstitute, lToDelete);
 //                    }
 //                -------------------------------------BEG
-                    doReplacementFromRightSubtree(vForRepl, vSubstitute, hole);
-                    if (orderingState) { // must do update, if vSubstitute is to replace node in other place
-                        updateHeightIfNeeded(vSubstitute, heightOfReplaced, lToDelete);
-                    }
-                    // here won't be updateOfHeight, because this vSubstitute is excluded from insertion to lToDelete
-//                    //  UPDATE OF NODE TO PROCESS
-//                    heightRef.setVal(hole.height);
-//                    vForRepl = hole.nodeToProcess;
-//                -------------------------------------END
+                doReplacementFromRightSubtree(vForRepl, vSubstitute, hole);
+                if (orderingState) { // must do update, if vSubstitute is to replace node in other place
+                    updateHeightIfNeeded(vSubstitute, heightOfReplaced, lToDelete);
+                }
+                // here won't be updateOfHeight, because this vSubstitute is excluded from insertion to lToDelete
 //                    if (!vForRepl.hasNoneSons()) // continue replacing nodes  todo zak. 03,11
-                    if (!hole.nodeToProcess.hasNoneSons()) // continue replacing nodes  todo pridane. 03,11
-                        orderingState = true;
-//                }
-//                else {  // ordering state
-//                    doReplacementFromRightSubtree(vForRepl, vSubstitute, hole);
-//                    updateHeightIfNeeded(vSubstitute, heightOfReplaced);
-//                    //  UPDATE OF NODE TO PROCESS
-//                    heightRef.setVal(hole.height);
-//                    vForRepl = hole.nodeToProcess;
+                if (!hole.nodeToProcess.hasNoneSons()) // continue replacing nodes  todo pridane. 03,11
+                    orderingState = true;
 //                }
                 //  UPDATE OF NODE TO PROCESS
                 heightRef.setVal(hole.height);
                 vForRepl = hole.nodeToProcess;
+//                -------------------------------------END
             } else {    // vForRep.hasNoneSons = true
-                if (vForRepl.getParent() == null)
-                    throw new RuntimeException("Je root? "+this.isRoot(vForRepl)+ this.size()+",hasNoneSons:"+vForRepl.hasNoneSons());
+//                if (vForRepl.getParent() == null)
+//                    throw new RuntimeException("hlbka: "+heightRef.intVal+", "+ this.size()+",hasNoneSons:"+vForRepl.hasNoneSons());
                 vForRepl.getParent().removeChild(vForRepl); // deleting relationships of helpful node with its parent
                 vForRepl.setParent(null);
-                nodeToProcess = lToDelete.isEmpty() ? null : lToDelete.removeLast();
-                if (nodeToProcess == null) {
+                NodeToProcess ntp = lToDelete.isEmpty() ? null : lToDelete.removeLast();
+                if (ntp == null) {
                     vForRepl = null;
                 } else {
-                    vForRepl = nodeToProcess.nodeToProcess;
-                    heightRef.setVal(nodeToProcess.height);
+                    vForRepl = ntp.nodeToProcess;
+                    heightRef.setVal(ntp.height);
+                    if (vForRepl.hasNoRelationships())
+                        System.out.println("V="+vForRepl+", height="+heightRef.intVal);
                 }
                 if (vForRepl != null)
                     lToReinsert.add(vForRepl);
@@ -213,7 +201,6 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         for (KdNode<E,T,K> n : lToReinsert) {
             this.insert(n.getUsedKey(), n.getData());
         }
-
         return deletedData;
     }
 
@@ -225,6 +212,8 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
     }
 
     public int size() {
+        if (this.root == null)
+            return 0;
         int elementsCount = 0;
         KdTreeInOrderIterator<E,T,K> iterator = this.inOrderIterator();
         while (iterator.hasNext()) {
@@ -413,7 +402,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
             if (currentNode.compareTo(key, dim) == 0 && currentNode != nodeToExclude) {
                 // check whether this instance has already been inserted into the list. No duplicate references allowed.
                 boolean isAlreadyIn = false;
-                for (NodeToProcess n : lNotProcessed) {
+                for (NodeToProcess n : lFound) {
                     if (n.nodeToProcess == currentNode) {
 //                        n.height = height;
                         isAlreadyIn = true;

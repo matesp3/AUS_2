@@ -29,6 +29,7 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
         this.d = d;
     }
 
+
     public Data4D(Data4D other, int uniqueId) {
         this(other.a, other.b, other.c, other.d, uniqueId);
     }
