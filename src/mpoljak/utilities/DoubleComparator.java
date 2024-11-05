@@ -24,9 +24,14 @@ public class DoubleComparator {
      * @return case a < b then -1; case a == b(regarding set epsilon) then 0; case a > b then 1
      */
     public int compare(double a, double b) {
-        double diff = a - b;
-        return (Math.abs(diff) < this.epsilon) ? 0 : (int) Math.signum(diff);
+        return this.compare(a, b, this.epsilon);
     }
+
+    public int compare(double a, double b, double epsilon) {
+        double diff = a - b;
+        return (Math.abs(diff) < epsilon) ? 0 : (int) Math.signum(diff);
+    }
+
     /**
      * Sets maximum difference in absolute value between two double values in order to claim that they are equal.
      * */
