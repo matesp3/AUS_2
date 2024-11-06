@@ -1,7 +1,5 @@
 package mpoljak.App;
 
-import mpoljak.dataStructures.searchTrees.KdTree.Testing.OperationsTesterOld;
-
 public class App {
 
     public static void main(String[] args) {
