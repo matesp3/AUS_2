@@ -3,9 +3,12 @@ package mpoljak.data.forTesting;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISame;
+import mpoljak.dataStructures.searchTrees.KdTree.Testing.IUniqueDataGenerator;
 import mpoljak.utilities.DoubleComparator;
+import mpoljak.utilities.CustomStringGenerator;
 
 import java.util.Comparator;
+import java.util.Random;
 
 public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
     private final int id;
@@ -14,10 +17,30 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
     private double d;
     private String b;
 
-    public static  class Data4DComparator implements Comparator<Data4D> {
+    public static class Data4DComparator implements Comparator<Data4D> {
         @Override
         public int compare(Data4D o1, Data4D o2) {
             return Integer.compare(o1.id, o2.id);
+        }
+    }
+
+    public static class Data4DGenerator implements IUniqueDataGenerator<Data4D, Integer> {
+
+        @Override
+        public Data4D generateInstance(Random valueGenerator, Integer uniqueId) {
+            CustomStringGenerator stringIdGenerator = new CustomStringGenerator();
+            stringIdGenerator.setCustomCharSet("abcde");
+
+            return new Data4D(valueGenerator.nextDouble() * (valueGenerator.nextInt() % 10),
+                    stringIdGenerator.nextString(10, valueGenerator),
+                    valueGenerator.nextInt() % 100,
+                    valueGenerator.nextDouble() * (valueGenerator.nextInt() % 10),
+                    uniqueId);
+        }
+
+        @Override
+        public Data4D copyConstruct(Data4D other, Integer uniqueId) {
+            return new Data4D(other, uniqueId);
         }
     }
 
@@ -28,7 +51,6 @@ public class Data4D implements IKdComparable<Data4D>, ISame<Data4D> {
         this.c = c;
         this.d = d;
     }
-
 
     public Data4D(Data4D other, int uniqueId) {
         this(other.a, other.b, other.c, other.d, uniqueId);

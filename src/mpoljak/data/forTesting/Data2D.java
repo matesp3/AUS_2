@@ -3,19 +3,41 @@ package mpoljak.data.forTesting;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISame;
+import mpoljak.dataStructures.searchTrees.KdTree.Testing.IUniqueDataGenerator;
+import mpoljak.utilities.IntegerIdGenerator;
 
 import java.util.Comparator;
+import java.util.Random;
 
 public class Data2D implements IKdComparable<Data2D>, ISame<Data2D> {
     private final int id;
     private int x;
     private int y;
 
-    public static  class Data2DComparator implements Comparator<Data2D> {
+    public static class Data2DComparator implements Comparator<Data2D> {
 
         @Override
         public int compare(Data2D o1, Data2D o2) {
             return Integer.compare(o1.id, o2.id);
+        }
+    }
+
+    public static class Data2DGenerator implements IUniqueDataGenerator<Data2D, Integer> {
+
+        @Override
+        public Data2D generateInstance(Random valueGenerator, Integer uniqueId) {
+            if (uniqueId == null)
+                throw new NullPointerException("UniqueId is null, while creating new Data2D instance.");
+            return new Data2D(
+                    uniqueId,
+                    (1+(Math.abs(valueGenerator.nextInt()) % 3)), // 1-3
+                    (1 +(Math.abs(valueGenerator.nextInt() % 3))) // 1-3
+            );
+        }
+
+        @Override
+        public Data2D copyConstruct(Data2D other, Integer uniqueId) {
+            return new Data2D(other, uniqueId);
         }
     }
 
