@@ -755,7 +755,7 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
 
         int chosenOperation = OVERALL_TEST;
 //        KdTester<Data2D, Integer> ot = new KdTester<Data2D, Integer>( // TODO GENERATOR of Strings
-//                new Data2D.Data2DComparator(),
+//                new Data2D.Data2DComparator(),                        // TODO 2 add description of doAllTest
 //                IntegerIdGenerator.getInstance(),
 //                new Data2D.Data2DGenerator(),
 //                2
@@ -781,7 +781,7 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
                     }
                 }
             } else {
-                allOk = ot.doOverallTest(0.4, 0.2, 0.4, 20000, 3, false);
+                allOk = ot.doOverallTest(0.4, 0.2, 0.4, 100000, 0, false);
             }
         }
 //        -----------------------------------------------------
