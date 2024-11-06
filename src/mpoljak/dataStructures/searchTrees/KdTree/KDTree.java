@@ -111,8 +111,6 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
     }
 
     public E delete(K key, E data) {
-//        List<NodeToProcess> lFoundDuplicates = this.findDuplicates(key);
-        //TODO AK OBSAHUJE STROM IBA KOREN A TEN CHCEM ODSTRANIT, JE TO OSETRENE?
         NodeToProcess nodeToProcess = this.findUnique(key, data);
         if (nodeToProcess == null)
             return null;
@@ -141,7 +139,6 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                 wantedDim = (heightRef.intVal % this.k) + 1;   // by which dim it is compared at height of node to delete
                 heightOfReplaced = heightRef.intVal();
                 heightRef.setVal(heightRef.intVal() + 1);   // going to the level of left/right son
-
                 vSubstitute = findMax(wantedDim, vForRepl.getLeftSon(), heightRef);
                 hole = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
                 // ^--<- need to remember substitute's relationships
@@ -153,33 +150,45 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                 vForRepl = hole.nodeToProcess;
 //                -------------------------------------END
             } else if (vForRepl.hasRightSon()) {  // v.hasOnlyRightSon
-                wantedDim = (heightRef.intVal % this.k) + 1;   // by which dim it is compared at height of node to delete
+                wantedDim = (heightRef.intVal % this.k) + 1;   // by which dim it's compared at height of node to delete
                 heightOfReplaced = heightRef.intVal();
                 heightRef.setVal(heightRef.intVal() + 1);   // going to the level of left/right son
 
-                vSubstitute = findMin(wantedDim, vForRepl.getRightSon(), heightRef);
-                hole = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember values
-                // ^--<- need to remember substitute's relationships
-//                    if (!orderingState) { // it is pre-ordering state, // commented 03.11
-                    this.findAllEqualInDim(vForRepl, heightOfReplaced, wantedDim, vSubstitute, lToDelete);
-//                    }
+                ArrayList<NodeToProcess> lDup = this.findMinWithDuplicates(
+                        new NodeToProcess(vForRepl.getRightSon(), heightRef.intVal), wantedDim);
+                if (lDup == null || lDup.isEmpty())
+                    throw new NoSuchElementException("Delete opearation:" +
+                            "No minimum from right subtree found when it was expected to get");
+                vSubstitute = lDup.get(0).nodeToProcess;
+                heightRef.setVal(lDup.get(0).height);
+                hole = new NodeToProcess(new KdNode<>(vSubstitute), heightRef.intVal()); // remember origin place
+
+                for (int dup = 1; dup < lDup.size(); dup++) { // add duplicates into evidence of elements to reinsert
+                    // add it only if it's not already in evidence
+                    NodeToProcess ntpDup = lDup.get(dup);
+                    boolean alreadyAdded = false;
+                    for (NodeToProcess e : lToDelete) {
+                        if (e.nodeToProcess.getData().isSame(ntpDup.nodeToProcess.getData())) {
+                            alreadyAdded = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyAdded)
+                        lToDelete.addLast(ntpDup);
+                }
 //                -------------------------------------BEG
                 doReplacementFromRightSubtree(vForRepl, vSubstitute, hole);
                 if (orderingState) { // must do update, if vSubstitute is to replace node in other place
                     updateHeightIfNeeded(vSubstitute, heightOfReplaced, lToDelete);
                 }
                 // here won't be updateOfHeight, because this vSubstitute is excluded from insertion to lToDelete
-//                    if (!vForRepl.hasNoneSons()) // continue replacing nodes  todo zak. 03,11
-                if (!hole.nodeToProcess.hasNoneSons()) // continue replacing nodes  todo pridane. 03,11
+                if (!hole.nodeToProcess.hasNoneSons()) // continue replacing nodes
                     orderingState = true;
-//                }
                 //  UPDATE OF NODE TO PROCESS
                 heightRef.setVal(hole.height);
                 vForRepl = hole.nodeToProcess;
 //                -------------------------------------END
             } else {    // vForRep.hasNoneSons = true
-//                if (vForRepl.getParent() == null)
-//                    throw new RuntimeException("hlbka: "+heightRef.intVal+", "+ this.size()+",hasNoneSons:"+vForRepl.hasNoneSons());
                 vForRepl.getParent().removeChild(vForRepl); // deleting relationships of helpful node with its parent
                 vForRepl.setParent(null);
                 NodeToProcess ntp = lToDelete.isEmpty() ? null : lToDelete.removeLast();
@@ -188,16 +197,13 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                 } else {
                     vForRepl = ntp.nodeToProcess;
                     heightRef.setVal(ntp.height);
-                    if (vForRepl.hasNoRelationships())
-                        System.out.println("V="+vForRepl+", height="+heightRef.intVal);
                 }
                 if (vForRepl != null)
                     lToReinsert.add(vForRepl);
                 orderingState = false;
             }
         } while (vForRepl != null);
-//        } while (vForRepl != null && !vForRepl.hasNoneSons());
-
+        // reinsert deleted duplicates (deleted due to not proper position after delete of specified data)
         for (KdNode<E,T,K> n : lToReinsert) {
             this.insert(n.getUsedKey(), n.getData());
         }
@@ -329,24 +335,6 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 //        inOrderProcessing(operationPrint, false);    // in-order for 1-dimension
         this.inOrderProcessing(null, true);      // general hierarchical structure
     }
-
-//    public void printRootMin() {
-//        KdNode<E,T,K> min = findMin(1,this.root.getLeftSon(),new MyInteger(1));
-//        System.out.println("  -  MIN to the root's LEFT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
-//
-//        min = findMin(1,this.root.getRightSon(),new MyInteger(1));
-//        System.out.println("  -  MIN to the root's RIGHT subtree: " + (min == null ? "NULL" : min.getUsedKey()));
-//    }
-//
-//    public void printRootMax() {
-//        System.out.println(root);
-//        KdNode<E,T,K> max = findMax(1,this.root.getLeftSon(),new MyInteger(1));
-//        System.out.println("  +  MAX to the root's LEFT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
-//
-//        max = findMax(1,this.root.getRightSon(),new MyInteger(1));
-//        System.out.println("  +  MAX to the root's RIGHT subtree: " + (max == null ? "NULL" : max.getUsedKey()));
-//    }
-
 // -------------------------------------------- P R I V A T E -------------------------------------------------------
     private class MyInteger {
         private int intVal;
@@ -371,58 +359,83 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         }
     }
 
+    /**
+     * Finds all nodes in subtree defined by subtree's root node which contain minimum value for specified dimension.
+     * @param startingNode first node (subtree's root) of evaluated subtree
+     * @param wantedDim dimension, for which is searched minimum with all its duplicates
+     * @return all sequentially found nodes which are equal to minimum value for wanted dimension
+     */
+    private ArrayList<NodeToProcess> findMinWithDuplicates(NodeToProcess startingNode, final int wantedDim) {
+        if (startingNode == null)
+            return null;
+        KdNode<E,T,K> currentNode = startingNode.nodeToProcess;
+        KdNode<E,T,K> nodeWithMin = startingNode.nodeToProcess;
+        int height                = startingNode.height;
+        ArrayList<NodeToProcess> lDuplicates = new ArrayList<>();
+        LinkedList<NodeToProcess> lNotProcessed = new LinkedList<>(); // nodes waiting in queue for processing
+
+        while (currentNode != null) {
+            // process current node here -----------v
+            int cmp = currentNode.compareTo(nodeWithMin, wantedDim);
+            if (cmp == -1) {    // new minimum found
+                nodeWithMin = currentNode;
+                lDuplicates.clear();
+                lDuplicates.add(new NodeToProcess(currentNode, height));
+            }
+            else if (cmp == 0) {
+                lDuplicates.add(new NodeToProcess(currentNode, height));
+            }
+            // -------------------------------------^
+            // find next node to process ---v
+            int dim = (height % this.k) + 1;
+            if (dim == wantedDim) { // minimum can be just in the left subtree
+                if (currentNode.hasLeftSon()) {
+                    currentNode = currentNode.getLeftSon();
+                    height++;
+                } else {
+                    if (lNotProcessed.isEmpty()) {
+                        currentNode = null;
+                    }
+                    else {
+                        NodeToProcess ntp = lNotProcessed.removeFirst();
+                        currentNode = ntp.nodeToProcess;
+                        height = ntp.height;
+                    }
+                }
+            } else {                // minimum could in the left or in the right subtree, because this node compares by
+                                    // other dimension
+                if (currentNode.hasBothSons()) {                            // has left and right sons
+                    height++;
+                    lNotProcessed.addLast(new NodeToProcess(currentNode.getRightSon(), height));
+                    currentNode = currentNode.getLeftSon();
+                }
+                else if (currentNode.hasLeftSon()) {                        // has ONLY LEFT son
+                    currentNode = currentNode.getLeftSon();
+                    height++;
+                }
+                else if (currentNode.hasRightSon()) {                       // has ONLY RIGHT son
+                    currentNode = currentNode.getRightSon();
+                    height++;
+                }
+                else {                                                      // has NONE sons
+                    if (lNotProcessed.isEmpty()) {
+                        currentNode = null;
+                    }
+                    else {
+                        NodeToProcess ntp = lNotProcessed.removeFirst();
+                        currentNode = ntp.nodeToProcess;
+                        height = ntp.height;
+                    }
+                }
+            }
+        }
+        return lDuplicates;
+    }
+
     private void updateHeightIfNeeded(KdNode<E,T,K> movedNode, int newHeight, LinkedList<NodeToProcess> lNodes) {
         for (NodeToProcess n : lNodes) {
             if (n.nodeToProcess == movedNode)
                 n.height = newHeight;
-        }
-    }
-
-    /**
-     * Finds all nodes which are equal for key in given dimension. If found node already exists in list, it won't be
-     * added to the list again, but if its height has changed, it will be updated in existing instance of NodeToProcess.
-     * @param startingNode node, where search starts
-     * @param nodeToExclude node whose key will be used to find nodes by given dim. This node won't be added to lFound
-     *                      list.
-     * @param height is height of starting node
-     * @param dim by which dimension will be equality checked
-     * @param lFound adds found elements to this list. The instance of list must already exist, else the method
-     *              execution ends.
-     */
-//    private void findAllEqualInDim(KdNode<E,T,K> startingNode, MyInteger startingHeight, int dim, KdNode<E,T,K> nodeToExclude, LinkedList<NodeToProcess> lFound) {
-    private void findAllEqualInDim(KdNode<E,T,K> startingNode, int height, int dim, KdNode<E,T,K> nodeToExclude,
-                                   LinkedList<NodeToProcess> lFound) {
-        if (nodeToExclude == null)
-            return;
-        K key = nodeToExclude.getUsedKey();
-        KdNode<E,T,K> currentNode = startingNode;
-        LinkedList<NodeToProcess> lNotProcessed = new LinkedList<>();
-
-        while (currentNode != null) {
-            if (currentNode.compareTo(key, dim) == 0 && currentNode != nodeToExclude) {
-                // check whether this instance has already been inserted into the list. No duplicate references allowed.
-                boolean isAlreadyIn = false;
-                for (NodeToProcess n : lFound) {
-                    if (n.nodeToProcess == currentNode) {
-//                        n.height = height;
-                        isAlreadyIn = true;
-                        break;
-                    }
-                }
-                if (!isAlreadyIn)
-                    lFound.addLast(new NodeToProcess(currentNode, height));
-            }
-            if (currentNode.hasRightSon()) {
-                lNotProcessed.addLast(new NodeToProcess(currentNode.getRightSon(), height + 1));
-            }
-
-            currentNode = currentNode.getLeftSon();
-            height++;
-            if (currentNode == null && !lNotProcessed.isEmpty()) {
-                NodeToProcess ntp = lNotProcessed.removeLast();
-                currentNode = ntp.nodeToProcess;
-                height = ntp.height;
-            }
         }
     }
 
@@ -598,6 +611,9 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return nodeWithExtreme;
     }
 
+    /**
+     * Exchange of vForRepl's relationships with its parent and sons to vSubstitute, which is from left subtree.
+     * */
     private void doReplacementFromLeftSubtree(KdNode<E,T,K> vForRepl, KdNode<E,T,K> vSubstitute, NodeToProcess hole) {
         if (vForRepl == vSubstitute.getParent() || vForRepl.isLeftSon(vSubstitute)) {  // DIRECT RELATIONSHIP between deleted and substituted node
             // LEFT SON OF REPLACED
@@ -626,7 +642,9 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
             doReplacementWithParent(vForRepl, vSubstitute);
         }
     }
-
+    /**
+     * Exchange of vForRepl's relationships with its parent and sons to vSubstitute, which is from right subtree.
+     * */
     private void doReplacementFromRightSubtree(KdNode<E,T,K> vForRepl, KdNode<E,T,K> vSubstitute, NodeToProcess hole) {
         if (vForRepl == vSubstitute.getParent() || vForRepl.isRightSon(vSubstitute)) {// DIRECT RELATIONSHIP between deleted and substituted node
             // RIGHT SON OF REPLACED

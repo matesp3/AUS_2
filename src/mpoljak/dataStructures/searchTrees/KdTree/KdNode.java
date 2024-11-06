@@ -78,6 +78,14 @@ public class KdNode<D extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return this.usedKey.compareTo(otherKey, dim);
     }
 
+    /**
+     *
+     * @param otherNode other node whose key will be compared with key used in this node
+     * @param dim dimension, by which keys of nodes must be compared
+     * @return -1 - key of other node is bigger for specified dim, 0 - both nodes are equal for specified dim, 1 - this
+     * node's key has greater value for specified dim,
+     * else instance of 'mpoljak. dataStructures. searchTrees. KdTree. ERROR'
+     */
     public int compareTo(KdNode<D,T,K> otherNode, int dim) {
         return this.compareTo(otherNode.usedKey, dim);
     }
@@ -97,6 +105,7 @@ public class KdNode<D extends T, T extends ISame<T>, K extends IKdComparable<K> 
     public boolean hasParent() { return this.parent != null; }
     public boolean hasLeftSon() { return this.leftSon != null; }
     public boolean hasRightSon() { return this.rightSon != null; }
+    public boolean hasBothSons() { return this.leftSon != null && this.rightSon != null; }
     public boolean hasNoneSons() { return this.leftSon == null && this.rightSon == null; }
     public boolean hasNoRelationships() { return !hasParent() && hasNoneSons();}
 
