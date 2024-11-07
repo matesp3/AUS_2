@@ -754,18 +754,18 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
         final int SPECIFIC_DUPLICATE_TEST   = 4;
 
         int chosenOperation = OVERALL_TEST;
-//        KdTester<Data2D, Integer> ot = new KdTester<Data2D, Integer>( // TODO GENERATOR of Strings
-//                new Data2D.Data2DComparator(),                        // TODO 2 add description of doAllTest
-//                IntegerIdGenerator.getInstance(),
-//                new Data2D.Data2DGenerator(),
-//                2
-//        );
-        KdTester<Data4D, Integer> ot = new KdTester<Data4D, Integer>(
-                new Data4D.Data4DComparator(),
+        KdTester<Data2D, Integer> ot = new KdTester<Data2D, Integer>( // TODO GENERATOR of Strings
+                new Data2D.Data2DComparator(),                        // TODO 2 add description of doAllTest
                 IntegerIdGenerator.getInstance(),
-                new Data4D.Data4DGenerator(),
-                4
+                new Data2D.Data2DGenerator(),
+                2
         );
+//        KdTester<Data4D, Integer> ot = new KdTester<Data4D, Integer>(
+//                new Data4D.Data4DComparator(),
+//                IntegerIdGenerator.getInstance(),
+//                new Data4D.Data4DGenerator(),
+//                4
+//        );
         boolean debug = false;
         boolean allOk = true;
 //        -----------------------------------------------------

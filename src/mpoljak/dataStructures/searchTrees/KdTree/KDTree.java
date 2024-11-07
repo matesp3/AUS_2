@@ -63,10 +63,10 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         int cmp = Integer.MIN_VALUE;    // undefined
 
         while (!inserted) {
-            currentNode.updateMaxKeyValues(key);
+//            currentNode.updateMaxKeyValues(key);
             dim = (height % this.k) + 1;
             cmp = currentNode.compareTo(key, dim);
-            if (cmp == 0 || cmp == 1) { // v------ go to the left subtree (currentNode has same or greater value of key)
+            if (cmp == 0 || cmp == 1) { // v------ go to the left subtree (currentNode has greater value of key)
                 if (!currentNode.hasLeftSon()) {
                     KdNode<E,T,K> leafNode = new KdNode<E,T,K>(currentNode, null, null, data, key);
                     currentNode.setLeftSon(leafNode);
@@ -74,7 +74,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
                 }
                 currentNode = currentNode.getLeftSon();
                 height++;
-            } else if (cmp == -1) {      // v------- go to the right subtree (currentNode has lower value of key)
+            } else if (cmp == -1) {      // v------- go to the right subtree(currentNode has lower or same value of key)
                 if (!currentNode.hasRightSon()) {
                     KdNode<E,T,K> leafNode = new KdNode<E,T,K>(currentNode, null, null, data, key);
                     currentNode.setRightSon(leafNode);
@@ -515,7 +515,7 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
             if (cmp == 0) {
                 if (currentNode.hasSameKey(key)) {
                     currentHeight.setVal(height - 1); // send back where you have ended
-                    return currentNode; // node with searched data found
+                    return currentNode; // node with searched key found
                 }
                 currentNode = currentNode.getLeftSon();
             } else if (cmp == 1) {
