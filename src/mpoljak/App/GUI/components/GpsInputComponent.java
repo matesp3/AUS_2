@@ -1,95 +1,130 @@
 package mpoljak.App.GUI.components;
 
+import mpoljak.App.GUI.models.GpsModel;
+
 import javax.swing.*;
 import java.awt.*;
 
-public class GpsInputComponent {
-    public static final int COMPONENT_WIDTH = 300;
-    public static final int COMPONENT_HEIGHT = 100;
-
-    private JPanel compositePanel;
-    private JPanel upperPanel;
-    private JPanel lowerPanel;
+public class GpsInputComponent extends JPanel {
+    public static final int PREFERRED_WIDTH = 300;
+    public static final int PREFERRED_HEIGHT = 100;
 
     private JTextField latDegTextField;
     private JTextField lonDegTextField;
-    private JTextField latSignTextField;
-    private JTextField lonSignTextField;
+    private JTextField latDirTextField;
+    private JTextField lonDirTextField;
 
     private JLabel latDegLabel;
     private JLabel lonDegLabel;
-    private JLabel latSignLabel;
-    private JLabel lonSignLabel;
+    private JLabel latDirLabel;
+    private JLabel lonDirLabel;
     private JLabel gpsComponentNameLabel;
 
-
-    public GpsInputComponent(String componentName, JFrame frame, int posX, int posY) {
+    public GpsInputComponent(String componentName, int width, int height) {
+        this.gpsComponentNameLabel = new JLabel(componentName);
 //      ----------------------------------------- latitude
-        this.upperPanel = new JPanel();
-        this.upperPanel.setLayout(new BoxLayout(this.upperPanel, BoxLayout.X_AXIS));
-
         this.latDegLabel = new JLabel("Lat degrees: ");
         this.latDegTextField = new JTextField();
-        this.upperPanel.add(Box.createHorizontalStrut(5));
-        this.upperPanel.add(this.latDegLabel);
-        this.upperPanel.add(Box.createHorizontalStrut(6));
-        this.upperPanel.add(this.latDegTextField);
-        this.upperPanel.add(Box.createHorizontalStrut(12));
+        this.latDegTextField.setPreferredSize(new Dimension(50, 22));
 
-        this.upperPanel.add(Box.createHorizontalStrut(5));
-        this.latSignLabel = new JLabel("Lat direction: ");
-        this.latSignTextField = new JTextField();
-        this.upperPanel.add(this.latSignLabel);
-        this.upperPanel.add(Box.createHorizontalStrut(6));
-        this.upperPanel.add(this.latSignTextField);
-        this.upperPanel.add(Box.createHorizontalStrut(5));
-
-        this.upperPanel.setBounds(0, 0, GpsInputComponent.COMPONENT_WIDTH,
-                GpsInputComponent.COMPONENT_HEIGHT / 2);
-//        this.upperPanel.setBorder(BorderFactory.createRaisedSoftBevelBorder());
+        this.latDirLabel = new JLabel("Lat direction: ");
+        this.latDirTextField = new JTextField();
+        this.latDirTextField.setPreferredSize(new Dimension(18, 22));
 //      ----------------------------------------- longitude
-        this.lowerPanel = new JPanel();
-        this.lowerPanel.setLayout(new BoxLayout(this.lowerPanel, BoxLayout.X_AXIS));
-
         this.lonDegLabel = new JLabel("Lon degrees: ");
         this.lonDegTextField = new JTextField();
-        this.lowerPanel.add(Box.createHorizontalStrut(5));
-        this.lowerPanel.add(this.lonDegLabel);
-        this.lowerPanel.add(Box.createHorizontalStrut(6));
-        this.lowerPanel.add(this.lonDegTextField);
-        this.lowerPanel.add(Box.createHorizontalStrut(12));
+        this.lonDegTextField.setPreferredSize(new Dimension(50, 22));
 
-        this.lowerPanel.add(Box.createHorizontalStrut(5));
-        this.lonSignLabel = new JLabel("Lon direction: ");
-        this.lonSignTextField = new JTextField();
-        this.lowerPanel.add(this.lonSignLabel);
-        this.lowerPanel.add(Box.createHorizontalStrut(6));
-        this.lowerPanel.add(this.lonSignTextField);
-        this.lowerPanel.add(Box.createHorizontalStrut(5));
+        this.lonDirLabel = new JLabel("Lon direction: ");
+        this.lonDirTextField = new JTextField();
+        this.lonDirTextField.setPreferredSize(new Dimension(18, 22));
 
-        this.lowerPanel.setBounds(0, GpsInputComponent.COMPONENT_HEIGHT / 2,
-                GpsInputComponent.COMPONENT_WIDTH,GpsInputComponent.COMPONENT_HEIGHT / 2);
-//        this.lowerPanel.setBorder(BorderFactory.createRaisedSoftBevelBorder());
-//      ------------------------------------------ nesting panels
+        this.createLayout(this);
 
-        this.compositePanel = new JPanel();
-        this.compositePanel.setLayout(new BoxLayout(this.compositePanel, BoxLayout.Y_AXIS));
-
-        this.gpsComponentNameLabel = new JLabel(componentName);
-        this.gpsComponentNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        this.compositePanel.add(Box.createVerticalStrut(5));
-        this.compositePanel.add(this.gpsComponentNameLabel);
-        this.compositePanel.add(Box.createVerticalStrut(10));
-        this.compositePanel.add(this.upperPanel);
-        this.compositePanel.add(Box.createVerticalStrut(8));
-        this.compositePanel.add(this.lowerPanel);
-        this.compositePanel.add(Box.createVerticalStrut(5));
-        this.compositePanel.setBounds(posX, posY, GpsInputComponent.COMPONENT_WIDTH, GpsInputComponent.COMPONENT_HEIGHT);
-        this.compositePanel.setBorder(BorderFactory.createRaisedSoftBevelBorder());
-        frame.add(compositePanel);
+//        this.setBorder(BorderFactory.createRaisedSoftBevelBorder());
+        this.setBorder(BorderFactory.createEtchedBorder());
+//        this.setBorder(BorderFactory.createLoweredSoftBevelBorder());
+        this.setSize(new Dimension(width, height));
     }
 
-    public void setVisible(boolean visible) {
+    public GpsModel getModel() {
+        char lat = latDegTextField.getText().charAt(0);
+        double latDeg = Double.parseDouble(latDegTextField.getText());
+        char lon = lonDegTextField.getText().charAt(0);
+        double lonDeg = Double.parseDouble(lonDegTextField.getText());
+        return new GpsModel(lat, latDeg, lon, lonDeg);
+    }
 
+    public void setModel(GpsModel model) {
+        this.latDegTextField.setText(String.format("%.4f", model.getLatDeg()));
+        this.latDirTextField.setText(String.format("%C", model.getLatitude()));
+        this.lonDegTextField.setText(String.format("%.4f", model.getLongDeg()));
+        this.lonDirTextField.setText(String.format("%C", model.getLongitude()));
+    }
+
+    public void setPosition(int x, int y) {
+        this.setBounds(x, y, PREFERRED_WIDTH, PREFERRED_HEIGHT);
+    }
+
+    public void setBorders(int x, int y, int width, int height) {
+        this.setBounds(x, y, width, height);
+    }
+
+    public void setBgColor(Color color) {
+        this.setBackground(color);
+    }
+
+
+    private void createLayout(JPanel panel) {
+        GridBagLayout layout = new GridBagLayout();
+        panel.setLayout(layout);
+
+        Insets insets = new Insets(5, 5, 5, 5);
+        GridBagConstraints con = new GridBagConstraints();
+        con.insets = insets;
+        con.weightx = 0.5;
+        con.weighty = 0.5;
+        con.anchor = GridBagConstraints.WEST;
+        con.ipadx = 5;
+
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.fill = GridBagConstraints.HORIZONTAL;
+        con.gridx = 0;
+        con.gridy = 0;
+        panel.add(gpsComponentNameLabel, con);
+
+        con.gridx = 0;
+        con.gridy = 1;
+        con.gridwidth = 1;
+        panel.add(this.latDegLabel, con);
+        con.gridx = 1;
+        con.gridy = 1;
+        con.gridwidth = 3;
+        panel.add(this.latDegTextField, con);
+        con.gridx = 4;
+        con.gridy = 1;
+        con.gridwidth = 1;
+        panel.add(this.latDirLabel, con);
+        con.gridx = 5;
+        con.gridy = 1;
+        con.gridwidth = 1;
+        panel.add(this.latDirTextField, con);
+
+        con.gridx = 0;
+        con.gridy = 2;
+        con.gridwidth = 1;
+        panel.add(this.lonDegLabel, con);
+        con.gridx = 1;
+        con.gridy = 2;
+        con.gridwidth = 3;
+        panel.add(this.lonDegTextField, con);
+        con.gridx = 4;
+        con.gridy = 2;
+        con.gridwidth = 1;
+        panel.add(this.lonDirLabel, con);
+        con.gridx = 5;
+        con.gridy = 2;
+        con.gridwidth = 1;
+        panel.add(this.lonDirTextField, con);
     }
 }
