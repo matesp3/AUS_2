@@ -11,8 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class GeoAppFrame extends JFrame implements ActionListener {
-    public static final int OP_INSERT   = 1;
-    public static final int OP_SEARCH   = 2;
+    public static final int OP_SEARCH   = 1;
+    public static final int OP_INSERT   = 2;
     public static final int OP_EDIT     = 3;
     public static final int OP_DELETE   = 4;
     public static final int OP_GENERATE = 5;
@@ -22,14 +22,44 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private static final int CANVAS_HEIGHT = 700;
     private static final int MANAGE_PANE_WIDTH = 350;
 
+    public static final char TYPE_PROPERTY = 'Y';
+    public static final char TYPE_PARCEL = 'L';
+
     private GpsInputComponent gpsInput1;
     private GpsInputComponent gpsInput2;
     private DetailsInputComponent detailsPanel;
     private GeneratorInputComponent panelForGenerating;
+
+    private JRadioButton optionParcel;
+    private JRadioButton optionProperty;
+    private JRadioButton optionAll;
+
     private JPanel gpsPanel;
+    private JPanel optionsPanel;
     private JButton executeBtn;
 
     private int selectedOp;
+
+    private class RadioButtonActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JRadioButton rBtn = (JRadioButton) e.getSource();
+            if (rBtn == optionAll) {
+                if (selectedOp == OP_SEARCH)
+                    gpsInput2.setComponentEnable(true); // because this can change when SEARCH op is chosen but
+                return;                                 // radio button is changed
+            }
+            else if (rBtn == optionParcel) {
+                detailsPanel.setDetailsType(GeoAppFrame.TYPE_PARCEL);
+            }
+            else if (rBtn == optionProperty) {
+                detailsPanel.setDetailsType(GeoAppFrame.TYPE_PROPERTY);
+            }
+
+            if (selectedOp == OP_SEARCH)
+                gpsInput2.setComponentEnable(false);
+        }
+    }
 
     public GeoAppFrame() {
         this.selectedOp = OP_INSERT;
@@ -75,25 +105,32 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 0;
         this.gpsPanel = this.createGpsFormsArea(300,200, gpsColor, frameColor);
         managePanel.add(this.gpsPanel, con);
-//      ----- MANAGE PANEL -> DETAILS FOR CHOSEN OPERATION
+//      ----- MANAGE PANEL -> RADIO BUTTON FOR CHOOSING TYPE OF GEO ITEM
         con.gridx = 0;
         con.gridy = 1;
+        this.optionsPanel = this.createGeoTypeSelection(300, 50, gpsColor);
+        managePanel.add(this.optionsPanel, con);
+//      ----- MANAGE PANEL -> DETAILS FOR CHOSEN OPERATION
+        con.gridx = 0;
+        con.gridy = 2;
         con.insets = insets;                                        // outer margin
-        this.detailsPanel = this.createDetailsArea(300, 180, frameColor);
+        this.detailsPanel = this.createDetailsArea(300, 140, frameColor);
         managePanel.add(detailsPanel, con);
 //      ----- MANAGE PANEL -> BUTTONS FOR OPERATIONS
         con.gridx = 0;
-        con.gridy = 2;
+        con.gridy = 3;
         JPanel operationsPanel = this.createOperationsArea(300, 50, gpsColor, btnColor);
         managePanel.add(operationsPanel, con);
 //      ----- MANAGE PANEL -> INPUTS FOR GENERATING DATA
         con.gridx = 0;
-        con.gridy = 3;
+        con.gridy = 4;
         this.panelForGenerating = new GeneratorInputComponent(300, 120, frameColor);
         managePanel.add(this.panelForGenerating, con);
 //      ---- set all visible
         this.setVisible(true);
         detailsPanel.setModel(new GeoInfoModel('Y',12,"This is property"));
+        this.selectedOp = OP_SEARCH;
+        this.prepareOperationContext();
     }
 
     private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
@@ -109,6 +146,49 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         if (e.getSource() == this) {
             System.out.println("Me.");
         }
+    }
+
+    private JPanel createGeoTypeSelection(int prefWidth, int prefHeight, Color bgColor) {
+        JPanel radiosPanel = new JPanel();
+        GridBagLayout layout = new GridBagLayout();
+        radiosPanel.setLayout(layout);
+        radiosPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        radiosPanel.setBackground(bgColor);
+
+        RadioButtonActionListener rbActionListener = new RadioButtonActionListener();
+        this.optionParcel = new JRadioButton("Parcel");
+        this.optionParcel.setBackground(bgColor);
+        this.optionParcel.addActionListener(rbActionListener);
+
+        this.optionProperty = new JRadioButton("Property");
+        this.optionProperty.setBackground(bgColor);
+        this.optionProperty.addActionListener(rbActionListener);
+
+        this.optionAll = new JRadioButton("Parcel & Property");
+        this.optionAll.setBackground(bgColor);
+        this.optionAll.addActionListener(rbActionListener);
+
+        GridBagConstraints con = new GridBagConstraints();
+        // choose type of location
+        ButtonGroup btnGroup = new ButtonGroup();
+        btnGroup.add(this.optionParcel);
+        btnGroup.add(this.optionProperty);
+        btnGroup.add(this.optionAll);
+
+        con.gridx = 0;
+        con.gridy = 0;
+        radiosPanel.add(this.optionParcel, con);
+        this.optionParcel.setSelected(true);
+
+        con.gridx = 1;
+        con.gridy = 0;
+        radiosPanel.add(this.optionProperty, con);
+
+        con.gridx = 2;
+        con.gridy = 0;
+        radiosPanel.add(this.optionAll, con);
+
+        return radiosPanel;
     }
 
     private JPanel createGpsFormsArea(int prefWidth, int prefHeight, Color background, Color gpsBackground) {
@@ -155,7 +235,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridx = 1;
         con.gridy = 0;
         con.insets = new Insets(12,0,0,0);
-        String[] comboItems = {"insert data", "search data", "edit data", "delete data", "generate data",
+        String[] comboItems = {"search data", "insert data", "edit data", "delete data", "generate data",
                 "print all data"};
         JComboBox<String> operationsBox = new JComboBox<>(comboItems);
         operationsBox.addActionListener(new ActionListener() {
@@ -163,18 +243,24 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
                 String selectedOperation = (String) comboBox.getSelectedItem();
-                if (selectedOperation.compareTo("insert data") == 0)
-                    selectedOp = GeoAppFrame.OP_INSERT;
-                else if (selectedOperation.compareTo("search data") == 0)
+                if (selectedOperation.compareTo("search data") == 0) {
                     selectedOp = GeoAppFrame.OP_SEARCH;
-                else if (selectedOperation.compareTo("edit data") == 0)
+                }
+                else if (selectedOperation.compareTo("insert data") == 0) {
+                    selectedOp = GeoAppFrame.OP_INSERT;
+                }
+                else if (selectedOperation.compareTo("edit data") == 0) {
                     selectedOp = GeoAppFrame.OP_EDIT;
-                else if (selectedOperation.compareTo("delete data") == 0)
+                }
+                else if (selectedOperation.compareTo("delete data") == 0) {
                     selectedOp = GeoAppFrame.OP_DELETE;
-                else if (selectedOperation.compareTo("generate data") == 0)
+                }
+                else if (selectedOperation.compareTo("generate data") == 0) {
                     selectedOp = GeoAppFrame.OP_GENERATE;
-                else if (selectedOperation.compareTo("print all data") == 0)
+                }
+                else if (selectedOperation.compareTo("print all data") == 0) {
                     selectedOp = GeoAppFrame.OP_PRINT;
+                }
                 prepareOperationContext();
             }
         });
@@ -194,6 +280,38 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
     private void prepareOperationContext() {
         System.out.println("OP > "+this.selectedOp);
+        if (this.selectedOp == OP_INSERT || this.selectedOp == OP_EDIT) {
+            this.gpsInput1.setComponentEnable(true);
+            this.gpsInput2.setComponentEnable(true);
+            this.detailsPanel.setComponentEnable(true);
+            this.panelForGenerating.setComponentEnable(false);
+            // it is not allowed to change type while editing
+            this.setEnableSingleOptions(this.selectedOp == OP_INSERT);
+            this.optionAll.setEnabled(false);
+            if (this.selectedOp == OP_INSERT)
+                this.optionParcel.setSelected(true);
+            return;
+        }
+        else if (this.selectedOp == OP_SEARCH) {
+            this.gpsInput1.setComponentEnable(true);
+            this.gpsInput2.setComponentEnable(false);
+            this.detailsPanel.setComponentEnable(false);
+            this.panelForGenerating.setComponentEnable(false);
+            this.optionParcel.setEnabled(true);
+            this.optionProperty.setEnabled(true);
+            this.optionAll.setEnabled(true);
+            return;
+        }
+        this.gpsInput1.setComponentEnable(false);
+        this.gpsInput2.setComponentEnable(false);
+        this.detailsPanel.setComponentEnable(false);
+        if (this.selectedOp == OP_GENERATE) {
+            this.panelForGenerating.setComponentEnable(true);
+        }
+        else if (this.selectedOp == OP_DELETE || this.selectedOp == OP_PRINT) {
+            this.panelForGenerating.setComponentEnable(false);
+        }
+        this.setEnableAllOptions(false);
     }
 
     private JButton createButton(int width, int height, String text, Color background) {
@@ -203,5 +321,24 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             button.setPreferredSize(new Dimension(width, height));
         button.setBackground(background);
         return button;
+    }
+
+    /**
+     * Enables or disables radio button for parcel and radio button for property
+     * @param enable
+     */
+    private void setEnableSingleOptions(boolean enable) {
+        this.optionParcel.setEnabled(enable);
+        this.optionProperty.setEnabled(enable);
+    }
+
+    /**
+     * Enables or disables all radio buttons for geo type possible choices
+     * @param enable
+     */
+    private void setEnableAllOptions(boolean enable) {
+        this.optionParcel.setEnabled(enable);
+        this.optionProperty.setEnabled(enable);
+        this.optionAll.setEnabled(enable);
     }
 }

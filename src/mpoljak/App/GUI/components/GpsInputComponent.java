@@ -20,6 +20,8 @@ public class GpsInputComponent extends JPanel {
     private JLabel lonDirLabel;
     private JLabel gpsComponentNameLabel;
 
+    private boolean enabledState;
+
     public GpsInputComponent(String componentName, int width, int height) {
         this.gpsComponentNameLabel = new JLabel(componentName);
 //      ----------------------------------------- latitude
@@ -45,6 +47,8 @@ public class GpsInputComponent extends JPanel {
         this.setBorder(BorderFactory.createEtchedBorder());
 //        this.setBorder(BorderFactory.createLoweredSoftBevelBorder());
         this.setSize(new Dimension(width, height));
+
+        this.enabledState = true;
     }
 
     public void setPosition(int x, int y) {
@@ -82,6 +86,30 @@ public class GpsInputComponent extends JPanel {
         this.lonDirTextField.setText(String.format("%C", model.getLongitude()));
     }
 
+    /**
+     * Enables/disables component's children
+     * @param enabled if component's children should be enabled or not
+     */
+    public void setComponentEnable(boolean enabled) {
+        if (this.enabledState == enabled)
+            return;
+        this.gpsComponentNameLabel.setEnabled(enabled);
+        this.latDegLabel.setEnabled(enabled);
+        this.latDegTextField.setEnabled(enabled);
+        this.latDirLabel.setEnabled(enabled);
+        this.latDirTextField.setEnabled(enabled);
+        this.lonDegLabel.setEnabled(enabled);
+        this.lonDegTextField.setEnabled(enabled);
+        this.lonDirLabel.setEnabled(enabled);
+        this.lonDirTextField.setEnabled(enabled);
+        this.enabledState = enabled;
+        if (!enabled) {
+            this.latDegTextField.setText(null);
+            this.latDirTextField.setText(null);
+            this.lonDegTextField.setText(null);
+            this.lonDirTextField.setText(null);
+        }
+    }
 
     private void createLayout(JPanel panel) {
         GridBagLayout layout = new GridBagLayout();
