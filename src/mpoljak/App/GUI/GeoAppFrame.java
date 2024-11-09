@@ -163,18 +163,24 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
                 String selectedOperation = (String) comboBox.getSelectedItem();
-                if (selectedOperation.compareTo("insert data") == 0)
+                if (selectedOperation.compareTo("insert data") == 0) {
                     selectedOp = GeoAppFrame.OP_INSERT;
-                else if (selectedOperation.compareTo("search data") == 0)
+                }
+                else if (selectedOperation.compareTo("search data") == 0) {
                     selectedOp = GeoAppFrame.OP_SEARCH;
-                else if (selectedOperation.compareTo("edit data") == 0)
+                }
+                else if (selectedOperation.compareTo("edit data") == 0) {
                     selectedOp = GeoAppFrame.OP_EDIT;
-                else if (selectedOperation.compareTo("delete data") == 0)
+                }
+                else if (selectedOperation.compareTo("delete data") == 0) {
                     selectedOp = GeoAppFrame.OP_DELETE;
-                else if (selectedOperation.compareTo("generate data") == 0)
+                }
+                else if (selectedOperation.compareTo("generate data") == 0) {
                     selectedOp = GeoAppFrame.OP_GENERATE;
-                else if (selectedOperation.compareTo("print all data") == 0)
+                }
+                else if (selectedOperation.compareTo("print all data") == 0) {
                     selectedOp = GeoAppFrame.OP_PRINT;
+                }
                 prepareOperationContext();
             }
         });
@@ -194,6 +200,30 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
     private void prepareOperationContext() {
         System.out.println("OP > "+this.selectedOp);
+        if (this.selectedOp == OP_INSERT || this.selectedOp == OP_EDIT) {
+            this.gpsInput1.setComponentEnable(true);
+            this.gpsInput2.setComponentEnable(true);
+            this.detailsPanel.setComponentEnable(true);
+            this.panelForGenerating.setComponentEnable(false);
+        }
+        else if (this.selectedOp == OP_SEARCH) {
+            this.gpsInput1.setComponentEnable(true);
+            this.gpsInput2.setComponentEnable(true);
+            this.detailsPanel.setComponentEnable(false);
+            this.panelForGenerating.setComponentEnable(false);
+        }
+        else if (this.selectedOp == OP_GENERATE) {
+            this.gpsInput1.setComponentEnable(false);
+            this.gpsInput2.setComponentEnable(false);
+            this.detailsPanel.setComponentEnable(false);
+            this.panelForGenerating.setComponentEnable(true);
+        }
+        else if (this.selectedOp == OP_DELETE || this.selectedOp == OP_PRINT) {
+            this.gpsInput1.setComponentEnable(false);
+            this.gpsInput2.setComponentEnable(false);
+            this.detailsPanel.setComponentEnable(false);
+            this.panelForGenerating.setComponentEnable(false);
+        }
     }
 
     private JButton createButton(int width, int height, String text, Color background) {

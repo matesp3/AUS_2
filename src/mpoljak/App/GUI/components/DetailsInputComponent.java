@@ -11,7 +11,6 @@ public class DetailsInputComponent extends JPanel {
     private JRadioButton optionParcel;
     private JRadioButton optionProperty;
 
-
     private JTextField numberInput;
     private JTextField descInput;
 
@@ -19,7 +18,7 @@ public class DetailsInputComponent extends JPanel {
     private JLabel numberSpecLabel;
     private JLabel descLabel;
 
-    private JButton executeBtn;
+    private boolean enabledState;
 
     private class RadioButtonActionListener implements ActionListener {
         @Override
@@ -103,6 +102,8 @@ public class DetailsInputComponent extends JPanel {
         this.descInput = new JTextField();
         this.descInput.setPreferredSize(new Dimension(prefWidth - 10, inputHeight));
         this.add(descInput, con);
+
+        this.enabledState = true;
     }
 
     /**
@@ -129,6 +130,23 @@ public class DetailsInputComponent extends JPanel {
             this.optionParcel.doClick();
         this.numberInput.setText(String.valueOf(model.getNumber()));
         this.descInput.setText(model.getDescription());
+    }
+
+    /**
+     * Enables/disables component's children
+     * @param enabled if component's children should be enabled or not
+     */
+    public void setComponentEnable(boolean enabled) {
+        if (this.enabledState == enabled)
+            return;
+        this.optionParcel.setEnabled(enabled);
+        this.optionProperty.setEnabled(enabled);
+        this.selectedDetailLabel.setEnabled(enabled);
+        this.numberSpecLabel.setEnabled(enabled);
+        this.numberInput.setEnabled(enabled);
+        this.descLabel.setEnabled(enabled);
+        this.descInput.setEnabled(enabled);
+        this.enabledState = enabled;
     }
 
 }
