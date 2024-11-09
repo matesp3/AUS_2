@@ -4,11 +4,17 @@ import mpoljak.App.GUI.components.DetailsInputComponent;
 import mpoljak.App.GUI.components.GeneratorInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
 import mpoljak.App.GUI.models.GeoInfoModel;
+import mpoljak.App.GUI.models.GpsModel;
+import mpoljak.App.GUI.models.ParcelModel;
+import mpoljak.App.GUI.models.ParcelTableModel;
+import mpoljak.utilities.SwingTableColumnResizer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.ArrayList;
 
 public class GeoAppFrame extends JFrame implements ActionListener {
     public static final int OP_SEARCH   = 1;
@@ -85,6 +91,24 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         dataPanel.setPreferredSize(new Dimension(CANVAS_WIDTH-MANAGE_PANE_WIDTH, CANVAS_HEIGHT));
         dataPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         this.add(dataPanel, BorderLayout.CENTER);
+//      ---- DATA -> TABLE OF PARCELS
+        JPanel parcelsPanel = new JPanel();
+        dataPanel.add(parcelsPanel);
+//        parcelsPanel.setPreferredSize(new Dimension(700, 250));
+        List<ParcelModel> lParcels = new ArrayList<ParcelModel>();
+        lParcels.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
+                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
+        lParcels.add(new ParcelModel(new GpsModel('S', 45.2,'E', 15.8),
+                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
+        ParcelTableModel model = new ParcelTableModel(lParcels);
+        JTable parcelsTab = new JTable(model);
+        SwingTableColumnResizer.setJTableColsWidth(parcelsTab, 980,
+                new double[] {8,22,9,8.5,9,8.5,9,8.5,9,8.5});
+        JScrollPane scrollPane = new JScrollPane(parcelsTab);
+        scrollPane.setPreferredSize(new Dimension(980,250));
+        parcelsPanel.add(scrollPane);
+
+
 //        *** main LEFT - MANAGE panel
         JPanel managePanel = new JPanel();
         managePanel.setPreferredSize(new Dimension(MANAGE_PANE_WIDTH, CANVAS_HEIGHT));
