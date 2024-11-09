@@ -1,5 +1,7 @@
 package mpoljak.App.GUI.components;
 
+import mpoljak.App.GUI.models.GeoInfoModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -31,6 +33,8 @@ public class DetailsInputComponent extends JPanel {
                 selectedDetailLabel.setText("Property's details:");
                 numberSpecLabel.setText("Property's number:");
             }
+            numberInput.setText(null);
+            descInput.setText(null);
         }
     }
 
@@ -49,7 +53,7 @@ public class DetailsInputComponent extends JPanel {
 
         // choose type of location
         ButtonGroup btnGroup = new ButtonGroup();
-        btnGroup.add(this.optionParcel);;
+        btnGroup.add(this.optionParcel);
         btnGroup.add(this.optionProperty);
 
         GridBagLayout layout = new GridBagLayout();
@@ -57,6 +61,7 @@ public class DetailsInputComponent extends JPanel {
         GridBagConstraints con = new GridBagConstraints();
         con.weighty = 0.5;
         con.weightx = 0.5;
+        con.insets = new Insets(0, 5, 0, 3);
 
         con.gridx = 0;
         con.gridy = 0;
@@ -83,7 +88,7 @@ public class DetailsInputComponent extends JPanel {
         con.gridx = 1;
         con.gridy = 2;
         this.numberInput = new JTextField();
-        this.numberInput.setPreferredSize(new Dimension(60, inputHeight));
+        this.numberInput.setPreferredSize(new Dimension(80, inputHeight));
         this.add(numberInput, con);
 
         con.gridx = 0;
@@ -98,13 +103,32 @@ public class DetailsInputComponent extends JPanel {
         this.descInput = new JTextField();
         this.descInput.setPreferredSize(new Dimension(prefWidth - 10, inputHeight));
         this.add(descInput, con);
+    }
 
-        con.anchor = GridBagConstraints.EAST;
-        con.gridwidth = 1;
-        con.gridx = 1;
-        con.gridy = 5;
-        this.executeBtn = new JButton("Execute");
-        this.add(executeBtn, con);
+    /**
+     * Gets data, which input fields contain
+     * @return model representation of visualized information
+     */
+    public GeoInfoModel getModel() {
+        int nr =  Integer.parseInt(this.numberInput.getText());
+        String desc = this.descInput.getText();
+        char type = this.optionParcel.isSelected() ? 'L' : 'Y'; // last character of parceL/propertY
+        return new GeoInfoModel(type, nr, desc);
+    }
+
+    /**
+     * Fills input fields with data from model
+     * @param model contains data to visualize
+     */
+    public void setModel(GeoInfoModel model) {
+        if (model == null)
+            return;
+        if (model.getGeoType() == 'Y')
+            this.optionProperty.doClick();
+        else
+            this.optionParcel.doClick();
+        this.numberInput.setText(String.valueOf(model.getNumber()));
+        this.descInput.setText(model.getDescription());
     }
 
 }

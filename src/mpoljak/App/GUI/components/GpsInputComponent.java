@@ -47,21 +47,6 @@ public class GpsInputComponent extends JPanel {
         this.setSize(new Dimension(width, height));
     }
 
-    public GpsModel getModel() {
-        char lat = latDegTextField.getText().charAt(0);
-        double latDeg = Double.parseDouble(latDegTextField.getText());
-        char lon = lonDegTextField.getText().charAt(0);
-        double lonDeg = Double.parseDouble(lonDegTextField.getText());
-        return new GpsModel(lat, latDeg, lon, lonDeg);
-    }
-
-    public void setModel(GpsModel model) {
-        this.latDegTextField.setText(String.format("%.4f", model.getLatDeg()));
-        this.latDirTextField.setText(String.format("%C", model.getLatitude()));
-        this.lonDegTextField.setText(String.format("%.4f", model.getLongDeg()));
-        this.lonDirTextField.setText(String.format("%C", model.getLongitude()));
-    }
-
     public void setPosition(int x, int y) {
         this.setBounds(x, y, PREFERRED_WIDTH, PREFERRED_HEIGHT);
     }
@@ -72,6 +57,29 @@ public class GpsInputComponent extends JPanel {
 
     public void setBgColor(Color color) {
         this.setBackground(color);
+    }
+
+    /**
+     * Gets data, which input fields contain
+     * @return model representation of visualized information
+     */
+    public GpsModel getModel() {
+        char lat = latDegTextField.getText().charAt(0);
+        double latDeg = Double.parseDouble(latDegTextField.getText());
+        char lon = lonDegTextField.getText().charAt(0);
+        double lonDeg = Double.parseDouble(lonDegTextField.getText());
+        return new GpsModel(lat, latDeg, lon, lonDeg);
+    }
+
+    /**
+     * Fills input fields with data from model
+     * @param model contains data to visualize
+     */
+    public void setModel(GpsModel model) {
+        this.latDegTextField.setText(String.format("%.4f", model.getLatDeg()));
+        this.latDirTextField.setText(String.format("%C", model.getLatitude()));
+        this.lonDegTextField.setText(String.format("%.4f", model.getLongDeg()));
+        this.lonDirTextField.setText(String.format("%C", model.getLongitude()));
     }
 
 

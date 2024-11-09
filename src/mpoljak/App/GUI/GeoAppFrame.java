@@ -1,26 +1,38 @@
 package mpoljak.App.GUI;
 
 import mpoljak.App.GUI.components.DetailsInputComponent;
+import mpoljak.App.GUI.components.GeneratorInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
-import mpoljak.App.GUI.components.OperationsAreaComponent;
+import mpoljak.App.GUI.models.GeoInfoModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class GeoAppFrame extends JFrame implements ActionListener {
+    public static final int OP_INSERT   = 1;
+    public static final int OP_SEARCH   = 2;
+    public static final int OP_EDIT     = 3;
+    public static final int OP_DELETE   = 4;
+    public static final int OP_GENERATE = 5;
+    public static final int OP_PRINT    = 6;
+
     private static final int CANVAS_WIDTH = 1400;
     private static final int CANVAS_HEIGHT = 700;
     private static final int MANAGE_PANE_WIDTH = 350;
 
     private GpsInputComponent gpsInput1;
     private GpsInputComponent gpsInput2;
+    private DetailsInputComponent detailsPanel;
+    private GeneratorInputComponent panelForGenerating;
     private JPanel gpsPanel;
+    private JButton executeBtn;
 
+    private int selectedOp;
 
     public GeoAppFrame() {
+        this.selectedOp = OP_INSERT;
         ImageIcon icon = new ImageIcon("src/mpoljak/files/GeoApp-icon.png");
         this.setIconImage(icon.getImage());
 //      ---- frame properties
@@ -67,26 +79,28 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridx = 0;
         con.gridy = 1;
         con.insets = insets;                                        // outer margin
-        JPanel detailsPanel = createDetailsArea(300, 180, gpsColor);
+        this.detailsPanel = this.createDetailsArea(300, 180, frameColor);
         managePanel.add(detailsPanel, con);
 //      ----- MANAGE PANEL -> BUTTONS FOR OPERATIONS
         con.gridx = 0;
         con.gridy = 2;
-        JPanel operationsPanel = new OperationsAreaComponent(300, 180, gpsColor, btnColor);
+        JPanel operationsPanel = this.createOperationsArea(300, 50, gpsColor, btnColor);
         managePanel.add(operationsPanel, con);
-
+//      ----- MANAGE PANEL -> INPUTS FOR GENERATING DATA
+        con.gridx = 0;
+        con.gridy = 3;
+        this.panelForGenerating = new GeneratorInputComponent(300, 120, frameColor);
+        managePanel.add(this.panelForGenerating, con);
 //      ---- set all visible
         this.setVisible(true);
+        detailsPanel.setModel(new GeoInfoModel('Y',12,"This is property"));
     }
 
-    private JPanel createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
-        JPanel detailsPanel = new JPanel();
+    private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
+        DetailsInputComponent detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor);
         detailsPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
         detailsPanel.setBackground(backgroundColor);
-        detailsPanel.setBorder(BorderFactory.createEtchedBorder(1));
-
-//        detailsPanel.setLayout(new GridLayout());
-        detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor);
+        detailsPanel.setBorder(BorderFactory.createEtchedBorder());
         return detailsPanel;
     }
 
@@ -115,5 +129,79 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         panelForGPS.add(this.gpsInput2);
 
         return panelForGPS;
+    }
+
+    private JPanel createOperationsArea(int prefWidth, int prefHeight, Color background, Color btnBackground) {
+        int btnWidth = 98;
+        int btnHeight = 25;
+
+        JPanel operationsPanel = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
+        operationsPanel.setLayout(gbl);
+        operationsPanel.setBackground(background);
+        operationsPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+//        operationsPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1, true));
+
+        GridBagConstraints con = new GridBagConstraints();
+        con.weighty = 0.5;
+        con.weightx = 1.0;
+        con.gridx = 0;
+        con.gridy = 0;
+        con.insets = new Insets(15,0,0,0);
+        con.anchor = GridBagConstraints.NORTHWEST;
+        JLabel labelTitle = new JLabel("Choose operation: ");
+        operationsPanel.add(labelTitle, con);
+
+        con.gridx = 1;
+        con.gridy = 0;
+        con.insets = new Insets(12,0,0,0);
+        String[] comboItems = {"insert data", "search data", "edit data", "delete data", "generate data",
+                "print all data"};
+        JComboBox<String> operationsBox = new JComboBox<>(comboItems);
+        operationsBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
+                String selectedOperation = (String) comboBox.getSelectedItem();
+                if (selectedOperation.compareTo("insert data") == 0)
+                    selectedOp = GeoAppFrame.OP_INSERT;
+                else if (selectedOperation.compareTo("search data") == 0)
+                    selectedOp = GeoAppFrame.OP_SEARCH;
+                else if (selectedOperation.compareTo("edit data") == 0)
+                    selectedOp = GeoAppFrame.OP_EDIT;
+                else if (selectedOperation.compareTo("delete data") == 0)
+                    selectedOp = GeoAppFrame.OP_DELETE;
+                else if (selectedOperation.compareTo("generate data") == 0)
+                    selectedOp = GeoAppFrame.OP_GENERATE;
+                else if (selectedOperation.compareTo("print all data") == 0)
+                    selectedOp = GeoAppFrame.OP_PRINT;
+                prepareOperationContext();
+            }
+        });
+        operationsPanel.add(operationsBox, con);
+
+        con.anchor = GridBagConstraints.NORTHEAST;
+        con.gridwidth = 1;
+        con.gridx = 2;
+        con.gridy = 0;
+        con.insets = new Insets(10, 0, 0, 0);
+        Color c = new Color(146, 236, 236);
+        this.executeBtn = createButton(80,30, "Execute", c);
+        operationsPanel.add(this.executeBtn, con);
+
+        return operationsPanel;
+    }
+
+    private void prepareOperationContext() {
+        System.out.println("OP > "+this.selectedOp);
+    }
+
+    private JButton createButton(int width, int height, String text, Color background) {
+        JButton button = new JButton();
+        button.setText(text);
+        if (height > 0 && width > 0)
+            button.setPreferredSize(new Dimension(width, height));
+        button.setBackground(background);
+        return button;
     }
 }
