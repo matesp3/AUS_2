@@ -27,13 +27,15 @@ public class GeneratorInputComponent extends JPanel {
         con.weightx = 0.5;
         con.weighty = 0.3;
 
-        con.insets = new Insets(5,0, 3, 0);
+        con.insets = new Insets(5,0, 7, 0);
+        con.gridwidth = 2;
         con.gridx = 0;
         con.gridy = 0;
-        this.titleLabel = new JLabel("Data generator");
+        this.titleLabel = new JLabel("Data generator parameters:");
         this.add(titleLabel, con);
 
         con.insets = new Insets(5,5,0,0);
+        con.gridwidth = 1;
         con.anchor = GridBagConstraints.WEST;
 
         con.gridx = 0;
@@ -88,6 +90,11 @@ public class GeneratorInputComponent extends JPanel {
         this.probabilityLabel.setEnabled(enabled);
         this.probabilityInput.setEnabled(enabled);
         this.enabledState = enabled;
+        if (!enabled) {
+            this.parcelNrInput.setText(null);
+            this.propertyNrInput.setText(null);
+            this.probabilityInput.setText(null);
+        }
     }
 
     /**

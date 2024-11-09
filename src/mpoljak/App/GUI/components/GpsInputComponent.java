@@ -103,6 +103,12 @@ public class GpsInputComponent extends JPanel {
         this.lonDirLabel.setEnabled(enabled);
         this.lonDirTextField.setEnabled(enabled);
         this.enabledState = enabled;
+        if (!enabled) {
+            this.latDegTextField.setText(null);
+            this.latDirTextField.setText(null);
+            this.lonDegTextField.setText(null);
+            this.lonDirTextField.setText(null);
+        }
     }
 
     private void createLayout(JPanel panel) {
