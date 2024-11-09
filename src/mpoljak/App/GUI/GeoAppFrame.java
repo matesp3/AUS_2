@@ -1,6 +1,8 @@
 package mpoljak.App.GUI;
 
+import mpoljak.App.GUI.components.DetailsInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
+import mpoljak.App.GUI.components.OperationsAreaComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,9 +18,6 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private GpsInputComponent gpsInput1;
     private GpsInputComponent gpsInput2;
     private JPanel gpsPanel;
-    private ArrayList<JButton> lButtons;
-
-    private boolean disabledState; // when some operation has been chosen
 
 
     public GeoAppFrame() {
@@ -59,36 +58,42 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.anchor = GridBagConstraints.NORTHWEST;
         con.ipadx = 5;
         con.ipady = 5;                                              // inner margin
+//      ----- MANAGE PANEL -> GPS FORMS
         con.gridx = 0;
         con.gridy = 0;
         this.gpsPanel = this.createGpsFormsArea(300,200, gpsColor, frameColor);
         managePanel.add(this.gpsPanel, con);
-
+//      ----- MANAGE PANEL -> DETAILS FOR CHOSEN OPERATION
         con.gridx = 0;
         con.gridy = 1;
         con.insets = insets;                                        // outer margin
-        lButtons = new ArrayList<>(6);
-        JPanel operationsPanel = createButtonsSection(300, 180, gpsColor, btnColor);
+        JPanel detailsPanel = createDetailsArea(300, 180, gpsColor);
+        managePanel.add(detailsPanel, con);
+//      ----- MANAGE PANEL -> BUTTONS FOR OPERATIONS
+        con.gridx = 0;
+        con.gridy = 2;
+        JPanel operationsPanel = new OperationsAreaComponent(300, 180, gpsColor, btnColor);
         managePanel.add(operationsPanel, con);
-//        this.add(this.gpsPanel);
-//        this.createButtonsSection(this);
+
 //      ---- set all visible
         this.setVisible(true);
-        this.disabledState = false;
+    }
+
+    private JPanel createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
+        JPanel detailsPanel = new JPanel();
+        detailsPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        detailsPanel.setBackground(backgroundColor);
+        detailsPanel.setBorder(BorderFactory.createEtchedBorder(1));
+
+//        detailsPanel.setLayout(new GridLayout());
+        detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor);
+        return detailsPanel;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == this) {
             System.out.println("Me.");
-        }
-
-
-    }
-
-    private void disableOtherBtns(JButton clickedBtn) {
-        for (JButton btn : lButtons) {
-            btn.setEnabled(btn == clickedBtn);
         }
     }
 
@@ -111,113 +116,4 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
         return panelForGPS;
     }
-
-    private JPanel createButtonsSection(int prefWidth, int prefHeight, Color background, Color btnBackground) {
-        int btnWidth = 98;
-        int btnHeight = 25;
-
-        JPanel btnPanel = new JPanel();
-        GridBagLayout gbl = new GridBagLayout();
-        btnPanel.setLayout(gbl);
-        btnPanel.setBackground(background);
-        btnPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
-        btnPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 1, true));
-//        btnPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createCompoundBorder(), "Operations"));
-
-        Insets insets = new Insets(10, 0, 0, 0);
-        GridBagConstraints con = new GridBagConstraints();
-        con.weightx = 0.25;
-        con.weighty = 0.5;
-
-        con.gridx = 0;
-        con.gridy = 0;
-        con.anchor = GridBagConstraints.WEST;
-        JLabel labelTitle = new JLabel("CHOOSE OPERATION:");
-        btnPanel.add(labelTitle, con);
-
-        con.anchor = GridBagConstraints.BASELINE;
-        con.gridx = 0;
-        con.gridy = 1;
-        JButton insertBtn = this.createButton(btnWidth, btnHeight, "Add data", btnBackground);
-        insertBtn.addActionListener(e -> {
-            this.btnExecution("INSERT", insertBtn);
-        });
-        btnPanel.add(insertBtn, con);
-        this.lButtons.add(insertBtn);
-
-        con.gridx = 1;
-        con.gridy = 1;
-//        con.anchor = GridBagConstraints.EAST;
-        JButton searchBtn = this.createButton(btnWidth, btnHeight, "Find data", btnBackground);
-        searchBtn.addActionListener(e -> {
-            this.btnExecution("SEARCH", searchBtn);
-        });
-        btnPanel.add(searchBtn, con);
-        this.lButtons.add(searchBtn);
-
-        con.gridx = 0;
-        con.gridy = 2;
-//        con.anchor = GridBagConstraints.WEST;
-        JButton editBtn = this.createButton(btnWidth, btnHeight, "Edit data", btnBackground);
-        editBtn.addActionListener(e -> {
-            this.btnExecution("EDIT", editBtn);
-        });
-        btnPanel.add(editBtn, con);
-        this.lButtons.add(editBtn);
-
-        con.gridx = 1;
-        con.gridy = 2;
-        JButton deleteBtn = this.createButton(btnWidth, btnHeight, "Delete data", btnBackground);
-        deleteBtn.addActionListener(e -> {
-            this.btnExecution("DELETE", deleteBtn);
-        });
-        btnPanel.add(deleteBtn, con);
-        this.lButtons.add(deleteBtn);
-
-        con.gridx = 0;
-        con.gridy = 3;
-        JButton generateBtn = this.createButton(-1, -1, "Generate data", btnBackground);
-        generateBtn.addActionListener(e -> {
-            this.btnExecution("GENERATE", generateBtn);
-        });
-        btnPanel.add(generateBtn, con);
-        this.lButtons.add(generateBtn);
-
-        con.gridx = 1;
-        con.gridy = 3;
-        JButton printBtn = this.createButton(-1, -1, "Get all data", btnBackground);
-        printBtn.addActionListener(e -> {
-            this.btnExecution("PRINT", printBtn);
-        });
-        btnPanel.add(printBtn, con);
-        this.lButtons.add(printBtn);
-
-        return btnPanel;
-    }
-
-    private JButton createButton(int width, int height, String text, Color background) {
-        JButton button = new JButton();
-        button.setText(text);
-        if (height > 0 && width > 0)
-            button.setPreferredSize(new Dimension(width, height));
-        button.setBackground(background);
-        return button;
-    }
-
-    private void btnExecution(String action, JButton clickedBtn) {
-        if (!this.disabledState) {
-            this.disabledState = true;
-            System.out.println(action);
-            this.disableOtherBtns(clickedBtn);
-        } else {
-            this.disabledState = false;
-            this.enableAllBtns();
-        }
-    }
-
-    private void enableAllBtns() {
-        for (JButton btn : lButtons)
-            btn.setEnabled(true);
-    }
-
 }
