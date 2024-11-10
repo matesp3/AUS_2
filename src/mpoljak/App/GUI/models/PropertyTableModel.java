@@ -1,16 +1,13 @@
 package mpoljak.App.GUI.models;
 
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class ParcelTableModel extends AbstractTableModel {
-
-    private final List<ParcelModel> lParcels;
+public class PropertyTableModel extends AbstractTableModel {
+    private final List<PropertyModel> lProperties;
 
     private final String[] aColNames = new String[] {
-            "Inventory nr.",
+            "Property nr.",
             "Description",
             "g1 Lat[°]",
             "g1 Lat[dir]",
@@ -32,19 +29,19 @@ public class ParcelTableModel extends AbstractTableModel {
             Double.class,
             Character.class};
 
-    public ParcelTableModel(List<ParcelModel> lParcels) {
-        if (lParcels == null)
+    public PropertyTableModel(List<PropertyModel> lProperties) {
+        if (lProperties == null)
             throw new NullPointerException("Parcels data are not provided");
-        this.lParcels = lParcels;
+        this.lProperties = lProperties;
     }
 
-    public void add(ParcelModel parcel) {
-        lParcels.add(parcel);
+    public void add(PropertyModel property) {
+        lProperties.add(property);
         this.fireTableDataChanged();
     }
 
-    public ParcelModel getModel(int index) {
-        return lParcels.get(index);
+    public PropertyModel getModel(int index) {
+        return lProperties.get(index);
     }
 
     @Override
@@ -59,7 +56,7 @@ public class ParcelTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return this.lParcels.size();
+        return this.lProperties.size();
     }
 
     @Override
@@ -72,31 +69,29 @@ public class ParcelTableModel extends AbstractTableModel {
         return false;
     }
 
-
-
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        ParcelModel parcel = lParcels.get(rowIndex);
+        PropertyModel property = lProperties.get(rowIndex);
         if (columnIndex == 0)
-            return parcel.getInventoryNr();
+            return property.getPropertyNr();
         else if (columnIndex == 1)
-            return parcel.getDescription();
+            return property.getDescription();
         else if (columnIndex == 2)
-            return parcel.getGps1().getLatDeg();
+            return property.getGps1().getLatDeg();
         else if (columnIndex == 3)
-            return parcel.getGps1().getLatitude();
+            return property.getGps1().getLatitude();
         else if (columnIndex == 4)
-            return parcel.getGps1().getLongDeg();
+            return property.getGps1().getLongDeg();
         else if (columnIndex == 5)
-            return parcel.getGps1().getLongitude();
+            return property.getGps1().getLongitude();
         else if (columnIndex == 6)
-            return parcel.getGps2().getLatDeg();
+            return property.getGps2().getLatDeg();
         else if (columnIndex == 7)
-            return parcel.getGps2().getLatitude();
+            return property.getGps2().getLatitude();
         else if (columnIndex == 8)
-            return parcel.getGps2().getLongDeg();
+            return property.getGps2().getLongDeg();
         else if (columnIndex == 9)
-            return parcel.getGps2().getLongitude();
+            return property.getGps2().getLongitude();
         return null;
     }
 }

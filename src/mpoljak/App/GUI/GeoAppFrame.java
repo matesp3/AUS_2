@@ -3,16 +3,16 @@ package mpoljak.App.GUI;
 import mpoljak.App.GUI.components.DetailsInputComponent;
 import mpoljak.App.GUI.components.GeneratorInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
-import mpoljak.App.GUI.models.GeoInfoModel;
-import mpoljak.App.GUI.models.GpsModel;
-import mpoljak.App.GUI.models.ParcelModel;
-import mpoljak.App.GUI.models.ParcelTableModel;
+import mpoljak.App.GUI.models.*;
 import mpoljak.utilities.SwingTableColumnResizer;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -40,8 +40,14 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private JRadioButton optionProperty;
     private JRadioButton optionAll;
 
+    private JTable parcelsJTab;
+    private JTable propertiesJTab;
+    private ParcelTableModel parcelModel;
+    private PropertyTableModel propertyModel;
+
     private JPanel gpsPanel;
     private JPanel optionsPanel;
+    private JPanel dataPanel;
     private JButton executeBtn;
 
     private int selectedOp;
@@ -67,6 +73,18 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
+    private class OnItemSelectListener implements ListSelectionListener {
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+
+            int firstIndex = e.getFirstIndex();
+            int lastIndex = e.getLastIndex();
+            System.out.println(firstIndex+ " -> "+lastIndex);
+        }
+    }
+
     public GeoAppFrame() {
         this.selectedOp = OP_INSERT;
         ImageIcon icon = new ImageIcon("src/mpoljak/files/GeoApp-icon.png");
@@ -86,28 +104,24 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         this.getContentPane().setBackground(frameColor);
 //      ---- components
 //        *** main RIGHT -DATA panel
-        JPanel dataPanel = new JPanel();
+        this.dataPanel = new JPanel();
         dataPanel.setBackground(frameColor);
         dataPanel.setPreferredSize(new Dimension(CANVAS_WIDTH-MANAGE_PANE_WIDTH, CANVAS_HEIGHT));
         dataPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         this.add(dataPanel, BorderLayout.CENTER);
-//      ---- DATA -> TABLE OF PARCELS
-        JPanel parcelsPanel = new JPanel();
-        dataPanel.add(parcelsPanel);
-//        parcelsPanel.setPreferredSize(new Dimension(700, 250));
+
         List<ParcelModel> lParcels = new ArrayList<ParcelModel>();
         lParcels.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
                 new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
-        lParcels.add(new ParcelModel(new GpsModel('S', 45.2,'E', 15.8),
-                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
-        ParcelTableModel model = new ParcelTableModel(lParcels);
-        JTable parcelsTab = new JTable(model);
-        SwingTableColumnResizer.setJTableColsWidth(parcelsTab, 980,
-                new double[] {8,22,9,8.5,9,8.5,9,8.5,9,8.5});
-        JScrollPane scrollPane = new JScrollPane(parcelsTab);
-        scrollPane.setPreferredSize(new Dimension(980,250));
-        parcelsPanel.add(scrollPane);
+//        lParcels.add(new ParcelModel(new GpsModel('S', 45.2,'E', 15.8),
+//                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
 
+        List<PropertyModel> lProperties = new ArrayList<PropertyModel>();
+        lProperties.add(new PropertyModel(new GpsModel('N', 45.2,'W', 15.8),
+                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
+//        lProperties.add(new PropertyModel(new GpsModel('S', 45.2,'E', 15.8),
+//                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
+        this.prepareDataPanel(dataPanel, lParcels, lProperties);
 
 //        *** main LEFT - MANAGE panel
         JPanel managePanel = new JPanel();
@@ -151,10 +165,75 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         this.panelForGenerating = new GeneratorInputComponent(300, 120, frameColor);
         managePanel.add(this.panelForGenerating, con);
 //      ---- set all visible
-        this.setVisible(true);
-        detailsPanel.setModel(new GeoInfoModel('Y',12,"This is property"));
+//        detailsPanel.setModel(new GeoInfoModel('Y',12,"This is property"));
         this.selectedOp = OP_SEARCH;
         this.prepareOperationContext();
+        this.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == this) {
+            System.out.println("Me.");
+        }
+    }
+
+    private void prepareDataPanel(JPanel dataPanel, List<ParcelModel> lParcels, List<PropertyModel> lProperties) {
+//      ---- DATA -> TABLE OF PARCELS
+        this.parcelModel = new ParcelTableModel(lParcels);
+        this.parcelsJTab = new JTable(parcelModel);
+        this.parcelsJTab.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selectedOp == OP_EDIT || selectedOp == OP_DELETE) {
+                    System.out.println("Parcel clicked");
+                    ParcelModel parcel = parcelModel.getModel(parcelsJTab.getSelectedRow());
+                    gpsInput1.setModel(parcel.getGps1());
+                    gpsInput2.setModel(parcel.getGps2());
+                    optionParcel.setSelected(true);
+                    detailsPanel.setModel(
+                            new GeoInfoModel(TYPE_PARCEL, parcel.getInventoryNr(), parcel.getDescription()));
+                }
+            }
+            @Override public void mousePressed(MouseEvent e) {}
+            @Override public void mouseReleased(MouseEvent e) {}
+            @Override public void mouseEntered(MouseEvent e) {}
+            @Override public void mouseExited(MouseEvent e) {}
+        });
+        parcelsJTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        SwingTableColumnResizer.setJTableColsWidth(parcelsJTab, 980,
+                new double[] {8,22,9,8.5,9,8.5,9,8.5,9,8.5});
+        JScrollPane scrollPane = new JScrollPane(parcelsJTab);
+        scrollPane.setPreferredSize(new Dimension(980,250));
+        dataPanel.add(scrollPane);
+
+//      ---- DATA -> TABLE OF PROPERTIES
+        this.propertyModel = new PropertyTableModel(lProperties);
+        this.propertiesJTab = new JTable(propertyModel);
+        this.propertiesJTab.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selectedOp == OP_EDIT || selectedOp == OP_DELETE) {
+                    System.out.println("Prop clicked");
+                    PropertyModel prop = propertyModel.getModel(propertiesJTab.getSelectedRow());
+                    gpsInput1.setModel(prop.getGps1());
+                    gpsInput2.setModel(prop.getGps2());
+                    optionProperty.setSelected(true);
+                    detailsPanel.setModel(
+                            new GeoInfoModel(TYPE_PROPERTY, prop.getPropertyNr(), prop.getDescription()));
+                }
+            }
+            @Override public void mousePressed(MouseEvent e) {}
+            @Override public void mouseReleased(MouseEvent e) {}
+            @Override public void mouseEntered(MouseEvent e) {}
+            @Override public void mouseExited(MouseEvent e) {}
+        });
+        propertiesJTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        SwingTableColumnResizer.setJTableColsWidth(propertiesJTab, 980,
+                new double[] {8,22,9,8.5,9,8.5,9,8.5,9,8.5});
+        JScrollPane scrollPane2 = new JScrollPane(propertiesJTab);
+        scrollPane2.setPreferredSize(new Dimension(980,250));
+        dataPanel.add(scrollPane2);
     }
 
     private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
@@ -163,13 +242,6 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         detailsPanel.setBackground(backgroundColor);
         detailsPanel.setBorder(BorderFactory.createEtchedBorder());
         return detailsPanel;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == this) {
-            System.out.println("Me.");
-        }
     }
 
     private JPanel createGeoTypeSelection(int prefWidth, int prefHeight, Color bgColor) {
@@ -297,6 +369,18 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.insets = new Insets(10, 0, 0, 0);
         Color c = new Color(146, 236, 236);
         this.executeBtn = createButton(80,30, "Execute", c);
+        this.executeBtn.addActionListener(e -> {
+            parcelModel.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
+                    new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
+            // todo retrieve model
+            switch (selectedOp) {
+                case OP_DELETE:
+//                    SEND delete to manager
+                    break;
+                case OP_GENERATE:
+//                    SEND generate
+            }
+        });
         operationsPanel.add(this.executeBtn, con);
 
         return operationsPanel;

@@ -20,6 +20,7 @@ public class GeneratorInputComponent extends JPanel {
     public GeneratorInputComponent(int prefWidth, int prefHeight, Color bgColor) {
         this.setPreferredSize(new Dimension(prefWidth, prefHeight));
         this.setBackground(bgColor);
+        this.setBorder(BorderFactory.createEtchedBorder());
         GridBagLayout layout = new GridBagLayout();
         this.setLayout(layout);
 
