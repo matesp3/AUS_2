@@ -25,7 +25,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     public static final int OP_PRINT    = 6;
 
     private static final int CANVAS_WIDTH = 1400;
-    private static final int CANVAS_HEIGHT = 700;
+    private static final int CANVAS_HEIGHT = 800;
     private static final int MANAGE_PANE_WIDTH = 350;
 
     public static final char TYPE_PROPERTY = 'Y';
@@ -44,6 +44,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private JTable propertiesJTab;
     private ParcelTableModel parcelModel;
     private PropertyTableModel propertyModel;
+
+    private JTextArea consoleTxtArea;
 
     private JPanel gpsPanel;
     private JPanel optionsPanel;
@@ -179,7 +181,25 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     }
 
     private void prepareDataPanel(JPanel dataPanel, List<ParcelModel> lParcels, List<PropertyModel> lProperties) {
+        GridBagLayout layout = new GridBagLayout();
+        dataPanel.setLayout(layout);
+        GridBagConstraints con = new GridBagConstraints();
+        Insets labelInsets = new Insets(0, 30, 3, 0);
+        Insets tableInsets = new Insets(0, 0, 0, 0);
+        con.weighty = 0.5;
+        con.weightx = 0.5;
 //      ---- DATA -> TABLE OF PARCELS
+        con.gridx = 0;
+        con.gridy = 0;
+        con.anchor = GridBagConstraints.SOUTHWEST;
+        con.insets = labelInsets;
+        JLabel parcListLabel = new JLabel("PARCELS:");
+        dataPanel.add(parcListLabel, con);
+
+        con.gridx = 0;
+        con.gridy = 1;
+        con.insets = tableInsets;
+        con.anchor = GridBagConstraints.BASELINE;
         this.parcelModel = new ParcelTableModel(lParcels);
         this.parcelsJTab = new JTable(parcelModel);
         this.parcelsJTab.addMouseListener(new MouseListener() {
@@ -204,10 +224,21 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         SwingTableColumnResizer.setJTableColsWidth(parcelsJTab, 980,
                 new double[] {8,22,9,8.5,9,8.5,9,8.5,9,8.5});
         JScrollPane scrollPane = new JScrollPane(parcelsJTab);
-        scrollPane.setPreferredSize(new Dimension(980,250));
-        dataPanel.add(scrollPane);
+        scrollPane.setPreferredSize(new Dimension(980,200));
+        dataPanel.add(scrollPane, con);
 
 //      ---- DATA -> TABLE OF PROPERTIES
+        con.gridx = 0;
+        con.gridy = 2;
+        con.insets = labelInsets;
+        con.anchor = GridBagConstraints.SOUTHWEST;
+        JLabel propListLabel = new JLabel("PROPERTIES:");
+        dataPanel.add(propListLabel, con);
+
+        con.gridx = 0;
+        con.gridy = 3;
+        con.insets = tableInsets;
+        con.anchor = GridBagConstraints.BASELINE;
         this.propertyModel = new PropertyTableModel(lProperties);
         this.propertiesJTab = new JTable(propertyModel);
         this.propertiesJTab.addMouseListener(new MouseListener() {
@@ -232,8 +263,26 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         SwingTableColumnResizer.setJTableColsWidth(propertiesJTab, 980,
                 new double[] {8,22,9,8.5,9,8.5,9,8.5,9,8.5});
         JScrollPane scrollPane2 = new JScrollPane(propertiesJTab);
-        scrollPane2.setPreferredSize(new Dimension(980,250));
-        dataPanel.add(scrollPane2);
+        scrollPane2.setPreferredSize(new Dimension(980,200));
+        dataPanel.add(scrollPane2, con);
+
+        con.gridx = 0;
+        con.gridy = 4;
+        con.insets = labelInsets;
+        con.anchor = GridBagConstraints.SOUTHWEST;
+        JLabel consoleTxtLabel = new JLabel("OUTPUT:");
+        dataPanel.add(consoleTxtLabel, con);
+
+        con.gridx = 0;
+        con.gridy = 5;
+        con.insets = tableInsets;
+        con.anchor = GridBagConstraints.BASELINE;
+        this.consoleTxtArea = new JTextArea();
+        consoleTxtArea.setEditable(false);
+        consoleTxtArea.setBorder(BorderFactory.createLoweredSoftBevelBorder());
+        JScrollPane scrollTxtPane = new JScrollPane(consoleTxtArea);
+        scrollTxtPane.setPreferredSize(new Dimension(980,200));
+        dataPanel.add(scrollTxtPane, con);
     }
 
     private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
@@ -372,6 +421,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         this.executeBtn.addActionListener(e -> {
             parcelModel.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
                     new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
+//            clearConsole();
+//            consoleTxtArea.append("ahoj");
             // todo retrieve model
             switch (selectedOp) {
                 case OP_DELETE:
@@ -448,5 +499,9 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         this.optionParcel.setEnabled(enable);
         this.optionProperty.setEnabled(enable);
         this.optionAll.setEnabled(enable);
+    }
+
+    private void clearConsole() {
+        this.consoleTxtArea.setText("");
     }
 }
