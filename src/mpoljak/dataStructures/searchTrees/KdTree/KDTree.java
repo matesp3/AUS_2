@@ -27,6 +27,12 @@ interface INodeRetrieving<E extends T, T extends ISame<T>, K extends IKdComparab
     KdNode<E,T,K> retrieveNode(KdNode<E,T,K> node);
 }
 
+/**
+ * Data structure, that can hold data by multidimensional key with logarithmic searching.
+ * @param <E> type of inserted elements
+ * @param <T> type that declares, that it can be uniquely distinguished
+ * @param <K> multidimensional key, by which are data stored in data structure
+ */
 public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> > {
     private static final int ROW_NODE_MAX = 30;
     private static final int PREFIX_LENGTH = 6;
@@ -40,7 +46,6 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
     private KdNode<E,T,K> root;
 
     /**
-     * Use in case, inserted data has only one key set. No two equivalent key sets in data.
      * @param k defines how many dimensions will tree work with
      */
     public KDTree(int k) {

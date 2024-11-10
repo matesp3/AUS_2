@@ -4,6 +4,7 @@ import mpoljak.data.*;
 import mpoljak.data.forTesting.MyCoupleInt;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.utilities.DoubleComparator;
+import mpoljak.utilities.IntegerIdGenerator;
 
 import java.util.List;
 import java.util.Random;
@@ -31,10 +32,10 @@ public class MiniTester {
             System.out.println(String.format("\n    ----------------------------------------------------\n" +
                     "Iteration %d: seed=%s; gpsSeed=%s; directionSeed=%s", a+ 1, "" + seedSeed, "" + gpsSeed, "" + dirSeed));
 //            -----------------------------------------
-            KDTree<Property, IGpsLocalizable, GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
+            KDTree<Property, GeoResource, GPS> kdTree = new KDTree<Property, GeoResource, GPS>(2);
             GPS myGps1 = generateGPS(gpsGen, dirGen);
             GPS myGps2 = generateGPS(gpsGen, dirGen);
-            Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2);
+            Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2, IntegerIdGenerator.getInstance().nextId());
             int insertedTimes = 0;
             for (int i = 0; i < times; i++) {
                 insertElements(insertionsCount, kdTree, gpsGen, dirGen, 1);
@@ -69,12 +70,12 @@ public class MiniTester {
         dirGen.setSeed(dirSeed);
         System.out.println("Iteration " + (a+ 1) + ". seed=" +  seedSeed + "; gpsSeed=" + gpsSeed + "; directionSeed=" + dirSeed);
 //            -----------------------------------------
-        KDTree<Property, IGpsLocalizable, GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
+        KDTree<Property, GeoResource, GPS> kdTree = new KDTree<Property, GeoResource, GPS>(2);
 //        KDTree<Parcel, GPS> kdTree = new KDTree<>(2);
 //        KDTree<GeoData, GPS> kdTree = new KDTree<>(2);
         GPS myGps1 = generateGPS(gpsGen, dirGen);
         GPS myGps2 = generateGPS(gpsGen, dirGen);
-        Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2);
+        Property myP = new Property(1_000_000, "myProp_v1", myGps1, myGps2, IntegerIdGenerator.getInstance().nextId());
         int insertedTimes = 0;
         for (int i = 0; i < times; i++) {
             insertElements(insertionsCount, kdTree, gpsGen, dirGen, 1);
@@ -103,7 +104,7 @@ public class MiniTester {
         System.out.println("        INSERTING '" + className + "' based on GPS positions, tree built by GPS_1\n         " +
                 "---------------------------------------------------------");
         int id = 1;
-        KDTree<Property, IGpsLocalizable,  GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
+        KDTree<Property, GeoResource,  GPS> kdTree = new KDTree<Property, GeoResource, GPS>(2);
 //        KDTree<Parcel, Double> kdTree = new KDTree<Parcel, Double>(2, 1);
 //        KDTree<GPS, Double> kdTree = new KDTree<GPS, Double>(2);
         for (int a = 0; a < seedCount; a++) {
@@ -113,16 +114,16 @@ public class MiniTester {
                 GPS g1 = generateGPS(gpsGen, dirGen);
                 GPS g2 = generateGPS(gpsGen, dirGen);
 
-                Property p = new Property(id++, null, g1, g2);
-                Parcel par = new Parcel(id++, null, g1, g2);
+                Property p = new Property(id++, null, g1, g2, IntegerIdGenerator.getInstance().nextId());
+                Parcel par = new Parcel(id++, null, g1, g2, IntegerIdGenerator.getInstance().nextId());
 
-                kdTree.insert(p.getPositions()[0], p); // inserted by first GPS
+                kdTree.insert(p.getGps1(), p); // inserted by first GPS
                 System.out.println("\n ---------------------------------------------------------------------------- ");
                 System.out.println(" (i) Inserting " + p + " FIRST time... (by FIRST GPS)");
                 System.out.println(" ---------------------------------------------------------------------------- ");
                 kdTree.printTree();
 
-                kdTree.insert(p.getPositions()[1], p); // inserted by second GPS
+                kdTree.insert(p.getGps2(), p); // inserted by second GPS
                 System.out.println("\n ---------------------------------------------------------------------------- ");
                 System.out.println(" (i) Inserting " + p + " SECOND time... (by SECOND GPS)");
                 System.out.println(" ---------------------------------------------------------------------------- ");
@@ -201,7 +202,7 @@ public class MiniTester {
         int seedCount = 1;
         int id = 1;
         int a = 0;
-        KDTree<Property, IGpsLocalizable, GPS> kdTree = new KDTree<Property, IGpsLocalizable, GPS>(2);
+        KDTree<Property, GeoResource, GPS> kdTree = new KDTree<Property, GeoResource, GPS>(2);
         GPS max = new GPS('S', 90.0, 'W', 180); // starting from minimum
         GPS min = new GPS('N', 90.0, 'E', 180); // starting from maximum
 
@@ -222,7 +223,7 @@ public class MiniTester {
         for (int i = 0; i < insertionsCount; i++) {
             GPS g1 = generateGPS(gpsGen, dirGen);
             GPS g2 = generateGPS(gpsGen, dirGen);
-            Property p = new Property(id++, null, g1, g2);
+            Property p = new Property(id++, null, g1, g2, IntegerIdGenerator.getInstance().nextId());
             kdTree.insert(g1, p); // inserted by first GPS
             if (g1.compareTo(min, 1) == -1)
                 min = g1;
@@ -255,11 +256,11 @@ public class MiniTester {
     }
 
     private static void testInsertingBothParcelsAndProperties() {
-        KDTree<IGpsLocalizable, IGpsLocalizable, GPS> kdTreeBoth = new KDTree<>(2);
+        KDTree<GeoResource, GeoResource, GPS> kdTreeBoth = new KDTree<>(2);
         GPS g1 = new GPS('N', 27.87, 'W', 25.4);
         GPS g2 = new GPS('S', 79.87, 'E', 52.4);
-        Parcel par = new Parcel(1, "", g1, g2);
-        Property prop = new Property(1, "", g2, g1);
+        Parcel par = new Parcel(1, "", g1, g2, IntegerIdGenerator.getInstance().nextId());
+        Property prop = new Property(1, "", g2, g1, IntegerIdGenerator.getInstance().nextId());
         kdTreeBoth.insert(g1, par);
         kdTreeBoth.insert(g2, prop);
         // OK..
@@ -278,16 +279,16 @@ public class MiniTester {
         return new GPS(chLat, lat, chLon, lon);
     }
 
-    private static void insertElements(long insertionsCount, KDTree<Property, IGpsLocalizable, GPS> kdTree, Random dirGenerator, Random
+    private static void insertElements(long insertionsCount, KDTree<Property, GeoResource, GPS> kdTree, Random dirGenerator, Random
             valGenerator, int nextId) {
         for (int i = 0; i < insertionsCount; i++) {
             GPS g1 = generateGPS(valGenerator, dirGenerator);
             GPS g2 = generateGPS(valGenerator, dirGenerator);
 
-            Property p = new Property(nextId++, null, g1, g2);
+            Property p = new Property(nextId++, null, g1, g2, IntegerIdGenerator.getInstance().nextId());
 //                Parcel p = new Parcel(id++, null, g1, g2);
-            kdTree.insert(p.getPositions()[0], p); // inserted by first GPS
-            kdTree.insert(p.getPositions()[1], p); // inserted by second GPS
+            kdTree.insert(p.getGps1(), p); // inserted by first GPS
+            kdTree.insert(p.getGps2(), p); // inserted by second GPS
 
         }
     }

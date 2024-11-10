@@ -4,6 +4,7 @@ import mpoljak.App.GUI.components.DetailsInputComponent;
 import mpoljak.App.GUI.components.GeneratorInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
 import mpoljak.App.GUI.models.*;
+import mpoljak.App.Logic.GeoDbClient;
 import mpoljak.utilities.SwingTableColumnResizer;
 
 import javax.swing.*;
@@ -52,6 +53,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
     private int selectedOp;
 
+    private GeoDbClient client;
+
     private class RadioButtonActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -73,19 +76,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
-    private class OnItemSelectListener implements ListSelectionListener {
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-
-            int firstIndex = e.getFirstIndex();
-            int lastIndex = e.getLastIndex();
-            System.out.println(firstIndex+ " -> "+lastIndex);
-        }
-    }
-
-    public GeoAppFrame() {
+    public GeoAppFrame(GeoDbClient client) {
+        this.client = client;
         this.selectedOp = OP_INSERT;
         ImageIcon icon = new ImageIcon("src/mpoljak/files/GeoApp-icon.png");
         this.setIconImage(icon.getImage());
