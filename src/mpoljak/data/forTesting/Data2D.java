@@ -4,13 +4,13 @@ import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 import mpoljak.dataStructures.searchTrees.KdTree.Testing.IUniqueDataGenerator;
-import mpoljak.utilities.IntegerIdGenerator;
+import mpoljak.utilities.StringIdGenerator;
 
 import java.util.Comparator;
 import java.util.Random;
 
 public class Data2D implements IKdComparable<Data2D>, ISame<Data2D> {
-    private final int id;
+    private final String id;
     private int x;
     private int y;
 
@@ -18,40 +18,40 @@ public class Data2D implements IKdComparable<Data2D>, ISame<Data2D> {
 
         @Override
         public int compare(Data2D o1, Data2D o2) {
-            return Integer.compare(o1.id, o2.id);
+            return (o1.id).compareTo(o2.id);
         }
     }
 
-    public static class Data2DGenerator implements IUniqueDataGenerator<Data2D, Integer> {
+    public static class Data2DGenerator implements IUniqueDataGenerator<Data2D, String> {
 
         @Override
-        public Data2D generateInstance(Random valueGenerator, Integer uniqueId) {
+        public Data2D generateInstance(Random valueGenerator, String uniqueId) {
             if (uniqueId == null)
                 throw new NullPointerException("UniqueId is null, while creating new Data2D instance.");
             return new Data2D(
                     uniqueId,
-                    (1+(Math.abs(valueGenerator.nextInt()) % 3)), // 1-3
-                    (1 +(Math.abs(valueGenerator.nextInt() % 3))) // 1-3
+                    (1+(Math.abs(valueGenerator.nextInt()) % 50)), // value range 1-50
+                    (1 +(Math.abs(valueGenerator.nextInt() % 50))) // value range 1-50
             );
         }
 
         @Override
-        public Data2D copyConstruct(Data2D other, Integer uniqueId) {
+        public Data2D copyConstruct(Data2D other, String uniqueId) {
             return new Data2D(other, uniqueId);
         }
     }
 
-    public Data2D(int uniqueId, int x, int y) {
+    public Data2D(String uniqueId, int x, int y) {
         this.id = uniqueId;
         this.x = x;
         this.y = y;
     }
 
-    public Data2D(Data2D other, int uniqueId) {
+    public Data2D(Data2D other, String uniqueId) {
         this(uniqueId, other.x, other.y);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -99,17 +99,18 @@ public class Data2D implements IKdComparable<Data2D>, ISame<Data2D> {
 
     @Override
     public boolean isSame(Data2D other) {
-        return this == other || this.id == other.id;
+        return this == other || this.id.compareTo(other.id) == 0;
     }
 
     @Override
     public String toString() {
-        return String.format("2D[ID=%d, x=%2d, y=%2d]", this.id, this.x, this.y);
+        return String.format("2D[ID='%s', x=%2d, y=%2d]", this.id, this.x, this.y);
     }
 
     public static void main(String[] args) {
-        Data2D d1 = new Data2D(1, 0,2);
-        Data2D d2 = new Data2D(2, 1,2);
+        StringIdGenerator strGen = StringIdGenerator.getInstance();
+        Data2D d1 = new Data2D(strGen.nextId(), 0,2);
+        Data2D d2 = new Data2D(strGen.nextId(), 1,2);
 //        Data4D d1 = new Data4D(5.2, "v", 5, 5.4, 1);
 //        Data4D d2 = new Data4D(8.6, "avdca", -5, 55.4, 2);
 //        Data4D d3 = new Data4D(-5.2, "sdvasa", 5, -0.4, 3);
