@@ -5,17 +5,15 @@ import mpoljak.data.forTesting.Data4D;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
-import mpoljak.utilities.BisectionSearch;
-import mpoljak.utilities.DoubleComparator;
-import mpoljak.utilities.IGeneratorId;
-import mpoljak.utilities.IntegerIdGenerator;
+import mpoljak.utilities.*;
 
 import java.util.*;
 
 /**
  * Class for testing main functionalities of K-dimensional(k-d) tree structure.
+ * @param <D> Class type which is key with data in one.
+ * @param <K> Class type of provided generator of unique ids.
  */
-//public class OperationsTester<D extends ISame<D> & IKdComparable<D> > {
 public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparable<K>> {
 
     private static final int VAL_SEED_IDX = 0;  // standardised index (within seed array) of seed for generating data
@@ -778,9 +776,9 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
         final int SPECIFIC_DUPLICATE_TEST   = 4;
 
         int chosenOperation = OVERALL_TEST;
-        KdTester<Data2D, Integer> ot = new KdTester<Data2D, Integer>( // TODO GENERATOR of Strings
-                new Data2D.Data2DComparator(),                        // TODO 2 add description of doAllTest
-                IntegerIdGenerator.getInstance(),
+        KdTester<Data2D, String> ot = new KdTester<Data2D, String>(
+                new Data2D.Data2DComparator(),
+                StringIdGenerator.getInstance(),
                 new Data2D.Data2DGenerator(),
                 2
         );

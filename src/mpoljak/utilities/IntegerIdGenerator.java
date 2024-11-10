@@ -1,5 +1,8 @@
 package mpoljak.utilities;
 
+/**
+ * Singleton implementation of unique value generator of Integer type.
+ */
 public class IntegerIdGenerator implements IGeneratorId<Integer> {
     private static IntegerIdGenerator instance = null;
 
