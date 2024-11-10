@@ -56,6 +56,14 @@ public class Parcel extends GeoResource {
         return this.properties;
     }
 
+    public void setParcelId(int parcelId) {
+        this.parcelId = parcelId;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void addProperty(Property property) {
         if (property == null)
             return;

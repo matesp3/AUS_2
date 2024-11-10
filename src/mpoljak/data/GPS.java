@@ -102,7 +102,7 @@ public class GPS implements IKdComparable<GPS>, ISame<GPS> {
     public String toString() {
         int c1 = this.latitude == 'N' ? 1 : -1;
         int c2 = this.longitude == 'E' ? 1 : -1;
-        return String.format("[%.4f;%.4f]", c1 * this.latDeg, c2 * this.longDeg);
+        return String.format("[%.2f;%.2f]", c1 * this.latDeg, c2 * this.longDeg);
     }
 
     @Override

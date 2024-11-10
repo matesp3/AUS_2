@@ -5,11 +5,12 @@ import mpoljak.App.GUI.components.GeneratorInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
 import mpoljak.App.GUI.models.*;
 import mpoljak.App.Logic.GeoDbClient;
+import mpoljak.data.GPS;
+import mpoljak.data.Parcel;
+import mpoljak.data.Property;
 import mpoljak.utilities.SwingTableColumnResizer;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -76,6 +77,40 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
+    public class ExecuteActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton btn = (JButton) e.getSource();
+            if (btn == executeBtn) {
+                if (selectedOp == OP_INSERT) {
+                    GPS g1 = gpsInput1.getModel();
+                    GPS g2 = gpsInput2.getModel();
+                    GeoInfoModel info = detailsPanel.getModel();
+                    if (info.getGeoType() == TYPE_PARCEL)
+                        client.addParcel(info.getNumber(), info.getDescription(), g1, g2);
+                    else if (info.getGeoType() == TYPE_PROPERTY)
+                        client.addProperty(info.getNumber(), info.getDescription(), g1, g2);
+                }
+                else if (selectedOp == OP_SEARCH) {
+                    GPS g1 = gpsInput1.getModel();
+                    if (optionParcel.isSelected()) {
+                        List<Parcel> lPar = client.findParcels(g1);
+                        parcelModel.setModels(lPar);
+                    }
+                    else if (optionProperty.isSelected()) {
+                        List<Property> lProps = client.findProperties(g1);
+                        propertyModel.setModels(lProps);
+                    }
+                    else if (optionAll.isSelected()) {
+                        GPS g2 = gpsInput2.getModel();
+                        client.findGeoResources(g1, g2);
+                    }
+                }
+            }
+        }
+    }
+
     public GeoAppFrame(GeoDbClient client) {
         this.client = client;
         this.selectedOp = OP_INSERT;
@@ -102,15 +137,22 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         dataPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         this.add(dataPanel, BorderLayout.CENTER);
 
-        List<ParcelModel> lParcels = new ArrayList<ParcelModel>();
-        lParcels.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
-                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
+        List<Parcel> lParcels = new ArrayList<Parcel>();
+        lParcels.add(new Parcel(23, "first-parcel", new GPS('N', 45.2,'W', 15.8),
+                new GPS('S', 5.2,'E', 47.8), -1));
+//        List<ParcelModel> lParcels = new ArrayList<ParcelModel>();
+//        lParcels.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
+//                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
 //        lParcels.add(new ParcelModel(new GpsModel('S', 45.2,'E', 15.8),
 //                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
 
-        List<PropertyModel> lProperties = new ArrayList<PropertyModel>();
-        lProperties.add(new PropertyModel(new GpsModel('N', 45.2,'W', 15.8),
-                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
+        List<Property> lProperties = new ArrayList<Property>();
+        lProperties.add(new Property(1, "first-parcel", new GPS('N', 45.2,'W', 15.8),
+                new GPS('S', 5.2,'E', 47.8), -1)
+        );
+//        List<PropertyModel> lProperties = new ArrayList<PropertyModel>();
+//        lProperties.add(new PropertyModel(new GpsModel('N', 45.2,'W', 15.8),
+//                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
 //        lProperties.add(new PropertyModel(new GpsModel('S', 45.2,'E', 15.8),
 //                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
         this.prepareDataPanel(dataPanel, lParcels, lProperties);
@@ -170,7 +212,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
-    private void prepareDataPanel(JPanel dataPanel, List<ParcelModel> lParcels, List<PropertyModel> lProperties) {
+//    private void prepareDataPanel(JPanel dataPanel, List<ParcelModel> lParcels, List<PropertyModel> lProperties) {
+    private void prepareDataPanel(JPanel dataPanel, List<Parcel> lParcels, List<Property> lProperties) {
         GridBagLayout layout = new GridBagLayout();
         dataPanel.setLayout(layout);
         GridBagConstraints con = new GridBagConstraints();
@@ -197,12 +240,13 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             public void mouseClicked(MouseEvent e) {
                 if (selectedOp == OP_EDIT || selectedOp == OP_DELETE) {
                     System.out.println("Parcel clicked");
-                    ParcelModel parcel = parcelModel.getModel(parcelsJTab.getSelectedRow());
+//                    ParcelModel parcel = parcelModel.getModel(parcelsJTab.getSelectedRow());
+                    Parcel parcel = parcelModel.getModel(parcelsJTab.getSelectedRow());
                     gpsInput1.setModel(parcel.getGps1());
                     gpsInput2.setModel(parcel.getGps2());
                     optionParcel.setSelected(true);
                     detailsPanel.setModel(
-                            new GeoInfoModel(TYPE_PARCEL, parcel.getInventoryNr(), parcel.getDescription()));
+                            new GeoInfoModel(TYPE_PARCEL, parcel.getParcelId(), parcel.getDescription()));
                 }
             }
             @Override public void mousePressed(MouseEvent e) {}
@@ -236,12 +280,13 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             public void mouseClicked(MouseEvent e) {
                 if (selectedOp == OP_EDIT || selectedOp == OP_DELETE) {
                     System.out.println("Prop clicked");
-                    PropertyModel prop = propertyModel.getModel(propertiesJTab.getSelectedRow());
+//                    PropertyModel prop = propertyModel.getModel(propertiesJTab.getSelectedRow());
+                    Property prop = propertyModel.getModel(propertiesJTab.getSelectedRow());
                     gpsInput1.setModel(prop.getGps1());
                     gpsInput2.setModel(prop.getGps2());
                     optionProperty.setSelected(true);
                     detailsPanel.setModel(
-                            new GeoInfoModel(TYPE_PROPERTY, prop.getPropertyNr(), prop.getDescription()));
+                            new GeoInfoModel(TYPE_PROPERTY, prop.getPropertyId(), prop.getDescription()));
                 }
             }
             @Override public void mousePressed(MouseEvent e) {}
@@ -408,20 +453,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.insets = new Insets(10, 0, 0, 0);
         Color c = new Color(146, 236, 236);
         this.executeBtn = createButton(80,30, "Execute", c);
-        this.executeBtn.addActionListener(e -> {
-            parcelModel.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
-                    new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
-//            clearConsole();
-//            consoleTxtArea.append("ahoj");
-            // todo retrieve model
-            switch (selectedOp) {
-                case OP_DELETE:
-//                    SEND delete to manager
-                    break;
-                case OP_GENERATE:
-//                    SEND generate
-            }
-        });
+        this.executeBtn.addActionListener(new ExecuteActionListener());
         operationsPanel.add(this.executeBtn, con);
 
         return operationsPanel;

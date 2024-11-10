@@ -1,10 +1,13 @@
 package mpoljak.App.GUI.models;
 
+import mpoljak.data.Property;
+
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 public class PropertyTableModel extends AbstractTableModel {
-    private final List<PropertyModel> lProperties;
+//    private final List<PropertyModel> lProperties;
+    private final List<Property> lProperties;
 
     private final String[] aColNames = new String[] {
             "Property nr.",
@@ -29,19 +32,33 @@ public class PropertyTableModel extends AbstractTableModel {
             Double.class,
             Character.class};
 
-    public PropertyTableModel(List<PropertyModel> lProperties) {
+//    public PropertyTableModel(List<PropertyModel> lProperties) {
+    public PropertyTableModel(List<Property> lProperties) {
         if (lProperties == null)
             throw new NullPointerException("Parcels data are not provided");
         this.lProperties = lProperties;
     }
 
-    public void add(PropertyModel property) {
+//    public void add(PropertyModel property) {
+    public void add(Property property) {
         lProperties.add(property);
         this.fireTableDataChanged();
     }
 
-    public PropertyModel getModel(int index) {
+//    public PropertyModel getModel(int index) {
+    public Property getModel(int index) {
         return lProperties.get(index);
+    }
+
+    public void setModels(List<Property> lModels) {
+        this.clear();
+        lProperties.addAll(lModels);
+        this.fireTableDataChanged();
+    }
+
+    public void clear() {
+        lProperties.clear();
+        this.fireTableDataChanged();
     }
 
     @Override
@@ -71,9 +88,10 @@ public class PropertyTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        PropertyModel property = lProperties.get(rowIndex);
+//        PropertyModel property = lProperties.get(rowIndex);
+        Property property = lProperties.get(rowIndex);
         if (columnIndex == 0)
-            return property.getPropertyNr();
+            return property.getPropertyId();
         else if (columnIndex == 1)
             return property.getDescription();
         else if (columnIndex == 2)

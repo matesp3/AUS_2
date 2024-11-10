@@ -55,7 +55,8 @@ public class GeoDbClient {
 
     /** Task 4 - add new property with specified parameters */
     public void addProperty(int inventoryNr, String description, GPS position1, GPS position2) {
-        Property property = new Property(inventoryNr, description, position1, position2, this.idGenerator.nextId());
+        Property property = new Property(inventoryNr, description, position1.copyConstruct(),
+                position2.copyConstruct(), this.idGenerator.nextId());
 
         List<Parcel> lParcelsByPos1 = this.kdTreeParcels.findAll(position1);    // log2(m)
         List<Parcel> lParcelsByPos2 = this.kdTreeParcels.findAll(position2);    // log2(m)
@@ -76,7 +77,8 @@ public class GeoDbClient {
 
     /** Task 5 - add new parcel with specified parameters */
     public void addParcel(int parcelNr, String description, GPS position1, GPS position2) {
-        Parcel parcel = new Parcel(parcelNr, description, position1, position2, this.idGenerator.nextId());
+        Parcel parcel = new Parcel(parcelNr, description, position1.copyConstruct(),
+                position2.copyConstruct(), this.idGenerator.nextId());
         List<Property> lPropsByPos1 = this.kdTreeProps.findAll(position1);    // log2(m)
         List<Property> lPropsByPos2 = this.kdTreeProps.findAll(position2);    // log2(m)
 
@@ -95,35 +97,71 @@ public class GeoDbClient {
     };
 
     /** Task 6 - edit property (its positions could be modified also) */
-    public boolean editProperty(Property modifiedProperty) {
-        if (modifiedProperty == null)
+    public boolean editProperty(Property modifiedProperty, Property originalProperty) {
+        if (modifiedProperty == null || originalProperty == null)
             return false;
-        List<Property> lResultProps = this.retrieveData(modifiedProperty.getGps1(), null, this.kdTreeProps);
-        if (lResultProps.isEmpty())
-            return false;
-        Property propToEdit = null;
-        for (Property prop : lResultProps) {
-            if (prop.isSame(modifiedProperty)) {
-                propToEdit = prop;
-                break;
-            }
-        }
-        if (propToEdit == null)
-            return false;
-        if (propToEdit.getGps1().isSameKey(modifiedProperty.getGps1())
-                && propToEdit.getGps2().isSameKey(modifiedProperty.getGps2())) {
 
+        if (modifiedProperty.getGps1().isSameKey(originalProperty.getGps1())
+                && modifiedProperty.getGps2().isSameKey(originalProperty.getGps2())) {
+            List<Property> lResultProps = this.retrieveData(originalProperty.getGps1(), null, this.kdTreeProps);
+            if (lResultProps.isEmpty())
+                return false;
+            Property propToEdit = null;
+            for (Property prop : lResultProps) {
+                if (prop.isSame(originalProperty)) {
+                    propToEdit = prop;
+                    break;
+                }
+            }
+            if (propToEdit == null)
+                return false;
+            if (propToEdit.getPropertyId() != modifiedProperty.getPropertyId())
+                propToEdit.setPropertyId(modifiedProperty.getPropertyId());
+            if (propToEdit.getDescription().compareTo(modifiedProperty.getDescription()) != 0)
+                propToEdit.setDescription(modifiedProperty.getDescription());
         }
         else {  // reinsertion because of secondary key change
-            // todo odstranit zo vsetkych stromov
+            boolean ok = this.removeProperty(originalProperty);
+            if (!ok)
+                return false;
+            this.addProperty(modifiedProperty.getPropertyId(), modifiedProperty.getDescription(),
+                    modifiedProperty.getGps1(), modifiedProperty.getGps2());
         }
         return true;
     };
 
     /** Task 7 - edit parcel (its positions could be modified also) */
-    public boolean editParcel(Parcel modifiedParcel) {
-        // todo odstranit zo vsetkych stromov
-        return false;
+    public boolean editParcel(Parcel modifiedParcel, Parcel originalParcel) {
+        if (modifiedParcel == null || originalParcel == null)
+            return false;
+
+        if (modifiedParcel.getGps1().isSameKey(originalParcel.getGps1())
+                && modifiedParcel.getGps2().isSameKey(originalParcel.getGps2())) {
+            List<Parcel> lResultParcels = this.retrieveData(originalParcel.getGps1(), null, this.kdTreeParcels);
+            if (lResultParcels.isEmpty())
+                return false;
+            Parcel parcelToEdit = null;
+            for (Parcel par : lResultParcels) {
+                if (par.isSame(originalParcel)) {
+                    parcelToEdit = par;
+                    break;
+                }
+            }
+            if (parcelToEdit == null)
+                return false;
+            if (parcelToEdit.getParcelId() != modifiedParcel.getParcelId())
+                parcelToEdit.setParcelId(modifiedParcel.getParcelId());
+            if (parcelToEdit.getDescription().compareTo(modifiedParcel.getDescription()) != 0)
+                parcelToEdit.setDescription(modifiedParcel.getDescription());
+        }
+        else {  // reinsertion because of secondary key change
+            boolean ok = this.removeParcel(originalParcel);
+            if (!ok)
+                return false;
+            this.addParcel(modifiedParcel.getParcelId(), modifiedParcel.getDescription(),
+                    modifiedParcel.getGps1(), modifiedParcel.getGps2());
+        }
+        return true;
     };
 
     /** Task 8 - remove specified property */
@@ -134,7 +172,7 @@ public class GeoDbClient {
         Property deletedProp = this.kdTreeProps.delete(property.getGps1(), property);
         if (deletedProp == null)
             return false;
-        deleted = deleted && this.kdTreeProps.delete(property.getGps2(), property) != null;
+        deleted = this.kdTreeProps.delete(property.getGps2(), property) != null;
 
         for (Parcel parcel : deletedProp.getParcels())
             parcel.removeProperty(deletedProp);
@@ -154,7 +192,7 @@ public class GeoDbClient {
         Parcel deletedParcel = this.kdTreeParcels.delete(parcel.getGps1(), parcel);
         if (deletedParcel == null)
             return false;
-        deleted = deleted && this.kdTreeParcels.delete(parcel.getGps2(), parcel) != null;
+        deleted = this.kdTreeParcels.delete(parcel.getGps2(), parcel) != null;
 
         for (Property prop : deletedParcel.getProperties())
             prop.removeParcel(deletedParcel);
