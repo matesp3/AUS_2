@@ -70,10 +70,14 @@ public class DetailsInputComponent extends JPanel {
      * @return model representation of visualized information
      */
     public GeoInfoModel getModel() {
-        int nr =  Integer.parseInt(this.numberInput.getText());
-        String desc = this.descInput.getText();
-        char type = (this.currentType == GeoAppFrame.TYPE_PARCEL) ? GeoAppFrame.TYPE_PARCEL : GeoAppFrame.TYPE_PROPERTY;
-        return new GeoInfoModel(type, nr, desc);
+        try {
+            int nr = Integer.parseInt(this.numberInput.getText());
+            String desc = this.descInput.getText();
+            char type = (this.currentType == GeoAppFrame.TYPE_PARCEL) ? GeoAppFrame.TYPE_PARCEL : GeoAppFrame.TYPE_PROPERTY;
+            return new GeoInfoModel(type, nr, desc);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

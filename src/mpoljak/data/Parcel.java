@@ -56,6 +56,14 @@ public class Parcel extends GeoResource {
         return this.properties;
     }
 
+    public void setParcelId(int parcelId) {
+        this.parcelId = parcelId;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void addProperty(Property property) {
         if (property == null)
             return;
@@ -78,7 +86,7 @@ public class Parcel extends GeoResource {
 
     @Override
     public String toString() {
-        return String.format("Par[id=%d;g1%s;g2%s]", this.parcelId, this.positions[0], this.positions[1]);
+        return String.format("Par[nr=%d;g1%s;g2%s,desc='%s']", this.parcelId, this.positions[0], this.positions[1], this.description);
     }
 
     @Override

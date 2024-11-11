@@ -115,6 +115,12 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return lToReturn;
     }
 
+    /**
+     * Deletes specified data inserted with given secondary key.
+     * @param key secondary key, by which specified data had been inserted into the k-d tree
+     * @param data data with unique attribute value to delete
+     * @return removed data or null if data wasn't found.
+     */
     public E delete(K key, E data) {
         NodeToProcess nodeToProcess = this.findUnique(key, data);
         if (nodeToProcess == null)

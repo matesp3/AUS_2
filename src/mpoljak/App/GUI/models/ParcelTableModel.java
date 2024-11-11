@@ -1,5 +1,8 @@
 package mpoljak.App.GUI.models;
 
+import mpoljak.data.Parcel;
+import mpoljak.data.Property;
+
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -7,7 +10,8 @@ import java.util.List;
 
 public class ParcelTableModel extends AbstractTableModel {
 
-    private final List<ParcelModel> lParcels;
+//    private final List<ParcelModel> lParcels;
+    private final List<Parcel> lParcels;
 
     private final String[] aColNames = new String[] {
             "Inventory nr.",
@@ -32,19 +36,38 @@ public class ParcelTableModel extends AbstractTableModel {
             Double.class,
             Character.class};
 
-    public ParcelTableModel(List<ParcelModel> lParcels) {
+//    public ParcelTableModel(List<ParcelModel> lParcels) {
+    public ParcelTableModel(List<Parcel> lParcels) {
         if (lParcels == null)
             throw new NullPointerException("Parcels data are not provided");
         this.lParcels = lParcels;
     }
 
-    public void add(ParcelModel parcel) {
+//    public void add(ParcelModel parcel) {
+    public void add(Parcel parcel) {
         lParcels.add(parcel);
         this.fireTableDataChanged();
     }
 
-    public ParcelModel getModel(int index) {
+    public void setModels(List<Parcel> lModels) {
+        this.clear();
+        lParcels.addAll(lModels);
+        this.fireTableDataChanged();
+    }
+
+//    public ParcelModel getModel(int index) {
+    public Parcel getModel(int index) {
         return lParcels.get(index);
+    }
+
+    public void remove(int index) {
+        lParcels.remove(index);
+        this.fireTableDataChanged();
+    }
+
+    public void clear() {
+        lParcels.clear();
+        this.fireTableDataChanged();
     }
 
     @Override
@@ -76,9 +99,10 @@ public class ParcelTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        ParcelModel parcel = lParcels.get(rowIndex);
+//        ParcelModel parcel = lParcels.get(rowIndex);
+        Parcel parcel = lParcels.get(rowIndex);
         if (columnIndex == 0)
-            return parcel.getInventoryNr();
+            return parcel.getParcelId();
         else if (columnIndex == 1)
             return parcel.getDescription();
         else if (columnIndex == 2)

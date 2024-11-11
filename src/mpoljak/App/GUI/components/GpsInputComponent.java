@@ -1,6 +1,7 @@
 package mpoljak.App.GUI.components;
 
 import mpoljak.App.GUI.models.GpsModel;
+import mpoljak.data.GPS;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,26 +64,52 @@ public class GpsInputComponent extends JPanel {
         this.setBackground(color);
     }
 
+//    /**
+//     * Gets data, which input fields contain
+//     * @return model representation of visualized information
+//     */
+//    public GpsModel getModel() {
+//        char lat = latDegTextField.getText().charAt(0);
+//        double latDeg = Double.parseDouble(latDegTextField.getText());
+//        char lon = lonDegTextField.getText().charAt(0);
+//        double lonDeg = Double.parseDouble(lonDegTextField.getText());
+//        return new GpsModel(lat, latDeg, lon, lonDeg);
+//    }
+//
+//    /**
+//     * Fills input fields with data from model
+//     * @param model contains data to visualize
+//     */
+//    public void setModel(GpsModel model) {
+//        this.latDegTextField.setText(String.format("%.4f", model.getLatDeg()));
+//        this.latDirTextField.setText(String.format("%C", model.getLatitude()));
+//        this.lonDegTextField.setText(String.format("%.4f", model.getLongDeg()));
+//        this.lonDirTextField.setText(String.format("%C", model.getLongitude()));
+//    }
     /**
      * Gets data, which input fields contain
-     * @return model representation of visualized information
+     * @return model representation of visualized information | null if some data weren't present
      */
-    public GpsModel getModel() {
-        char lat = latDegTextField.getText().charAt(0);
-        double latDeg = Double.parseDouble(latDegTextField.getText());
-        char lon = lonDegTextField.getText().charAt(0);
-        double lonDeg = Double.parseDouble(lonDegTextField.getText());
-        return new GpsModel(lat, latDeg, lon, lonDeg);
+    public GPS getModel() {
+        try {
+            char lat = latDirTextField.getText().charAt(0);
+            double latDeg = Double.parseDouble(latDegTextField.getText());
+            char lon = lonDirTextField.getText().charAt(0);
+            double lonDeg = Double.parseDouble(lonDegTextField.getText());
+            return new GPS(lat, latDeg, lon, lonDeg);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
      * Fills input fields with data from model
      * @param model contains data to visualize
      */
-    public void setModel(GpsModel model) {
-        this.latDegTextField.setText(String.format("%.4f", model.getLatDeg()));
+    public void setModel(GPS model) {
+        this.latDegTextField.setText(String.format("%.4f", model.getLatDeg()).replace(",","."));
         this.latDirTextField.setText(String.format("%C", model.getLatitude()));
-        this.lonDegTextField.setText(String.format("%.4f", model.getLongDeg()));
+        this.lonDegTextField.setText(String.format("%.4f", model.getLongDeg()).replace(",","."));
         this.lonDirTextField.setText(String.format("%C", model.getLongitude()));
     }
 
