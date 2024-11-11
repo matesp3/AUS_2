@@ -100,9 +100,10 @@ public class GPS implements IKdComparable<GPS>, ISame<GPS> {
 
     @Override
     public String toString() {
-        int c1 = this.latitude == 'N' ? 1 : -1;
-        int c2 = this.longitude == 'E' ? 1 : -1;
-        return String.format("[%.2f;%.2f]", c1 * this.latDeg, c2 * this.longDeg);
+//        int c1 = this.latitude == 'N' ? 1 : -1;
+//        int c2 = this.longitude == 'E' ? 1 : -1;
+//        return String.format("[%C %02.02f; %C %02.02f]", this.latitude, c1 * this.latDeg, this.longitude, c2 * this.longDeg);
+        return String.format("[%C %2.02f; %C %2.02f]", this.latitude,this.latDeg, this.longitude,this.longDeg);
     }
 
     @Override
@@ -126,7 +127,8 @@ public class GPS implements IKdComparable<GPS>, ISame<GPS> {
         return (this.longitude == 'E' ? 1 : -1) * this.longDeg;
     }
 
-    public static void testFallingIntoGPS() {
+    /** testFallingIntoGPS */
+    public static void main(String[] args) {
         System.out.println(" Test FALLING INTO GPS (falling into means that all key values of first GPS are less" +
                                      " or equal to second GPS key values)\n");
 

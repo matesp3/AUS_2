@@ -88,14 +88,18 @@ public class GpsInputComponent extends JPanel {
 //    }
     /**
      * Gets data, which input fields contain
-     * @return model representation of visualized information
+     * @return model representation of visualized information | null if some data weren't present
      */
     public GPS getModel() {
-        char lat = latDirTextField.getText().charAt(0);
-        double latDeg = Double.parseDouble(latDegTextField.getText());
-        char lon = lonDirTextField.getText().charAt(0);
-        double lonDeg = Double.parseDouble(lonDegTextField.getText());
-        return new GPS(lat, latDeg, lon, lonDeg);
+        try {
+            char lat = latDirTextField.getText().charAt(0);
+            double latDeg = Double.parseDouble(latDegTextField.getText());
+            char lon = lonDirTextField.getText().charAt(0);
+            double lonDeg = Double.parseDouble(lonDegTextField.getText());
+            return new GPS(lat, latDeg, lon, lonDeg);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

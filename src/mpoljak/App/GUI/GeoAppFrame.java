@@ -3,9 +3,11 @@ package mpoljak.App.GUI;
 import mpoljak.App.GUI.components.DetailsInputComponent;
 import mpoljak.App.GUI.components.GeneratorInputComponent;
 import mpoljak.App.GUI.components.GpsInputComponent;
+import mpoljak.App.GUI.controllers.OperationsController;
 import mpoljak.App.GUI.models.*;
 import mpoljak.App.Logic.GeoDbClient;
 import mpoljak.data.GPS;
+import mpoljak.data.GeoResource;
 import mpoljak.data.Parcel;
 import mpoljak.data.Property;
 import mpoljak.utilities.SwingTableColumnResizer;
@@ -13,6 +15,7 @@ import mpoljak.utilities.SwingTableColumnResizer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -54,7 +57,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
     private int selectedOp;
 
-    private GeoDbClient client;
+    private OperationsController controller;
 
     private class RadioButtonActionListener implements ActionListener {
         @Override
@@ -84,35 +87,34 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             JButton btn = (JButton) e.getSource();
             if (btn == executeBtn) {
                 if (selectedOp == OP_INSERT) {
-                    GPS g1 = gpsInput1.getModel();
-                    GPS g2 = gpsInput2.getModel();
-                    GeoInfoModel info = detailsPanel.getModel();
-                    if (info.getGeoType() == TYPE_PARCEL)
-                        client.addParcel(info.getNumber(), info.getDescription(), g1, g2);
-                    else if (info.getGeoType() == TYPE_PROPERTY)
-                        client.addProperty(info.getNumber(), info.getDescription(), g1, g2);
+                    boolean insertOk = controller.insertDataToDb(gpsInput1.getModel(), gpsInput2.getModel(),
+                            detailsPanel.getModel());
+                    logOperation("INSERT", insertOk);
                 }
                 else if (selectedOp == OP_SEARCH) {
-                    GPS g1 = gpsInput1.getModel();
-                    if (optionParcel.isSelected()) {
-                        List<Parcel> lPar = client.findParcels(g1);
-                        parcelModel.setModels(lPar);
-                    }
-                    else if (optionProperty.isSelected()) {
-                        List<Property> lProps = client.findProperties(g1);
-                        propertyModel.setModels(lProps);
-                    }
-                    else if (optionAll.isSelected()) {
-                        GPS g2 = gpsInput2.getModel();
-                        client.findGeoResources(g1, g2);
-                    }
+                    boolean searchOk = controller.searchDataInDb(gpsInput1.getModel(), gpsInput2.getModel(),
+                            optionParcel.isSelected(),
+                            optionProperty.isSelected(), optionAll.isSelected(), parcelModel, propertyModel);
+                    logOperation("SEARCH", searchOk);
+                }
+                else if (selectedOp == OP_DELETE) {
+                    boolean deleteOk = controller.deleteDataFromDb(gpsInput1.getModel(), gpsInput2.getModel(),
+                            detailsPanel.getModel(),
+                            parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
+                    logOperation("DELETE", deleteOk);
+                }
+                else if (selectedOp == OP_EDIT) {
+                    boolean editOk = controller.editDataInDb(gpsInput1.getModel(), gpsInput2.getModel(),
+                            detailsPanel.getModel(),
+                            parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
+                    logOperation("EDIT", editOk);
                 }
             }
         }
     }
 
     public GeoAppFrame(GeoDbClient client) {
-        this.client = client;
+        this.controller = new OperationsController(client);
         this.selectedOp = OP_INSERT;
         ImageIcon icon = new ImageIcon("src/mpoljak/files/GeoApp-icon.png");
         this.setIconImage(icon.getImage());
@@ -136,26 +138,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         dataPanel.setPreferredSize(new Dimension(CANVAS_WIDTH-MANAGE_PANE_WIDTH, CANVAS_HEIGHT));
         dataPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         this.add(dataPanel, BorderLayout.CENTER);
-
-        List<Parcel> lParcels = new ArrayList<Parcel>();
-        lParcels.add(new Parcel(23, "first-parcel", new GPS('N', 45.2,'W', 15.8),
-                new GPS('S', 5.2,'E', 47.8), -1));
-//        List<ParcelModel> lParcels = new ArrayList<ParcelModel>();
-//        lParcels.add(new ParcelModel(new GpsModel('N', 45.2,'W', 15.8),
-//                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
-//        lParcels.add(new ParcelModel(new GpsModel('S', 45.2,'E', 15.8),
-//                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
-
-        List<Property> lProperties = new ArrayList<Property>();
-        lProperties.add(new Property(1, "first-parcel", new GPS('N', 45.2,'W', 15.8),
-                new GPS('S', 5.2,'E', 47.8), -1)
-        );
-//        List<PropertyModel> lProperties = new ArrayList<PropertyModel>();
-//        lProperties.add(new PropertyModel(new GpsModel('N', 45.2,'W', 15.8),
-//                new GpsModel('S', 5.2,'E', 47.8), "first-parcel", 1));
-//        lProperties.add(new PropertyModel(new GpsModel('S', 45.2,'E', 15.8),
-//                new GpsModel('S', 5.2,'W', 47.8), "second-parcel", 2));
-        this.prepareDataPanel(dataPanel, lParcels, lProperties);
+        this.prepareDataPanel(dataPanel, new ArrayList<Parcel>(), new ArrayList<Property>());
 
 //        *** main LEFT - MANAGE panel
         JPanel managePanel = new JPanel();
@@ -221,6 +204,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         Insets tableInsets = new Insets(0, 0, 0, 0);
         con.weighty = 0.5;
         con.weightx = 0.5;
+        con.gridwidth = 2;
 //      ---- DATA -> TABLE OF PARCELS
         con.gridx = 0;
         con.gridy = 0;
@@ -308,8 +292,17 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         JLabel consoleTxtLabel = new JLabel("OUTPUT:");
         dataPanel.add(consoleTxtLabel, con);
 
+        con.gridx = 1;
+        con.gridy = 4;
+        con.insets = new Insets(0,0,3,30);
+        con.anchor = GridBagConstraints.SOUTHEAST;
+        JButton clearConsoleBtn = new JButton("Clear");
+        clearConsoleBtn.addActionListener(e -> clearConsole());
+        dataPanel.add(clearConsoleBtn, con);
+
         con.gridx = 0;
         con.gridy = 5;
+        con.gridwidth = 2;
         con.insets = tableInsets;
         con.anchor = GridBagConstraints.BASELINE;
         this.consoleTxtArea = new JTextArea();
@@ -318,6 +311,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         JScrollPane scrollTxtPane = new JScrollPane(consoleTxtArea);
         scrollTxtPane.setPreferredSize(new Dimension(980,200));
         dataPanel.add(scrollTxtPane, con);
+        this.consoleTxtArea.setText("       * * *   W E L C O M E   * * *");
     }
 
     private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
@@ -525,5 +519,18 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
     private void clearConsole() {
         this.consoleTxtArea.setText("");
+    }
+
+    private void logOperation(String operationName, boolean success) {
+        this.consoleTxtArea.append("\n"+getFormattedSysTime()+
+                "   -   "+operationName+" operation: " + (success ? "Ok.." : "Failed"));
+    }
+
+    private String getFormattedSysTime() {
+        GregorianCalendar gc = new GregorianCalendar();
+        return String.format("[%4d-%02d-%02d %02d:%02d:%02d]", gc.get(GregorianCalendar.YEAR),
+                gc.get(GregorianCalendar.MONTH),
+                gc.get(GregorianCalendar.DAY_OF_MONTH), gc.get(GregorianCalendar.HOUR),
+                gc.get(GregorianCalendar.MINUTE), gc.get(GregorianCalendar.SECOND));
     }
 }
