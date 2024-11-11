@@ -1,6 +1,7 @@
 package mpoljak.App.GUI.controllers;
 
 import mpoljak.App.GUI.GeoAppFrame;
+import mpoljak.App.GUI.models.GeneratorModel;
 import mpoljak.App.GUI.models.GeoInfoModel;
 import mpoljak.App.GUI.models.ParcelTableModel;
 import mpoljak.App.GUI.models.PropertyTableModel;
@@ -119,5 +120,11 @@ public class OperationsController {
 
     public String getParcelsDataRepresentation() {
         return this.client.getParcelsRepresentation();
+    }
+
+    public void generateValuesToDb(GeneratorModel model) {
+        if (model == null)
+            return;
+        this.client.generateData(model.getParcelsCount(), model.getPropertiesCount(), model.getOverlayProbability());
     }
 }

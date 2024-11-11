@@ -115,6 +115,10 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                     consoleTxtArea.append("\n\n - - - - - - -   PROPERTIES:     - - - - - - -\n");
                     consoleTxtArea.append( controller.getPropertiesDataRepresentation() );
                 }
+                else if (selectedOp == OP_GENERATE) {
+                    controller.generateValuesToDb(panelForGenerating.getModel());
+                    consoleTxtArea.append("     >> DATA GENERATED");
+                }
             }
         }
     }
