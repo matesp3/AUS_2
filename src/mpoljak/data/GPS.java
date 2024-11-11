@@ -1,14 +1,31 @@
 package mpoljak.data;
 
+import mpoljak.data.forTesting.Data2D;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
 
 import mpoljak.dataStructures.searchTrees.KdTree.ISame;
+import mpoljak.dataStructures.searchTrees.KdTree.Testing.IUniqueDataGenerator;
 import mpoljak.utilities.DoubleComparator;
+
+import java.util.Random;
 
 public class GPS implements IKdComparable<GPS>, ISame<GPS> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
+
+    public static GPS generateGPS(Random generator, Random dirGenerator) {
+        char chLat;
+        char chLon;
+
+        double lat = generator.nextDouble() * 90;
+        chLat = (dirGenerator.nextDouble() > 0.5)  ? 'S' : 'N';
+
+        double lon = generator.nextDouble() * 180;
+        chLon = (dirGenerator.nextDouble() > 0.5)  ? 'E' : 'W';
+
+        return new GPS(chLat, lat, chLon, lon);
+    }
 
     private char latitude;    // zem. sirka {N, S}
     private double latDeg;    // if 'S', represent as negative
@@ -103,7 +120,7 @@ public class GPS implements IKdComparable<GPS>, ISame<GPS> {
 //        int c1 = this.latitude == 'N' ? 1 : -1;
 //        int c2 = this.longitude == 'E' ? 1 : -1;
 //        return String.format("[%C %02.02f; %C %02.02f]", this.latitude, c1 * this.latDeg, this.longitude, c2 * this.longDeg);
-        return String.format("[%C %2.02f; %C %2.02f]", this.latitude,this.latDeg, this.longitude,this.longDeg);
+        return String.format("[%C %2.03f; %C %2.03f]", this.latitude,this.latDeg, this.longitude,this.longDeg);
     }
 
     @Override

@@ -103,10 +103,14 @@ public class GeneratorInputComponent extends JPanel {
      * @return model representation of visualized information
      */
     public GeneratorModel getModel() {
-        return new GeneratorModel(Integer.parseInt(this.parcelNrInput.getText()),
-                                  Integer.parseInt(this.propertyNrInput.getText()),
-                                  Double.parseDouble(this.probabilityInput.getText())
-                                );
+        try {
+            return new GeneratorModel(Integer.parseInt(this.parcelNrInput.getText()),
+                    Integer.parseInt(this.propertyNrInput.getText()),
+                    Double.parseDouble(this.probabilityInput.getText())
+            );
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

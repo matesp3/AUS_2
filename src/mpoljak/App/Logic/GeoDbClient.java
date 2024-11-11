@@ -9,6 +9,7 @@ import mpoljak.utilities.IntegerIdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GeoDbClient {
     private KDTree<Property, GeoResource, GPS> kdTreeProps;
@@ -204,10 +205,56 @@ public class GeoDbClient {
         return deleted;
     }
 
+    /**
+     * Generates and inserts random parcel and property data with given overlay probability of one GPS position.
+     * @param parcelsCount
+     * @param propertiesCount
+     * @param overlayProbability
+     */
+    public void generateData(int parcelsCount, int propertiesCount, double overlayProbability) {
+        Random generator = new Random();
+        Random dirGenerator = new Random(generator.nextInt());
+        ArrayList<Parcel> lGps = new ArrayList<>(parcelsCount);
+        for (int i = 0; i < parcelsCount; i++) {
+            GPS gps1 = GPS.generateGPS(generator, dirGenerator);
+            GPS gps2 = GPS.generateGPS(generator, dirGenerator);
+            Parcel p = new Parcel(i, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
+            lGps.add(p);
+
+            this.kdTreeParcels.insert(gps1, p);
+            this.kdTreeParcels.insert(gps2, p);
+
+            this.kdTreeResources.insert(gps1,p);
+            this.kdTreeResources.insert(gps2,p);
+        }
+
+        for (int a = 0; a < propertiesCount; a++) {
+            GPS gps1;
+            if (generator.nextDouble() <= overlayProbability)
+                gps1 = lGps.get(generator.nextInt(lGps.size())).getGps1();
+            else
+                gps1 = GPS.generateGPS(generator, dirGenerator);
+            GPS gps2 = GPS.generateGPS(generator, dirGenerator);
+            Property prop = new Property(a, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
+            this.kdTreeProps.insert(gps1, prop);
+            this.kdTreeProps.insert(gps2, prop);
+            this.kdTreeResources.insert(gps1, prop);
+            this.kdTreeResources.insert(gps2, prop);
+        }
+    }
+
+    /**
+     * Creates string representation of all saved properties.
+     * @return
+     */
     public String getPropertiesRepresentation() {
         return this.getTreeDataRepresentation(this.kdTreeProps);
     }
 
+    /**
+     * Creates string representation of all saved parcels.
+     * @return
+     */
     public String getParcelsRepresentation() {
         return this.getTreeDataRepresentation(this.kdTreeParcels);
     }
