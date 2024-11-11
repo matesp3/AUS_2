@@ -109,6 +109,12 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                             parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
                     logOperation("EDIT", editOk);
                 }
+                else if (selectedOp == OP_PRINT) {
+                    consoleTxtArea.setText(" - - - - - - -   PARCELS:   - - - - - - -\n");
+                    consoleTxtArea.append( controller.getParcelsDataRepresentation() );
+                    consoleTxtArea.append("\n\n - - - - - - -   PROPERTIES:     - - - - - - -\n");
+                    consoleTxtArea.append( controller.getPropertiesDataRepresentation() );
+                }
             }
         }
     }

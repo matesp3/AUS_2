@@ -204,6 +204,14 @@ public class GeoDbClient {
         return deleted;
     }
 
+    public String getPropertiesRepresentation() {
+        return this.getTreeDataRepresentation(this.kdTreeProps);
+    }
+
+    public String getParcelsRepresentation() {
+        return this.getTreeDataRepresentation(this.kdTreeParcels);
+    }
+
 //   -  -   -   -   -   -   -   -   -    P R I V A T E  -   -   -   -   -   -   -   -   -   -   -   -
 
     /**
@@ -262,5 +270,18 @@ public class GeoDbClient {
                 lData1.add(data2);
         }
         return lData1;
+    }
+
+    private String getTreeDataRepresentation(KDTree<? extends GeoResource, GeoResource, GPS> kdtree) {
+        if (kdtree == null)
+            return null;
+        if (kdtree.isEmpty())
+            return "    ..No data.";
+        KDTree<? extends GeoResource,GeoResource,GPS>.KdTreeInOrderIterator<? extends GeoResource,GeoResource,GPS> it =
+                kdtree.inOrderIterator();
+        StringBuilder sb = new StringBuilder();
+        while (it.hasNext())
+            sb.append(String.format("%50s   -   ",it.next()));
+        return sb.toString();
     }
 }

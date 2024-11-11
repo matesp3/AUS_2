@@ -87,7 +87,7 @@ public class Property extends GeoResource {
     @Override
     public String toString() {
 //        return String.format("Prop[id=%d;g1%s;g2%s]", this.propertyId, this.positions[0], this.positions[1]);
-        return String.format("Prop[id=%d;g1%s]", this.propertyId, this.positions[0]);
+        return String.format("Prop[nr=%d;g1%s;g2%s,desc='%s']", this.propertyId, this.positions[0], this.positions[1], this.description);
 //        return String.format("Prop[id=%d]", this.propertyId); // temporally
     }
     @Override

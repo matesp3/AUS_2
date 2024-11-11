@@ -50,6 +50,11 @@ public class PropertyTableModel extends AbstractTableModel {
         return lProperties.get(index);
     }
 
+    public void remove(int index) {
+        lProperties.remove(index);
+        this.fireTableDataChanged();
+    }
+
     public void setModels(List<Property> lModels) {
         this.clear();
         lProperties.addAll(lModels);

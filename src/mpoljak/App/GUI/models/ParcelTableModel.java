@@ -60,6 +60,11 @@ public class ParcelTableModel extends AbstractTableModel {
         return lParcels.get(index);
     }
 
+    public void remove(int index) {
+        lParcels.remove(index);
+        this.fireTableDataChanged();
+    }
+
     public void clear() {
         lParcels.clear();
         this.fireTableDataChanged();

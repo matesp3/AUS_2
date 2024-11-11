@@ -73,10 +73,14 @@ public class OperationsController {
         if (info.getGeoType() == GeoAppFrame.TYPE_PARCEL && parcelIdx > -1) {
             Parcel selectedParcel = parcelModel.getModel(parcelIdx);
             deleteOk = client.removeParcel(selectedParcel);
+            if (deleteOk)
+                parcelModel.remove(parcelIdx);
         }
         else if (info.getGeoType() == GeoAppFrame.TYPE_PROPERTY && propertyIdx > -1) {
             Property selectedProperty = propertyModel.getModel(propertyIdx);
             deleteOk = client.removeProperty(selectedProperty);
+            if (deleteOk)
+                propertyModel.remove(propertyIdx);
         }
         return deleteOk;
     }
@@ -107,5 +111,13 @@ public class OperationsController {
             editOk = client.editProperty(modified, original);
         }
         return editOk;
+    }
+
+    public String getPropertiesDataRepresentation() {
+        return this.client.getPropertiesRepresentation();
+    }
+
+    public String getParcelsDataRepresentation() {
+        return this.client.getParcelsRepresentation();
     }
 }
