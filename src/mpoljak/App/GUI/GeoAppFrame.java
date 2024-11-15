@@ -1,8 +1,6 @@
 package mpoljak.App.GUI;
 
-import mpoljak.App.GUI.components.DetailsInputComponent;
-import mpoljak.App.GUI.components.GeneratorInputComponent;
-import mpoljak.App.GUI.components.GpsInputComponent;
+import mpoljak.App.GUI.components.*;
 import mpoljak.App.GUI.controllers.OperationsController;
 import mpoljak.App.GUI.models.*;
 import mpoljak.App.Logic.GeoDbClient;
@@ -48,6 +46,9 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private ParcelTableModel parcelModel;
     private PropertyTableModel propertyModel;
 
+    private JMenuItem propertyMenuItem;
+    private JMenuItem parcelMenuItem;
+
     private JTextArea consoleTxtArea;
 
     private JPanel gpsPanel;
@@ -80,7 +81,40 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
-    public class ExecuteActionListener implements ActionListener {
+    private class MenuItemActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            if (menuItem == parcelMenuItem) {
+                PropertyTableModel propModel = new PropertyTableModel(new ArrayList<Property>());
+                controller.setParcelWithProperties(propModel, parcelModel, parcelsJTab.getSelectedRow());
+                ParcelDetailsWindow parcWindow = new ParcelDetailsWindow(500, 250, propModel);
+            }
+            else if (menuItem == propertyMenuItem) {
+                ParcelTableModel parcModel = new ParcelTableModel(new ArrayList<Parcel>());
+                controller.setPropertyWithParcels(parcModel, propertyModel, propertiesJTab.getSelectedRow());
+                PropertyDetailsWindow propWindow = new PropertyDetailsWindow(1000, 250, parcModel);
+            }
+        }
+    }
+
+    private class ParcelTabListener extends MouseAdapter {
+        private JTable table;
+
+        public ParcelTabListener(JTable table) {
+            this.table = table;
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Point point = e.getPoint();
+            int row = table.rowAtPoint(point);
+            table.setRowSelectionInterval(row, row);    // manually setting row as selected for case of popup menu
+        }
+    }
+
+    private class ExecuteActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -117,8 +151,9 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                 }
                 else if (selectedOp == OP_GENERATE) {
                     controller.generateValuesToDb(panelForGenerating.getModel());
-                    consoleTxtArea.append("     >> DATA GENERATED");
+                    consoleTxtArea.append("\n     >> DATA GENERATED");
                 }
+
             }
         }
     }
@@ -207,6 +242,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
 //    private void prepareDataPanel(JPanel dataPanel, List<ParcelModel> lParcels, List<PropertyModel> lProperties) {
     private void prepareDataPanel(JPanel dataPanel, List<Parcel> lParcels, List<Property> lProperties) {
+        MenuItemActionListener menuListener = new MenuItemActionListener();
         GridBagLayout layout = new GridBagLayout();
         dataPanel.setLayout(layout);
         GridBagConstraints con = new GridBagConstraints();
@@ -227,8 +263,14 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 1;
         con.insets = tableInsets;
         con.anchor = GridBagConstraints.BASELINE;
+        JPopupMenu popupMenu = new JPopupMenu();
+        this.parcelMenuItem = new JMenuItem("See corresponding properties");
+        this.parcelMenuItem.addActionListener(menuListener);
+        popupMenu.add(this.parcelMenuItem);
         this.parcelModel = new ParcelTableModel(lParcels);
         this.parcelsJTab = new JTable(parcelModel);
+        this.parcelsJTab.setComponentPopupMenu(popupMenu);
+        this.parcelsJTab.addMouseListener(new ParcelTabListener(this.parcelsJTab));
         this.parcelsJTab.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -267,8 +309,13 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 3;
         con.insets = tableInsets;
         con.anchor = GridBagConstraints.BASELINE;
+        JPopupMenu popupMenu2 = new JPopupMenu();
+        this.propertyMenuItem = new JMenuItem("See corresponding parcels");
+        this.propertyMenuItem.addActionListener(menuListener);
+        popupMenu2.add(this.propertyMenuItem);
         this.propertyModel = new PropertyTableModel(lProperties);
         this.propertiesJTab = new JTable(propertyModel);
+        this.propertiesJTab.setComponentPopupMenu(popupMenu2);
         this.propertiesJTab.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {

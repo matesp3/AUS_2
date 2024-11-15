@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class App {
 
     public static void main(String[] args) {
-        DoubleComparator.getInstance().setEpsilon(0.001);
+        DoubleComparator.getInstance().setEpsilon(0.01);
         GeoDbClient client = new GeoDbClient();
         GeoAppFrame appFrame = new GeoAppFrame(client);
 

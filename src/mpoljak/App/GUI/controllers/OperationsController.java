@@ -127,4 +127,30 @@ public class OperationsController {
             return;
         this.client.generateData(model.getParcelsCount(), model.getPropertiesCount(), model.getOverlayProbability());
     }
+
+    /**
+     * Sets propModel with relationship of specified parcel
+     * @param propModel
+     * @param fromModel
+     * @param onIndex
+     */
+    public void setParcelWithProperties(PropertyTableModel propModel, ParcelTableModel fromModel, int onIndex) {
+        if (onIndex < 0)
+            return;
+        Parcel parcel = fromModel.getModel(onIndex);
+        propModel.setModels(parcel.getProperties());
+    }
+
+    /**
+     * Sets parcModel with relationship of specified property
+     * @param parcModel
+     * @param propertyModel
+     * @param selectedRow
+     */
+    public void setPropertyWithParcels(ParcelTableModel parcModel, PropertyTableModel propertyModel, int selectedRow) {
+        if (selectedRow < 0)
+            return;
+        Property property = propertyModel.getModel(selectedRow);
+        parcModel.setModels(property.getParcels());
+    }
 }

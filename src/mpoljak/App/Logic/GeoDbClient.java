@@ -7,6 +7,7 @@ import mpoljak.data.Property;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.utilities.IntegerIdGenerator;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -221,11 +222,12 @@ public class GeoDbClient {
             Parcel p = new Parcel(i, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
             lGps.add(p);
 
-            this.kdTreeParcels.insert(gps1, p);
-            this.kdTreeParcels.insert(gps2, p);
-
-            this.kdTreeResources.insert(gps1,p);
-            this.kdTreeResources.insert(gps2,p);
+            this.addParcel(i, "generated", gps1, gps2);
+//            this.kdTreeParcels.insert(gps1, p);
+//            this.kdTreeParcels.insert(gps2, p);
+//
+//            this.kdTreeResources.insert(gps1,p);
+//            this.kdTreeResources.insert(gps2,p);
         }
 
         for (int a = 0; a < propertiesCount; a++) {
@@ -235,11 +237,12 @@ public class GeoDbClient {
             else
                 gps1 = GPS.generateGPS(generator, dirGenerator);
             GPS gps2 = GPS.generateGPS(generator, dirGenerator);
-            Property prop = new Property(a, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
-            this.kdTreeProps.insert(gps1, prop);
-            this.kdTreeProps.insert(gps2, prop);
-            this.kdTreeResources.insert(gps1, prop);
-            this.kdTreeResources.insert(gps2, prop);
+//            Property prop = new Property(a, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
+            this.addProperty(a, "generated", gps1, gps2);
+//            this.kdTreeProps.insert(gps1, prop);
+//            this.kdTreeProps.insert(gps2, prop);
+//            this.kdTreeResources.insert(gps1, prop);
+//            this.kdTreeResources.insert(gps2, prop);
         }
     }
 
@@ -328,7 +331,94 @@ public class GeoDbClient {
                 kdtree.inOrderIterator();
         StringBuilder sb = new StringBuilder();
         while (it.hasNext())
-            sb.append(String.format("%50s   -   ",it.next()));
+            sb.append(String.format("%s\n",it.next()));
         return sb.toString();
     }
+
+    /**
+     * Writes current data about parcels and properties to file
+     * @param filePath where data should be stores
+     * @return result of operation
+     */
+    private boolean writeToCsvFile(String filePath) {
+        GPS g = new GPS('N',15.458, 'E', 44.569);
+        try (FileWriter fw = new FileWriter(new File("gps.csv"))) {
+            fw.write( g.getLatitude() + DELIMITER + g.getLatDeg() + DELIMITER + g.getLongitude() + DELIMITER
+                    + g.getLongitude()+ "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Read data stored in file and appends them to current data.
+     * @param filePath where data are stored
+     * @return result of operation
+     */
+    private boolean loadFromCsvFile(String filePath) {
+        return false;
+    }
+
+    private static String gpsToStr(GPS gps, char delimiter) {
+        return ""+ gps.getLatitude() + delimiter + gps.getLatDeg() + delimiter + gps.getLongitude() + delimiter
+                + gps.getLongDeg();
+    }
+
+    private static GPS strToGps(String lat, String latDeg, String lon, String lonDeg) {
+        return new GPS(lat.charAt(0), Double.parseDouble(latDeg), lon.charAt(0), Double.parseDouble(lonDeg));
+    }
+
+    /* Without GPS positions */
+    private static String parcelToStr(Parcel parcel, char delimiter) {
+        return String.valueOf(parcel.getParcelId()) + delimiter +
+                (parcel.getDescription() == null || parcel.getDescription().isEmpty()
+                        ? " "
+                        : parcel.getDescription().replaceAll(String.valueOf(DELIMITER), DELIMITER_REPLACEMENT));
+    }
+
+    /* Without GPS positions */
+    private static String propertyToStr(Property prop, char delimiter) {
+        return String.valueOf(prop.getPropertyId()) + delimiter +
+                (prop.getDescription() == null || prop.getDescription().isEmpty()
+                        ? " "
+                        : prop.getDescription().replaceAll(String.valueOf(DELIMITER), DELIMITER_REPLACEMENT));
+    }
+
+    public static void main(String[] args) {
+        GPS g = new GPS('N',15.458, 'E', 44.569);
+        GPS g2 = new GPS('S',15.458, 'W', 44.569);
+        Parcel p = new Parcel(1, null, g, g2, -1);
+        Parcel p2 = new Parcel(2, "ahoj", g, g2, -1);
+        Parcel p3 = new Parcel(3, "aho;;;j. Volam 'sa' \"Matej\"", g, g2, -1);
+        try (FileWriter fw = new FileWriter("gps.csv")) {
+//            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+ "\n");
+            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+DELIMITER+parcelToStr(p, DELIMITER)+ "\n");
+            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+DELIMITER+parcelToStr(p2, DELIMITER)+ "\n");
+            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+DELIMITER+parcelToStr(p3, DELIMITER)+ "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//------ R E A D I N G
+        try (BufferedReader br = new BufferedReader(new FileReader("gps.csv"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] tokens = line.split(String.valueOf(DELIMITER));
+                GPS g11 = strToGps(tokens[0], tokens[1], tokens[2], tokens[3]);
+                GPS g22 = strToGps(tokens[4], tokens[5], tokens[6], tokens[7]);
+                System.out.println(g11 + " & "+ g22);
+                Parcel p11 = new Parcel(Integer.valueOf(tokens[8]),
+                        tokens[9].replaceAll(DELIMITER_REPLACEMENT, String.valueOf(DELIMITER)),
+                        g11, g22, -1);
+                System.out.println(p11);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static final char DELIMITER = ';';
+    private static final String DELIMITER_REPLACEMENT = "%#%";
+
 }
