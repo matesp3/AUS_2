@@ -17,6 +17,8 @@ public class GeoDbClient {
     private KDTree<Parcel, GeoResource, GPS> kdTreeParcels;
     private KDTree<GeoResource, GeoResource, GPS> kdTreeResources;
     private IntegerIdGenerator idGenerator;
+    private String propertiesFilePath;
+    private String parcelsFilePath;
 
     public GeoDbClient() {
         this.kdTreeProps = new KDTree<>(2);
@@ -24,6 +26,18 @@ public class GeoDbClient {
         this.kdTreeResources = new KDTree<>(2);
         this.idGenerator = IntegerIdGenerator.getInstance();
         System.out.println(this.loadDataFromCsvFile("gps.csv"));
+        System.out.println(this.writeDataToCsvFile(null));
+    }
+
+    public boolean setGeoPropertiesPath(String path) {
+        if (path == null || path.isEmpty())
+            return false;
+
+        return true;
+    }
+
+    public boolean setGeoParcelsPath(String path) {
+        return true;
     }
 
     /** Task 1 - finds all properties, whose one of the GPS positions leans on given GPS position.*/
@@ -345,11 +359,37 @@ public class GeoDbClient {
      * @param filePath where data should be stores
      * @return result of operation
      */
-    private boolean writeToCsvFile(String filePath) {
-        GPS g = new GPS('N',15.458, 'E', 44.569);
-        try (FileWriter fw = new FileWriter(new File("gps.csv"))) {
-            fw.write( g.getLatitude() + DELIMITER + g.getLatDeg() + DELIMITER + g.getLongitude() + DELIMITER
-                    + g.getLongitude()+ "\n");
+    private boolean writeDataToCsvFile(String filePath) {
+//        - vytvorim si novy strom - vzdy ked idem vlozit prvok, vyhladam vsetky duplikaty podla 1. gpsky
+//        - ziskam vsetky duplikaty - ak sa medzi nimi bude nachadzat prvok s rovnakym idckom, tak ho nepridam
+
+
+        try (FileWriter fw = new FileWriter(new File("gps-w.csv"))) { // n * 2 * log2(n)
+            fw.write("#_PARCELS\n");
+            KDTree<Parcel, GeoResource, GPS> kdTreeWriteParcels = new KDTree<>(2);
+            KDTree<Parcel, GeoResource, GPS>. KdTreeLevelOrderIterator<Parcel, GeoResource, GPS> it =
+                    this.kdTreeParcels.levelOrderIterator();
+            while (it.hasNext()) {
+                Parcel parcel = it.next();
+                List<Parcel> lFound = kdTreeWriteParcels.findAll(parcel.getGps1());
+                if (lFound == null) {
+                    kdTreeWriteParcels.insert(parcel.getGps1(), parcel);    // do evidence of parcel
+                    fw.write( parcel.toCsvLine(DELIMITER, DELIMITER_REPLACEMENT, STR_BLANK_REPLACEMENT)+ "\n");
+                }
+                else {
+                    boolean notFound = true;
+                    for (Parcel par : lFound) {
+                        if (par.isSame(parcel)) {
+                            notFound = false;
+                            break;
+                        }
+                    }
+                    if (notFound) {
+                        kdTreeWriteParcels.insert(parcel.getGps1(), parcel);    // do evidence of parcel
+                        fw.write( parcel.toCsvLine(DELIMITER, DELIMITER_REPLACEMENT, STR_BLANK_REPLACEMENT)+ "\n");
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;
