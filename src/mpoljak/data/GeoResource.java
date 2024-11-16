@@ -1,8 +1,9 @@
 package mpoljak.data;
 
+import mpoljak.App.Logic.ICsvFormattable;
 import mpoljak.dataStructures.searchTrees.KdTree.ISame;
 
-public abstract class GeoResource implements ISame<GeoResource> {
+public abstract class GeoResource implements ISame<GeoResource>, ICsvFormattable<GeoResource> {
     protected final int uniqueId;
     public GeoResource(int uniqueId) {
         this.uniqueId = uniqueId;

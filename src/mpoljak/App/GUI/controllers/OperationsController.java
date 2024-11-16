@@ -54,6 +54,8 @@ public class OperationsController {
             List<GeoResource> lData = client.findGeoResources(g1, g2);
             List<Property> lProps = new ArrayList<>();
             List<Parcel> lParcels = new ArrayList<>();
+            propertyModel.clear();  // need to do this, because don't know what has been retrieved (only parc e.g.)
+            parcelModel.clear();    // need to do this, because don't know what has been retrieved (only props e.g.)
             for (GeoResource g : lData) {
                 if (g instanceof Property)
                     lProps.add((Property) g);

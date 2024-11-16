@@ -1,5 +1,6 @@
 package mpoljak.data;
 
+import mpoljak.App.Logic.ICsvFormattable;
 import mpoljak.data.forTesting.Data2D;
 import mpoljak.dataStructures.searchTrees.KdTree.Error;
 import mpoljak.dataStructures.searchTrees.KdTree.IKdComparable;
@@ -10,7 +11,7 @@ import mpoljak.utilities.DoubleComparator;
 
 import java.util.Random;
 
-public class GPS implements IKdComparable<GPS>, ISame<GPS> {
+public class GPS implements IKdComparable<GPS>, ISame<GPS>, ICsvFormattable<GPS> {
     private static final double MAX_LATITUDE_DEGREES = 90.0;
     private static final double MAX_LONGITUDE_DEGREES = 180.0;
 
@@ -136,6 +137,21 @@ public class GPS implements IKdComparable<GPS>, ISame<GPS> {
         return this.isSameKey(other);       // because GPS instance can behave as key and as data at the same time
     }
 
+    @Override
+    public String toCsvLine(char delimiter, String delimiterReplacement, String blankSpaceReplacement) {
+        return ""+ this.latitude + delimiter + this.latDeg + delimiter + this.longitude + delimiter
+                + this.longDeg;
+    }
+
+    @Override
+    public GPS fromCsvLine(String csvLine, char delimiter, String delimiterReplacement, String blankSpaceReplacement) {
+        String[] tokens = csvLine.split(String.valueOf(delimiter));
+        if (tokens.length != 4)
+            return null;
+        return new GPS(tokens[0].charAt(0), Double.parseDouble(tokens[1]), tokens[2].charAt(0),
+                Double.parseDouble(tokens[3]));
+    }
+
     private double convertLatitude() {
         return (this.latitude == 'N' ? 1 : -1) * this.latDeg;
     }
@@ -166,5 +182,4 @@ public class GPS implements IKdComparable<GPS>, ISame<GPS> {
         System.out.println(g8 + " falls into " + g1 + ":" + g8.fallsInto(g1));
         System.out.println(g9 + " falls into " + g1 + ":" + g9.fallsInto(g1));
     }
-
 }

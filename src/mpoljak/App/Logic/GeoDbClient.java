@@ -23,6 +23,7 @@ public class GeoDbClient {
         this.kdTreeParcels = new KDTree<>(2);
         this.kdTreeResources = new KDTree<>(2);
         this.idGenerator = IntegerIdGenerator.getInstance();
+        System.out.println(this.loadDataFromCsvFile("gps.csv"));
     }
 
     /** Task 1 - finds all properties, whose one of the GPS positions leans on given GPS position.*/
@@ -232,7 +233,7 @@ public class GeoDbClient {
 
         for (int a = 0; a < propertiesCount; a++) {
             GPS gps1;
-            if (generator.nextDouble() <= overlayProbability)
+            if (!lGps.isEmpty() && generator.nextDouble() <= overlayProbability)
                 gps1 = lGps.get(generator.nextInt(lGps.size())).getGps1();
             else
                 gps1 = GPS.generateGPS(generator, dirGenerator);
@@ -335,6 +336,10 @@ public class GeoDbClient {
         return sb.toString();
     }
 
+    private static final char DELIMITER = ';';
+    private static final String DELIMITER_REPLACEMENT = "%#%";
+    private static final String STR_BLANK_REPLACEMENT = "NULL";
+
     /**
      * Writes current data about parcels and properties to file
      * @param filePath where data should be stores
@@ -351,74 +356,128 @@ public class GeoDbClient {
         }
         return true;
     }
-
     /**
      * Read data stored in file and appends them to current data.
      * @param filePath where data are stored
-     * @return result of operation
+     * @return <code>false</code> if structure of file is corrupted, else <code>true</code>
      */
-    private boolean loadFromCsvFile(String filePath) {
-        return false;
-    }
+    private boolean loadDataFromCsvFile(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            int typeToRead = -1;
+            final int TYPE_PARCEL = 1;
+            final int TYPE_PROPERTY = 2;
+            GeoResource geoResource = null;
+            GPS gForFact = new GPS('N',1,'E',1); // just for factory instance
+            String line = br.readLine();
+            if (line == null)
+                return false;
+            if (line.equals("#_PARCELS")) {
+                typeToRead = TYPE_PARCEL;
+                geoResource = new Parcel(1,null,gForFact,gForFact,-1);// just for factory purposes
+            }
+            else if (line.equals("#_PROPERTIES")) {
+                typeToRead = TYPE_PROPERTY;
+                geoResource = new Property(1,null,gForFact,gForFact,-1);// just for factory purposes
+            } else
+                return false;
 
-    private static String gpsToStr(GPS gps, char delimiter) {
-        return ""+ gps.getLatitude() + delimiter + gps.getLatDeg() + delimiter + gps.getLongitude() + delimiter
-                + gps.getLongDeg();
-    }
-
-    private static GPS strToGps(String lat, String latDeg, String lon, String lonDeg) {
-        return new GPS(lat.charAt(0), Double.parseDouble(latDeg), lon.charAt(0), Double.parseDouble(lonDeg));
-    }
-
-    /* Without GPS positions */
-    private static String parcelToStr(Parcel parcel, char delimiter) {
-        return String.valueOf(parcel.getParcelId()) + delimiter +
-                (parcel.getDescription() == null || parcel.getDescription().isEmpty()
-                        ? " "
-                        : parcel.getDescription().replaceAll(String.valueOf(DELIMITER), DELIMITER_REPLACEMENT));
-    }
-
-    /* Without GPS positions */
-    private static String propertyToStr(Property prop, char delimiter) {
-        return String.valueOf(prop.getPropertyId()) + delimiter +
-                (prop.getDescription() == null || prop.getDescription().isEmpty()
-                        ? " "
-                        : prop.getDescription().replaceAll(String.valueOf(DELIMITER), DELIMITER_REPLACEMENT));
-    }
-
-    public static void main(String[] args) {
-        GPS g = new GPS('N',15.458, 'E', 44.569);
-        GPS g2 = new GPS('S',15.458, 'W', 44.569);
-        Parcel p = new Parcel(1, null, g, g2, -1);
-        Parcel p2 = new Parcel(2, "ahoj", g, g2, -1);
-        Parcel p3 = new Parcel(3, "aho;;;j. Volam 'sa' \"Matej\"", g, g2, -1);
-        try (FileWriter fw = new FileWriter("gps.csv")) {
-//            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+ "\n");
-            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+DELIMITER+parcelToStr(p, DELIMITER)+ "\n");
-            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+DELIMITER+parcelToStr(p2, DELIMITER)+ "\n");
-            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+DELIMITER+parcelToStr(p3, DELIMITER)+ "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//------ R E A D I N G
-        try (BufferedReader br = new BufferedReader(new FileReader("gps.csv"))) {
-            String line;
             while ((line = br.readLine()) != null) {
-                String[] tokens = line.split(String.valueOf(DELIMITER));
-                GPS g11 = strToGps(tokens[0], tokens[1], tokens[2], tokens[3]);
-                GPS g22 = strToGps(tokens[4], tokens[5], tokens[6], tokens[7]);
-                System.out.println(g11 + " & "+ g22);
-                Parcel p11 = new Parcel(Integer.valueOf(tokens[8]),
-                        tokens[9].replaceAll(DELIMITER_REPLACEMENT, String.valueOf(DELIMITER)),
-                        g11, g22, -1);
-                System.out.println(p11);
+                if (typeToRead == TYPE_PARCEL) {
+                    Parcel pa = (Parcel) geoResource.fromCsvLine(line,
+                            GeoDbClient.DELIMITER, GeoDbClient.DELIMITER_REPLACEMENT, GeoDbClient.STR_BLANK_REPLACEMENT);
+                    this.addParcel(pa.getParcelId(), pa.getDescription(), pa.getGps1(), pa.getGps2());
+                }
+                else if (typeToRead == TYPE_PROPERTY) {
+                    Property pr = (Property) geoResource.fromCsvLine(line,
+                            GeoDbClient.DELIMITER, GeoDbClient.DELIMITER_REPLACEMENT, GeoDbClient.STR_BLANK_REPLACEMENT);
+                    this.addProperty(pr.getPropertyId(), pr.getDescription(), pr.getGps1(), pr.getGps2());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    private static final char DELIMITER = ';';
-    private static final String DELIMITER_REPLACEMENT = "%#%";
+//    private static String gpsToStr(GPS gps, char delimiter) {
+//        return ""+ gps.getLatitude() + delimiter + gps.getLatDeg() + delimiter + gps.getLongitude() + delimiter
+//                + gps.getLongDeg();
+//    }
+//
+//    private static GPS strToGps(String lat, String latDeg, String lon, String lonDeg) {
+//        return new GPS(lat.charAt(0), Double.parseDouble(latDeg), lon.charAt(0), Double.parseDouble(lonDeg));
+//    }
+
+//    /* Without GPS positions */
+//    private static String parcelToStr(Parcel parcel) {
+//        String strGpsRepr = gpsToStr(parcel.getGps1(), GeoDbClient.DELIMITER)
+//                            + GeoDbClient.DELIMITER
+//                            + gpsToStr(parcel.getGps2(), GeoDbClient.DELIMITER);
+//        String parcelDesc = parcel.getDescription() == null || parcel.getDescription().isEmpty()
+//                ? " "
+//                : parcel.getDescription().replaceAll(String.valueOf(GeoDbClient.DELIMITER), DELIMITER_REPLACEMENT);
+//        return strGpsRepr
+//                + GeoDbClient.DELIMITER
+//                + parcel.getParcelId()
+//                + GeoDbClient.DELIMITER
+//                + parcelDesc;
+//    }
+
+//    private static Parcel strToParcel(String[] tokens) {
+//        if (tokens == null || tokens.length != 10)
+//            return null;
+//        GPS g1 = strToGps(tokens[0], tokens[1], tokens[2], tokens[3]);
+//        GPS g2 = strToGps(tokens[4], tokens[5], tokens[6], tokens[7]);
+//        int parcelId = Integer.parseInt(tokens[8]);
+//        String parcelDesc = tokens[9].isBlank() ? null :
+//                tokens[9].replaceAll(GeoDbClient.DELIMITER_REPLACEMENT, String.valueOf(GeoDbClient.DELIMITER));
+//        return new Parcel(parcelId, parcelDesc, g1, g2, -1);
+//    }
+
+//    /* Without GPS positions */
+//    private static String propertyToStr(Property prop, char delimiter) {
+//        String strGpsRepr = gpsToStr(prop.getGps1(), GeoDbClient.DELIMITER)
+//                + GeoDbClient.DELIMITER
+//                + gpsToStr(prop.getGps2(), GeoDbClient.DELIMITER);
+//        String parcelDesc = prop.getDescription() == null || prop.getDescription().isEmpty()
+//                ? " "
+//                : prop.getDescription().replaceAll(String.valueOf(GeoDbClient.DELIMITER), DELIMITER_REPLACEMENT);
+//        return strGpsRepr
+//                + GeoDbClient.DELIMITER
+//                + prop.getPropertyId()
+//                + GeoDbClient.DELIMITER
+//                + parcelDesc;
+//    }
+
+    public static void main(String[] args) {
+//        System.out.println("a".repeat(2));
+//        GPS g = new GPS('N',15.458, 'E', 44.569);
+//        GPS g2 = new GPS('S',15.458, 'W', 44.569);
+//        Parcel p = new Parcel(1, null, g, g2, -1);
+//        Parcel p2 = new Parcel(2, "ahoj", g, g2, -1);
+//        Parcel p3 = new Parcel(3, "aho;;;j. Volam 'sa' \"Matej\"", g, g2, -1);
+//        try (FileWriter fw = new FileWriter("gps.csv")) {
+////            fw.write( gpsToStr(g, DELIMITER)+DELIMITER+ gpsToStr(g2, DELIMITER)+ "\n");
+//            fw.write( parcelToStr(p)+ "\n");
+//            fw.write( parcelToStr(p2)+ "\n");
+//            fw.write( parcelToStr(p3)+ "\n");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+////------ R E A D I N G
+//        try (BufferedReader br = new BufferedReader(new FileReader("gps.csv"))) {
+//            String line;
+//            while ((line = br.readLine()) != null) {
+//                String[] tokens = line.split(String.valueOf(DELIMITER));
+//                Parcel p1 = strToParcel(tokens);
+//                this.addParcel(p1.getParcelId(), p1.getDescription(), p1.getGps1(), p1.getGps2());
+//
+//                System.out.println(p11);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
 
 }
