@@ -241,11 +241,21 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
         return elementsCount;
     }
 
+    /**
+     * In-order iterator of k-d tree.
+     * @return null if size of tree is 0;
+     */
     public KdTreeInOrderIterator<E,T,K> inOrderIterator() {
         return new KdTreeInOrderIterator<E,T,K>(this.root);
     }
 
+    /**
+     * Level-order iterator of k-d tree.
+     * @return null if size of tree is 0;
+     */
     public KdTreeLevelOrderIterator<E,T,K> levelOrderIterator() {
+        if (this.size() == 0)
+            return null;
         return new KdTreeLevelOrderIterator<E,T,K>(this.root);
     }
 

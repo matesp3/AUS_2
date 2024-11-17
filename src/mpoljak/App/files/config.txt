@@ -1,2 +1,2 @@
---propsFilePath
---parclFilePath
+parcelFP=
+propsFP=

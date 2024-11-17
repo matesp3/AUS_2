@@ -9,6 +9,9 @@ public abstract class GeoResource implements ISame<GeoResource>, ICsvFormattable
         this.uniqueId = uniqueId;
     }
 
+    public abstract GPS getGps1();
+    public abstract GPS getGps2();
+
     /**
      * Deep copy constructing with deep copied relationships.
      * @return deep copy of instance
