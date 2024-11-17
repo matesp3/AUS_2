@@ -520,12 +520,16 @@ public class GeoDbClient {
                         File f = new File(data[1]);
                         if (f.exists())
                             this.parcelsFilePath = f.getAbsolutePath();
+                        else
+                            this.parcelsFilePath = this.defaultParcFilePath;
                         aConfigSet[0] = true;
                     }
                     else if (data[0].equals("propertyFP")) {
                         File f = new File(data[1]);
                         if (f.exists())
                             this.propertiesFilePath = f.getAbsolutePath();
+                        else
+                            this.propertiesFilePath = this.defaultPropFilePath;
                         aConfigSet[1] = true;
                     }
                 }
