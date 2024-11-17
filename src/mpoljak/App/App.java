@@ -14,7 +14,6 @@ public class App {
         DoubleComparator.getInstance().setEpsilon(0.01);
         GeoDbClient client = new GeoDbClient();
         GeoAppFrame appFrame = new GeoAppFrame(client);
-
     }
 
 
