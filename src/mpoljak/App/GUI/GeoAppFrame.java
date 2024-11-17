@@ -26,7 +26,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     public static final int OP_PRINT    = 6;
 
     private static final int CANVAS_WIDTH = 1400;
-    private static final int CANVAS_HEIGHT = 800;
+    private static final int CANVAS_HEIGHT = 840;
     private static final int MANAGE_PANE_WIDTH = 350;
 
     public static final char TYPE_PROPERTY = 'Y';
@@ -40,6 +40,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private JRadioButton optionParcel;
     private JRadioButton optionProperty;
     private JRadioButton optionAll;
+    private JRadioButton fileOptionParcel;
+    private JRadioButton fileOptionProperty;
 
     private JTable parcelsJTab;
     private JTable propertiesJTab;
@@ -56,6 +58,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private JPanel dataPanel;
     private JButton executeBtn;
 
+    private String fileChosenType;
     private int selectedOp;
 
     private OperationsController controller;
@@ -174,7 +177,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 //      ---- colors
         Color frameColor = new Color(181, 248, 211);
         Color gpsColor = new Color(179, 234, 182);
-        Color btnColor = new Color(210, 229, 191, 255);
+        Color btnColor = new Color(231, 255, 209, 255);
         this.getContentPane().setBackground(frameColor);
 //      ---- components
 //        *** main RIGHT -DATA panel
@@ -226,11 +229,94 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 4;
         this.panelForGenerating = new GeneratorInputComponent(300, 120, frameColor);
         managePanel.add(this.panelForGenerating, con);
+//      ----- MANAGE PANEL -> FILE HANDLING
+        con.gridx = 0;
+        con.gridy = 5;
+        JPanel filesPanel = this.createFilesHandlingArea(300, 140, btnColor);
+        managePanel.add(filesPanel, con);
 //      ---- set all visible
 //        detailsPanel.setModel(new GeoInfoModel('Y',12,"This is property"));
         this.selectedOp = OP_SEARCH;
         this.prepareOperationContext();
         this.setVisible(true);
+    }
+
+    private JPanel createFilesHandlingArea(int prefWidth, int prefHeight, Color bgColor) {
+        JPanel radiosPanel = new JPanel();
+        GridBagLayout radLayout = new GridBagLayout();
+        radiosPanel.setLayout(radLayout);
+//        radiosPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        radiosPanel.setBackground(bgColor);
+//        RadioButtonActionListener rbActionListener = new RadioButtonActionListener();
+        this.fileOptionParcel = new JRadioButton("Parcels");
+        this.fileOptionParcel.setBackground(bgColor);
+//        this.fileOptionParcel.addActionListener(rbActionListener);
+        this.fileOptionProperty = new JRadioButton("Properties");
+        this.fileOptionProperty.setBackground(bgColor);
+//        this.fileOptionProperty.addActionListener(rbActionListener);
+
+        GridBagConstraints conRad = new GridBagConstraints();
+        // choose type of location
+        ButtonGroup btnGroup = new ButtonGroup();
+        btnGroup.add(this.fileOptionParcel);
+        btnGroup.add(this.fileOptionProperty);
+
+        conRad.gridx = 0;
+        conRad.gridy = 0;
+        radiosPanel.add(this.fileOptionParcel, conRad);
+        this.fileOptionParcel.setSelected(true);
+        this.fileChosenType = "parcels";
+
+        conRad.gridx = 1;
+        conRad.gridy = 0;
+        radiosPanel.add(this.fileOptionProperty, conRad);
+//-----------------------------------------------------------
+        JPanel mainPanel = new JPanel();
+        GridBagLayout layout = new GridBagLayout();
+        mainPanel.setLayout(layout);
+        mainPanel.setBorder(BorderFactory.createEtchedBorder());
+        mainPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        mainPanel.setBackground(bgColor);
+        GridBagConstraints con = new GridBagConstraints();
+        con.weightx = 0.5;
+        con.weighty = 0.5;
+        con.anchor = GridBagConstraints.WEST;
+        con.insets = new Insets(3,7,3,0);
+
+        con.gridx = 0;
+        con.gridy = 0;
+        JLabel chooseLabel = new JLabel("Choose a geo resource type for file processing:");
+        mainPanel.add(chooseLabel, con);
+
+        con.gridwidth = 2;
+        con.gridx = 0;
+        con.gridy = 1;
+        mainPanel.add(radiosPanel, con);
+
+        con.gridx = 0;
+        con.gridy = 2;
+        con.anchor = GridBagConstraints.SOUTHWEST;
+        JPanel loadPanel = new JPanel(new FlowLayout());
+        loadPanel.setBackground(bgColor);
+        JLabel loadLabel = new JLabel("Load "+this.fileChosenType+" from file:");
+        loadPanel.add(loadLabel);
+        Icon icon = new ImageIcon("src/mpoljak/files/file-icon.png");
+        JButton btnLoad = new JButton(icon);
+        btnLoad.setPreferredSize(new Dimension(24,25));
+        loadPanel.add(btnLoad);
+        mainPanel.add(loadPanel, con);
+
+        con.gridx = 0;
+        con.gridy = 3;
+        JPanel savePanel = new JPanel(new FlowLayout());
+        savePanel.setBackground(bgColor);
+        JLabel saveLabel = new JLabel("Save "+this.fileChosenType+" to file:");
+        savePanel.add(saveLabel);
+        JButton btnSave = new JButton(icon);
+        btnSave.setPreferredSize(new Dimension(24,25));
+        savePanel.add(btnSave);
+        mainPanel.add(savePanel, con);
+        return mainPanel;
     }
 
     @Override
