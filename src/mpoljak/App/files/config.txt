@@ -1,2 +1,2 @@
-parcelFP=
-propsFP=
+parcelFP=C:\Users\mpoljak\IdeaProjects\AUS_2\gps.csv
+propertyFP=C:\Users\mpoljak\IdeaProjects\AUS_2\gps.csv

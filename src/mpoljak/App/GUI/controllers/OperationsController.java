@@ -155,4 +155,36 @@ public class OperationsController {
         Property property = propertyModel.getModel(selectedRow);
         parcModel.setModels(property.getParcels());
     }
+
+    /**
+     * Requests GeoDB to execute specified operation with selected file.
+     * @param filePath file path of selected path
+     * @param selectedOperation possible valid choices: <code>GeoAppFrame.FILE_SAVE_OPTION</code> or
+     *                          <code>GeoAppFrame.FILE_LOAD_OPTION</code>
+     * @param geoType for which type will be <code>selectedOperation</code> executed. Possible valid choices:
+     *                <code>GeoAppFrame.TYPE_PARCEL</code>, <code>GeoAppFrame.TYPE_PROPERTY</code>
+     * @return message about success of selected file operation
+     */
+    public String processSelectedFile(String filePath, char selectedOperation, char geoType) {
+        if (filePath == null || filePath.isBlank())
+            return "E: selected file is ''";
+        if (geoType != GeoAppFrame.TYPE_PARCEL && geoType != GeoAppFrame.TYPE_PROPERTY)
+            return "E: Unknown geo type, for which the action was to be executed.";
+
+        if (geoType == GeoAppFrame.TYPE_PARCEL)
+            geoType = GeoDbClient.GEO_TYPE_PARCEL;
+        else if (geoType == GeoAppFrame.TYPE_PROPERTY)
+            geoType = GeoDbClient.GEO_TYPE_PROPERTY;
+
+        if (selectedOperation == GeoAppFrame.FILE_SAVE_OPTION) {
+            boolean ok = client.saveState(filePath, geoType);
+            return ok ? "I: Ok.. Data saved to "+filePath : "E: Saving data failed.";
+        }
+        else if (selectedOperation == GeoAppFrame.FILE_LOAD_OPTION) {
+            boolean ok = client.loadDataFromFile(filePath);
+            return ok ? "I: Ok.. Data loaded from "+filePath : "E: Loading data failed.";
+        }
+
+        return "E: Unknown operation requested.";
+    }
 }

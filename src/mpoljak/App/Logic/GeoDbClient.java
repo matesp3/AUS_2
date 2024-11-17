@@ -9,11 +9,13 @@ import mpoljak.utilities.IntegerIdGenerator;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 public class GeoDbClient {
+    public static final char GEO_TYPE_PARCEL = 'A';
+    public static final char GEO_TYPE_PROPERTY = 'B';
+
     private static final String ID_FILE_PARCEL = "#_PARCELS";
     private static final String ID_FILE_PROPERTY = "#_PROPERTIES";
 
@@ -290,11 +292,29 @@ public class GeoDbClient {
         return this.getTreeDataRepresentation(this.kdTreeParcels);
     }
 
-    public void saveState() {
-        this.writeDataToCsvFile();
+    /**
+     * Saves current db data to specified file.
+     * @param fileName if not specified - <code>null</code> - then it is saved in default directory's file
+     * @return information about success of saving to specified file
+     */
+    public boolean saveState(String fileName, char geoType) {
+        if (geoType == GEO_TYPE_PARCEL)
+            this.parcelsFilePath = fileName != null ? fileName : this.parcelsFilePath;
+        else if (geoType == GEO_TYPE_PROPERTY)
+            this.propertiesFilePath = fileName != null ? fileName : this.propertiesFilePath;
+        else
+            return false;   // unsupported type to save
+
+        boolean success = this.writeDataToCsvFile();
         this.saveConfig();
+        return success;
     }
 
+    /**
+     * Loads data (appends them to current data) to db from specified file by parameter <code>fileName</code>
+     * @param fileName file path to file, from which will be data loaded
+     * @return information about success of loading data from file
+     */
     public boolean loadDataFromFile(String fileName) {
         return this.loadGeoResourceFromCsvFile(fileName);
     }
@@ -532,7 +552,7 @@ public class GeoDbClient {
     }
 
     private void saveConfig() {
-        try (FileWriter fw = new FileWriter(this.propertiesFilePath)) {
+        try (FileWriter fw = new FileWriter(this.configPath)) {
                 fw.write("parcelFP="+this.parcelsFilePath+"\n");
                 fw.write("propertyFP="+this.propertiesFilePath+"\n");
             } catch (IOException e) {
