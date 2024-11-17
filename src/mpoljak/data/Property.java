@@ -109,4 +109,50 @@ public class Property extends GeoResource {
         }
         return newProperty;
     }
+
+    @Override
+    public String toCsvLine(char delimiter, String delimiterReplacement, String blankSpaceReplacement) {
+        if (delimiterReplacement == null)
+            delimiterReplacement = "";
+        char gpsDelim = (delimiter != '&') ? '&' : '%'; /* in order to differentiate inner attributes of gps with this
+                                                            instance */
+        String strGpsRepr = this.positions[0].toCsvLine(gpsDelim, null, null)
+                + delimiter
+                + this.positions[1].toCsvLine(gpsDelim, null, null);
+        if (blankSpaceReplacement == null || blankSpaceReplacement.isEmpty())
+            blankSpaceReplacement = " ";
+        String parcelDesc = this.description == null || this.description.isEmpty()
+                ? blankSpaceReplacement
+                : (this.description.equals(blankSpaceReplacement) ? blankSpaceReplacement + this.description
+                     : this.description.replaceAll(String.valueOf(delimiter), delimiterReplacement));
+        return strGpsRepr + delimiter + this.propertyId + delimiter + parcelDesc;
+    }
+
+    @Override
+    public GeoResource fromCsvLine(String csvLine, char delimiter, String delimiterReplacement
+            , String blankSpaceReplacement) {
+        if (csvLine == null || csvLine.isBlank())
+            return null;
+        String[] tokens = csvLine.split(String.valueOf(delimiter));
+        if (tokens.length != 4)
+            return null;
+        char gpsDelim = (delimiter != '&') ? '&' : '%'; /* in order to differentiate inner attributes of gps with this
+                                                            instance */
+        GPS gFactory = new GPS('N',1,'E',1);    // JUST FOR calling member method
+        GPS g1 = gFactory.fromCsvLine(tokens[0], gpsDelim, null, null);   // TODO? FACTORY design pattern?
+        GPS g2 = gFactory.fromCsvLine(tokens[1], gpsDelim, null, null);
+        int propId = Integer.parseInt(tokens[2]);
+        if (delimiterReplacement == null)
+            delimiterReplacement = "";
+        if (blankSpaceReplacement == null)
+            blankSpaceReplacement = "";
+        String propDesc;
+        if (tokens[3].equals(blankSpaceReplacement))
+            propDesc = null;
+        else if (tokens[3].equals(blankSpaceReplacement.repeat(2)))
+            propDesc = blankSpaceReplacement;
+        else
+            propDesc = tokens[3].replaceAll(delimiterReplacement, String.valueOf(delimiter));
+        return new Property(propId, propDesc, g1, g2, -1);
+    }
 }

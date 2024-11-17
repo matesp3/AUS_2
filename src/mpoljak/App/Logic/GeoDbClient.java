@@ -7,21 +7,52 @@ import mpoljak.data.Property;
 import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
 import mpoljak.utilities.IntegerIdGenerator;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class GeoDbClient {
+    public static final char GEO_TYPE_PARCEL = 'A';
+    public static final char GEO_TYPE_PROPERTY = 'B';
+
+    private static final String ID_FILE_PARCEL = "#_PARCELS";
+    private static final String ID_FILE_PROPERTY = "#_PROPERTIES";
+
+    private static final String DELIMITER_REPLACEMENT = "%#%";
+    private static final String STR_BLANK_REPLACEMENT = "NULL";
+    private static final char DELIMITER = ';';
+
     private KDTree<Property, GeoResource, GPS> kdTreeProps;
     private KDTree<Parcel, GeoResource, GPS> kdTreeParcels;
     private KDTree<GeoResource, GeoResource, GPS> kdTreeResources;
     private IntegerIdGenerator idGenerator;
+    private final String defaultDir          = "src/mpoljak/App/files";
+    private final String configPath          = this.defaultDir + "/config.txt";
+    private final String defaultParcFilePath = this.defaultDir + "/data-parcels.txt";
+    private final String defaultPropFilePath = this.defaultDir + "/data-properties.txt";
+    private String propertiesFilePath;
+    private String parcelsFilePath;
 
     public GeoDbClient() {
         this.kdTreeProps = new KDTree<>(2);
         this.kdTreeParcels = new KDTree<>(2);
         this.kdTreeResources = new KDTree<>(2);
         this.idGenerator = IntegerIdGenerator.getInstance();
+        this.readConfing();
+//        System.out.println(this.loadDataFromCsvFile());
+//        System.out.println(this.writeDataToCsvFile());
+    }
+
+    public boolean setGeoPropertiesPath(String path) {
+        if (path == null || path.isEmpty())
+            return false;
+
+        return true;
+    }
+
+    public boolean setGeoParcelsPath(String path) {
+        return true;
     }
 
     /** Task 1 - finds all properties, whose one of the GPS positions leans on given GPS position.*/
@@ -221,25 +252,27 @@ public class GeoDbClient {
             Parcel p = new Parcel(i, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
             lGps.add(p);
 
-            this.kdTreeParcels.insert(gps1, p);
-            this.kdTreeParcels.insert(gps2, p);
-
-            this.kdTreeResources.insert(gps1,p);
-            this.kdTreeResources.insert(gps2,p);
+            this.addParcel(i, "generated", gps1, gps2);
+//            this.kdTreeParcels.insert(gps1, p);
+//            this.kdTreeParcels.insert(gps2, p);
+//
+//            this.kdTreeResources.insert(gps1,p);
+//            this.kdTreeResources.insert(gps2,p);
         }
 
         for (int a = 0; a < propertiesCount; a++) {
             GPS gps1;
-            if (generator.nextDouble() <= overlayProbability)
+            if (!lGps.isEmpty() && generator.nextDouble() <= overlayProbability)
                 gps1 = lGps.get(generator.nextInt(lGps.size())).getGps1();
             else
                 gps1 = GPS.generateGPS(generator, dirGenerator);
             GPS gps2 = GPS.generateGPS(generator, dirGenerator);
-            Property prop = new Property(a, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
-            this.kdTreeProps.insert(gps1, prop);
-            this.kdTreeProps.insert(gps2, prop);
-            this.kdTreeResources.insert(gps1, prop);
-            this.kdTreeResources.insert(gps2, prop);
+//            Property prop = new Property(a, "generated", gps1, gps2, IntegerIdGenerator.getInstance().nextId());
+            this.addProperty(a, "generated", gps1, gps2);
+//            this.kdTreeProps.insert(gps1, prop);
+//            this.kdTreeProps.insert(gps2, prop);
+//            this.kdTreeResources.insert(gps1, prop);
+//            this.kdTreeResources.insert(gps2, prop);
         }
     }
 
@@ -257,6 +290,33 @@ public class GeoDbClient {
      */
     public String getParcelsRepresentation() {
         return this.getTreeDataRepresentation(this.kdTreeParcels);
+    }
+
+    /**
+     * Saves current db data to specified file.
+     * @param fileName if not specified - <code>null</code> - then it is saved in default directory's file
+     * @return information about success of saving to specified file
+     */
+    public boolean saveState(String fileName, char geoType) {
+        if (geoType == GEO_TYPE_PARCEL)
+            this.parcelsFilePath = fileName != null ? fileName : this.parcelsFilePath;
+        else if (geoType == GEO_TYPE_PROPERTY)
+            this.propertiesFilePath = fileName != null ? fileName : this.propertiesFilePath;
+        else
+            return false;   // unsupported type to save
+
+        boolean success = this.writeDataToCsvFile();
+        this.saveConfig();
+        return success;
+    }
+
+    /**
+     * Loads data (appends them to current data) to db from specified file by parameter <code>fileName</code>
+     * @param fileName file path to file, from which will be data loaded
+     * @return information about success of loading data from file
+     */
+    public boolean loadDataFromFile(String fileName) {
+        return this.loadGeoResourceFromCsvFile(fileName);
     }
 
 //   -  -   -   -   -   -   -   -   -    P R I V A T E  -   -   -   -   -   -   -   -   -   -   -   -
@@ -328,7 +388,180 @@ public class GeoDbClient {
                 kdtree.inOrderIterator();
         StringBuilder sb = new StringBuilder();
         while (it.hasNext())
-            sb.append(String.format("%50s   -   ",it.next()));
+            sb.append(String.format("%s\n",it.next()));
         return sb.toString();
     }
+
+    /**
+     * Writes data of all currently existing geo data in RAM to files.
+     * @return <code>true</code> if ALL geo resources were successfully saved to files, else <code>false</code>.
+     */
+    private boolean writeDataToCsvFile() {
+        boolean success = true;
+        if (!this.kdTreeParcels.isEmpty())
+            success = this.writeGeoResourceToCsvFile(this.parcelsFilePath, ID_FILE_PARCEL,
+                        this.kdTreeParcels.levelOrderIterator());
+        if (!this.kdTreeProps.isEmpty())
+            success = success && this.writeGeoResourceToCsvFile(this.propertiesFilePath, ID_FILE_PROPERTY,
+                        this.kdTreeProps.levelOrderIterator());
+        return success;
+    }
+
+    /**
+     * Loads data of all available data files.
+     * @return <code>true</code> if ALL geo resources were successfully loaded from files, else <code>false</code>.
+     */
+    private boolean loadDataFromCsvFile() {
+        boolean success;
+        success = this.loadGeoResourceFromCsvFile(this.parcelsFilePath);
+        success = success && this.loadGeoResourceFromCsvFile(this.propertiesFilePath);
+        return success;
+    }
+
+    /**
+     * Writes current data of specified geo resource type <code>T</code> to file from passed tree structure.
+     * @param filePath where data should be stores
+     * @param identification identification, which type of geo resource is stored in file.
+     * @param iterator iterator of data structure whose instances of geo resources will be written to file
+     * @return success of writing data to file
+     */
+    private <T extends GeoResource> boolean writeGeoResourceToCsvFile(String filePath, String identification,
+                                                                      KDTree<T, GeoResource, GPS>.KdTreeLevelOrderIterator
+                                                                       <T, GeoResource, GPS> iterator) {
+        if (iterator == null)
+            return false;
+        try (FileWriter fw = new FileWriter(filePath)) { // n * 2 * log2(n)
+            fw.write(identification+"\n");
+            KDTree<T, GeoResource, GPS> kdTreeIdEvidence = new KDTree<>(2);
+
+            while (iterator.hasNext()) {
+                T geoRes = iterator.next();
+                List<T> lFound = kdTreeIdEvidence.findAll(geoRes.getGps1());
+                if (lFound == null) {
+                    kdTreeIdEvidence.insert(geoRes.getGps1(), geoRes);    // do evidence of parcel
+                    fw.write( geoRes.toCsvLine(DELIMITER, DELIMITER_REPLACEMENT, STR_BLANK_REPLACEMENT)+ "\n");
+                }
+                else {
+                    boolean notFound = true;
+                    for (T res : lFound) {
+                        if (res.isSame(geoRes)) {
+                            notFound = false;
+                            break;
+                        }
+                    }
+                    if (notFound) {
+                        kdTreeIdEvidence.insert(geoRes.getGps1(), geoRes);    // do evidence of parcel
+                        fw.write( geoRes.toCsvLine(DELIMITER, DELIMITER_REPLACEMENT, STR_BLANK_REPLACEMENT)+ "\n");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Read data stored in file and appends them to current data.
+     * @param filePath where data are stored
+     * @return <code>false</code> if structure of file is corrupted, else <code>true</code>
+     */
+    private boolean loadGeoResourceFromCsvFile(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            int typeToRead = -1;
+            final int TYPE_PARCEL = 1;
+            final int TYPE_PROPERTY = 2;
+            GeoResource geoResource;
+            GPS gForFact = new GPS('N',1,'E',1); // just for factory instance
+            String line = br.readLine();
+            if (line == null)
+                return false;
+            if (line.equals(ID_FILE_PARCEL)) {
+                typeToRead = TYPE_PARCEL;
+                geoResource = new Parcel(1,null,gForFact,gForFact,-1);// just for factory purposes
+            }
+            else if (line.equals(ID_FILE_PROPERTY)) {
+                typeToRead = TYPE_PROPERTY;
+                geoResource = new Property(1,null,gForFact,gForFact,-1);// just for factory purposes
+            } else
+                return false;
+
+            while ((line = br.readLine()) != null) {
+                if (typeToRead == TYPE_PARCEL) {
+                    Parcel pa = (Parcel) geoResource.fromCsvLine(line,
+                            GeoDbClient.DELIMITER, GeoDbClient.DELIMITER_REPLACEMENT, GeoDbClient.STR_BLANK_REPLACEMENT);
+                    this.addParcel(pa.getParcelId(), pa.getDescription(), pa.getGps1(), pa.getGps2());
+                }
+                else if (typeToRead == TYPE_PROPERTY) {
+                    Property pr = (Property) geoResource.fromCsvLine(line,
+                            GeoDbClient.DELIMITER, GeoDbClient.DELIMITER_REPLACEMENT, GeoDbClient.STR_BLANK_REPLACEMENT);
+                    this.addProperty(pr.getPropertyId(), pr.getDescription(), pr.getGps1(), pr.getGps2());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private void readConfing() {
+        boolean[] aConfigSet = {false, false};
+        try (BufferedReader br = new BufferedReader(new FileReader(this.configPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.trim().split("=");
+                if (data.length == 2) {
+                    if (data[0].equals("parcelFP")) {
+                        File f = new File(data[1]);
+                        if (f.exists())
+                            this.parcelsFilePath = f.getAbsolutePath();
+                        aConfigSet[0] = true;
+                    }
+                    else if (data[0].equals("propertyFP")) {
+                        File f = new File(data[1]);
+                        if (f.exists())
+                            this.propertiesFilePath = f.getAbsolutePath();
+                        aConfigSet[1] = true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (!aConfigSet[0]) {
+            this.parcelsFilePath = this.defaultParcFilePath;
+//            try (FileWriter fw = new FileWriter(this.parcelsFilePath)) {
+//                fw.write(ID_FILE_PARCEL+"\n");
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+        }
+        if (!aConfigSet[1]) {
+            this.propertiesFilePath = this.defaultPropFilePath;
+//            try (FileWriter fw = new FileWriter(this.propertiesFilePath)) {
+//                fw.write(ID_FILE_PROPERTY+"\n");
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+        }
+    }
+
+    private void saveConfig() {
+        try (FileWriter fw = new FileWriter(this.configPath)) {
+                fw.write("parcelFP="+this.parcelsFilePath+"\n");
+                fw.write("propertyFP="+this.propertiesFilePath+"\n");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+    }
+
+    public static void main(String[] args) {
+    }
+
 }

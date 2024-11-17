@@ -1,5 +1,7 @@
 package mpoljak.data;
 
+import mpoljak.App.Logic.GeoDbClient;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,5 +112,51 @@ public class Parcel extends GeoResource {
             newParcel.addProperty(new Property(p));
         }
         return newParcel;
+    }
+
+    @Override
+    public String toCsvLine(char delimiter, String delimiterReplacement, String blankSpaceReplacement) {
+        if (delimiterReplacement == null)
+            delimiterReplacement = "";
+        char gpsDelim = (delimiter != '&') ? '&' : '%'; /* in order to differentiate inner attributes of gps with this
+                                                            instance */
+        String strGpsRepr = this.positions[0].toCsvLine(gpsDelim, null, null)
+                            + delimiter
+                            + this.positions[1].toCsvLine(gpsDelim, null, null);
+        if (blankSpaceReplacement == null || blankSpaceReplacement.isEmpty())
+            blankSpaceReplacement = " ";
+        String parcelDesc = this.description == null || this.description.isEmpty()
+                ? blankSpaceReplacement
+                : (this.description.equals(blankSpaceReplacement) ? blankSpaceReplacement + this.description
+                     : this.description.replaceAll(String.valueOf(delimiter), delimiterReplacement));
+        return strGpsRepr + delimiter + this.parcelId + delimiter + parcelDesc;
+    }
+
+    @Override
+    public GeoResource fromCsvLine(String csvLine, char delimiter, String delimiterReplacement,
+                                   String blankSpaceReplacement) {
+        if (csvLine == null || csvLine.isBlank())
+            return null;
+        String[] tokens = csvLine.split(String.valueOf(delimiter));
+        if (tokens.length != 4)
+            return null;
+        char gpsDelim = (delimiter != '&') ? '&' : '%'; /* in order to differentiate inner attributes of gps with this
+                                                            instance */
+        GPS gFactory = new GPS('N',1,'E',1);    // JUST FOR calling member method
+        GPS g1 = gFactory.fromCsvLine(tokens[0], gpsDelim, null, null);   // TODO?FACTORY design pattern?
+        GPS g2 = gFactory.fromCsvLine(tokens[1], gpsDelim, null, null);
+        int parcelId = Integer.parseInt(tokens[2]);
+        if (delimiterReplacement == null)
+            delimiterReplacement = "";
+        if (blankSpaceReplacement == null)
+            blankSpaceReplacement = "";
+        String parcDesc;
+        if (tokens[3].equals(blankSpaceReplacement))
+            parcDesc = null;
+        else if (tokens[3].equals(blankSpaceReplacement.repeat(2)))
+            parcDesc = blankSpaceReplacement;
+        else
+            parcDesc = tokens[3].replaceAll(delimiterReplacement, String.valueOf(delimiter));
+        return new Parcel(parcelId, parcDesc, g1, g2, -1);
     }
 }

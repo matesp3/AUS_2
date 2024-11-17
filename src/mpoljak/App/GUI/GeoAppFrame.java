@@ -1,13 +1,9 @@
 package mpoljak.App.GUI;
 
-import mpoljak.App.GUI.components.DetailsInputComponent;
-import mpoljak.App.GUI.components.GeneratorInputComponent;
-import mpoljak.App.GUI.components.GpsInputComponent;
+import mpoljak.App.GUI.components.*;
 import mpoljak.App.GUI.controllers.OperationsController;
 import mpoljak.App.GUI.models.*;
 import mpoljak.App.Logic.GeoDbClient;
-import mpoljak.data.GPS;
-import mpoljak.data.GeoResource;
 import mpoljak.data.Parcel;
 import mpoljak.data.Property;
 import mpoljak.utilities.SwingTableColumnResizer;
@@ -15,6 +11,7 @@ import mpoljak.utilities.SwingTableColumnResizer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.ArrayList;
@@ -26,13 +23,14 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     public static final int OP_DELETE   = 4;
     public static final int OP_GENERATE = 5;
     public static final int OP_PRINT    = 6;
-
-    private static final int CANVAS_WIDTH = 1400;
-    private static final int CANVAS_HEIGHT = 800;
-    private static final int MANAGE_PANE_WIDTH = 350;
-
+    public static final char FILE_LOAD_OPTION = 'L';
+    public static final char FILE_SAVE_OPTION = 'S';
     public static final char TYPE_PROPERTY = 'Y';
     public static final char TYPE_PARCEL = 'L';
+
+    private static final int CANVAS_WIDTH = 1400;
+    private static final int CANVAS_HEIGHT = 840;
+    private static final int MANAGE_PANE_WIDTH = 350;
 
     private GpsInputComponent gpsInput1;
     private GpsInputComponent gpsInput2;
@@ -42,11 +40,16 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private JRadioButton optionParcel;
     private JRadioButton optionProperty;
     private JRadioButton optionAll;
+    private JRadioButton fileOptionParcel;
+    private JRadioButton fileOptionProperty;
 
     private JTable parcelsJTab;
     private JTable propertiesJTab;
     private ParcelTableModel parcelModel;
     private PropertyTableModel propertyModel;
+
+    private JMenuItem propertyMenuItem;
+    private JMenuItem parcelMenuItem;
 
     private JTextArea consoleTxtArea;
 
@@ -55,9 +58,34 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private JPanel dataPanel;
     private JButton executeBtn;
 
+    private JLabel loadLabel;
+    private JLabel saveLabel;
+
+    private String fileChosenType;
     private int selectedOp;
 
     private OperationsController controller;
+
+    private void processFileFromDialog(char selectedOption) {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//        fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+        int result = 256;
+        if (selectedOption == FILE_LOAD_OPTION)
+            result = fc.showOpenDialog(this);
+        else if (selectedOption == FILE_SAVE_OPTION)
+            result = fc.showSaveDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fc.getSelectedFile();
+            System.out.println("Selected file >> "+selectedFile.getAbsolutePath());
+            char chosenGeoType = fileOptionParcel.isSelected() ? TYPE_PARCEL : TYPE_PROPERTY;
+            String res = controller.processSelectedFile(selectedFile.getAbsolutePath(), selectedOption, chosenGeoType);
+            this.logInfo(res);
+        }
+    }
 
     private class RadioButtonActionListener implements ActionListener {
         @Override
@@ -80,7 +108,55 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
-    public class ExecuteActionListener implements ActionListener {
+    private class FileRadionButtonActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JRadioButton rBtn = (JRadioButton) e.getSource();
+            if (rBtn == fileOptionParcel) {
+                fileChosenType = "parcels";
+            }
+            else if (rBtn == fileOptionProperty) {
+                fileChosenType = "properties";
+            }
+            loadLabel.setText("Load "+fileChosenType+" from file:");
+            saveLabel.setText("Save "+fileChosenType+" to file:");
+        }
+    }
+
+    private class MenuItemActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            if (menuItem == parcelMenuItem) {
+                PropertyTableModel propModel = new PropertyTableModel(new ArrayList<Property>());
+                controller.setParcelWithProperties(propModel, parcelModel, parcelsJTab.getSelectedRow());
+                ParcelDetailsWindow parcWindow = new ParcelDetailsWindow(500, 250, propModel);
+            }
+            else if (menuItem == propertyMenuItem) {
+                ParcelTableModel parcModel = new ParcelTableModel(new ArrayList<Parcel>());
+                controller.setPropertyWithParcels(parcModel, propertyModel, propertiesJTab.getSelectedRow());
+                PropertyDetailsWindow propWindow = new PropertyDetailsWindow(1000, 250, parcModel);
+            }
+        }
+    }
+
+    private class ParcelTabListener extends MouseAdapter {
+        private JTable table;
+
+        public ParcelTabListener(JTable table) {
+            this.table = table;
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Point point = e.getPoint();
+            int row = table.rowAtPoint(point);
+            table.setRowSelectionInterval(row, row);    // manually setting row as selected for case of popup menu
+        }
+    }
+
+    private class ExecuteActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -117,8 +193,9 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                 }
                 else if (selectedOp == OP_GENERATE) {
                     controller.generateValuesToDb(panelForGenerating.getModel());
-                    consoleTxtArea.append("     >> DATA GENERATED");
+                    consoleTxtArea.append("\n     >> DATA GENERATED");
                 }
+
             }
         }
     }
@@ -139,7 +216,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 //      ---- colors
         Color frameColor = new Color(181, 248, 211);
         Color gpsColor = new Color(179, 234, 182);
-        Color btnColor = new Color(210, 229, 191, 255);
+        Color btnColor = new Color(209, 252, 184, 255);
         this.getContentPane().setBackground(frameColor);
 //      ---- components
 //        *** main RIGHT -DATA panel
@@ -191,11 +268,96 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 4;
         this.panelForGenerating = new GeneratorInputComponent(300, 120, frameColor);
         managePanel.add(this.panelForGenerating, con);
+//      ----- MANAGE PANEL -> FILE HANDLING
+        con.gridx = 0;
+        con.gridy = 5;
+        JPanel filesPanel = this.createFilesHandlingArea(300, 140, btnColor);
+        managePanel.add(filesPanel, con);
 //      ---- set all visible
 //        detailsPanel.setModel(new GeoInfoModel('Y',12,"This is property"));
         this.selectedOp = OP_SEARCH;
         this.prepareOperationContext();
         this.setVisible(true);
+    }
+
+    private JPanel createFilesHandlingArea(int prefWidth, int prefHeight, Color bgColor) {
+        JPanel radiosPanel = new JPanel();
+        GridBagLayout radLayout = new GridBagLayout();
+        radiosPanel.setLayout(radLayout);
+//        radiosPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        radiosPanel.setBackground(bgColor);
+        FileRadionButtonActionListener rbListener = new FileRadionButtonActionListener();
+        this.fileOptionParcel = new JRadioButton("Parcels");
+        this.fileOptionParcel.setBackground(bgColor);
+        this.fileOptionParcel.addActionListener(rbListener);
+        this.fileOptionProperty = new JRadioButton("Properties");
+        this.fileOptionProperty.setBackground(bgColor);
+        this.fileOptionProperty.addActionListener(rbListener);
+
+        GridBagConstraints conRad = new GridBagConstraints();
+        // choose type of location
+        ButtonGroup btnGroup = new ButtonGroup();
+        btnGroup.add(this.fileOptionParcel);
+        btnGroup.add(this.fileOptionProperty);
+
+        conRad.gridx = 0;
+        conRad.gridy = 0;
+        radiosPanel.add(this.fileOptionParcel, conRad);
+        this.fileOptionParcel.setSelected(true);
+        this.fileChosenType = "parcels";
+
+        conRad.gridx = 1;
+        conRad.gridy = 0;
+        radiosPanel.add(this.fileOptionProperty, conRad);
+//-----------------------------------------------------------
+        JPanel mainPanel = new JPanel();
+        GridBagLayout layout = new GridBagLayout();
+        mainPanel.setLayout(layout);
+        mainPanel.setBorder(BorderFactory.createEtchedBorder());
+        mainPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        mainPanel.setBackground(bgColor);
+        GridBagConstraints con = new GridBagConstraints();
+        con.weightx = 0.5;
+        con.weighty = 0.5;
+        con.anchor = GridBagConstraints.WEST;
+        con.insets = new Insets(3,7,3,0);
+
+        con.gridx = 0;
+        con.gridy = 0;
+        JLabel chooseLabel = new JLabel("Choose a geo resource type for file processing:");
+        mainPanel.add(chooseLabel, con);
+
+        con.gridwidth = 2;
+        con.gridx = 0;
+        con.gridy = 1;
+        mainPanel.add(radiosPanel, con);
+
+        con.gridx = 0;
+        con.gridy = 2;
+        con.anchor = GridBagConstraints.SOUTHWEST;
+        JPanel loadPanel = new JPanel(new FlowLayout());
+        loadPanel.setBackground(bgColor);
+        this.loadLabel = new JLabel("Load "+this.fileChosenType+" from file:");
+        loadPanel.add(loadLabel);
+        Icon icon = new ImageIcon("src/mpoljak/files/file-icon.png");
+        JButton btnLoad = new JButton(icon);
+        btnLoad.setPreferredSize(new Dimension(24,25));
+        btnLoad.addActionListener(e -> processFileFromDialog(FILE_LOAD_OPTION));
+        loadPanel.add(btnLoad);
+        mainPanel.add(loadPanel, con);
+
+        con.gridx = 0;
+        con.gridy = 3;
+        JPanel savePanel = new JPanel(new FlowLayout());
+        savePanel.setBackground(bgColor);
+        this.saveLabel = new JLabel("Save "+this.fileChosenType+" to file:");
+        savePanel.add(saveLabel);
+        JButton btnSave = new JButton(icon);
+        btnSave.setPreferredSize(new Dimension(24,25));
+        btnSave.addActionListener(e -> processFileFromDialog(FILE_SAVE_OPTION));
+        savePanel.add(btnSave);
+        mainPanel.add(savePanel, con);
+        return mainPanel;
     }
 
     @Override
@@ -207,6 +369,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
 
 //    private void prepareDataPanel(JPanel dataPanel, List<ParcelModel> lParcels, List<PropertyModel> lProperties) {
     private void prepareDataPanel(JPanel dataPanel, List<Parcel> lParcels, List<Property> lProperties) {
+        MenuItemActionListener menuListener = new MenuItemActionListener();
         GridBagLayout layout = new GridBagLayout();
         dataPanel.setLayout(layout);
         GridBagConstraints con = new GridBagConstraints();
@@ -227,8 +390,14 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 1;
         con.insets = tableInsets;
         con.anchor = GridBagConstraints.BASELINE;
+        JPopupMenu popupMenu = new JPopupMenu();
+        this.parcelMenuItem = new JMenuItem("See corresponding properties");
+        this.parcelMenuItem.addActionListener(menuListener);
+        popupMenu.add(this.parcelMenuItem);
         this.parcelModel = new ParcelTableModel(lParcels);
         this.parcelsJTab = new JTable(parcelModel);
+        this.parcelsJTab.setComponentPopupMenu(popupMenu);
+        this.parcelsJTab.addMouseListener(new ParcelTabListener(this.parcelsJTab));
         this.parcelsJTab.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -267,8 +436,13 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 3;
         con.insets = tableInsets;
         con.anchor = GridBagConstraints.BASELINE;
+        JPopupMenu popupMenu2 = new JPopupMenu();
+        this.propertyMenuItem = new JMenuItem("See corresponding parcels");
+        this.propertyMenuItem.addActionListener(menuListener);
+        popupMenu2.add(this.propertyMenuItem);
         this.propertyModel = new PropertyTableModel(lProperties);
         this.propertiesJTab = new JTable(propertyModel);
+        this.propertiesJTab.setComponentPopupMenu(popupMenu2);
         this.propertiesJTab.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -534,6 +708,10 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private void logOperation(String operationName, boolean success) {
         this.consoleTxtArea.append("\n"+getFormattedSysTime()+
                 "   -   "+operationName+" operation: " + (success ? "Ok.." : "Failed"));
+    }
+
+    private void logInfo(String info) {
+        this.consoleTxtArea.append("\n"+getFormattedSysTime()+" -   "+info);
     }
 
     private String getFormattedSysTime() {
