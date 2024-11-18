@@ -2,7 +2,7 @@
   <artifact type="jar" name="GeoApp:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/GeoApp_jar</output-path>
     <root id="archive" name="GeoApp.jar">
-      <element id="module-output" name="AUS_2" />
+      <element id="module-output" name="AUS_II-S1" />
     </root>
   </artifact>
 </component>
