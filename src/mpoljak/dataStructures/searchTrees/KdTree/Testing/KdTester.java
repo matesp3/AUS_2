@@ -160,19 +160,31 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
                 printIterationOperation("Checking whether all remained data are present in k-d tree..");
             }
 //          At the end, check if remaining elements are in helper structure and k-d tree the same
+            ArrayList<D> lRemaining = new ArrayList<>(requiredTreeSize-deletionsCount);
+            for (int i = 0; i < lObserved.size(); i++) { // deleted were just set as null, so I need only relevant data
+                if (lObserved.get(i) != null)
+                    lRemaining.add(lObserved.get(i));
+            }
+            lRemaining.sort(this.comparator);
+
             ArrayList<D> lRetrieved = new ArrayList<>(deletionsCount);
             getSortedTreeDataById(kdTree, lRetrieved);
+            if (lRetrieved.size() != lRemaining.size())
+                throw new RuntimeException("Sizes of retrieved from k-d tree and remainig from helper struct are" +
+                                            " different.");
             int hi = -1;
             for (int i = 0; i < lRetrieved.size(); i++) {
-                D fromKd = lRetrieved.get(i);
-                D fromHelper = null;
-                do {
-                    hi++;
-                    fromHelper = lObserved.get(hi);
-                } while (fromHelper == null && hi < lObserved.size());
-                if (!fromHelper.isSame(fromKd))
-                    throw new NoSuchElementException(i+"-th elements (in sorted order by id) are not the same!  -   "
-                            +"fromHelperStructure="+fromHelper+"    VS      fromKdTree="+fromKd);
+                if (!lRetrieved.get(i).isSame(lRemaining.get(i)))
+                    throw new RuntimeException("Not same elements at expected sorted position.");
+//                D fromKd = lRetrieved.get(i);
+//                D fromHelper = null;
+//                do {
+//                    hi++;
+//                    fromHelper = lObserved.get(hi);
+//                } while (fromHelper == null && hi < lObserved.size());
+//                if (!fromHelper.isSame(fromKd))
+//                    throw new NoSuchElementException(i+"-th elements (in sorted order by id) are not the same!  -   "
+//                            +"fromHelperStructure="+fromHelper+"    VS      fromKdTree="+fromKd);
             }
             if (logLevel >= 2)
                 printInfo("..Ok delete test passed");
@@ -848,7 +860,7 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
                 for (int i = 10000; i <= 100000; i*=10) {               // treeSize
                     for (double d = 3.34; d < 11; d+=3.33) {              // d*10 = percentage of deleted elements
                         for (double p = 0.01; p <= 0.35; p += 0.32) {      // probability of creating duplicate
-                            System.out.println("\n v---  for params: i=" + i + ", deleted="+d*i/10+", p="+p+"  <---");
+                            System.out.println("\n v---  for params: i=" + i + ", deleted="+(int)d*i/10+", p="+p+"  <---");
                             boolean ok = ot.testDeleteFunctionality(1, i, (int)d*i/10, p, 1, true);
                             System.out.println("..." + (ok ? "SUCCESS" : "FAILED"));
                             allOk = allOk && ok;
@@ -863,7 +875,7 @@ public class KdTester<D extends ISame<D> & IKdComparable<D>, K extends Comparabl
             }
         }
         else if (chosenOperation == SPECIFIC_DUPLICATE_TEST) {
-            ot.testFindingAllDuplicates(200,0.2, 3,debug);
+            ot.testFindingAllDuplicates(20000,0.3, 3,debug);
         }
 //        -----------------------------------------------------------------------------------
         /*                                          R E S U L T                                                    */
