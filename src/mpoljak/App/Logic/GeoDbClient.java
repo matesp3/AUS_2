@@ -27,10 +27,10 @@ public class GeoDbClient {
     private KDTree<Parcel, GeoResource, GPS> kdTreeParcels;
     private KDTree<GeoResource, GeoResource, GPS> kdTreeResources;
     private IntegerIdGenerator idGenerator;
-    private final String defaultDir          = "src/mpoljak/App/files";
+    private final String defaultDir          = System.getProperty("user.dir");
     private final String configPath          = this.defaultDir + "/config.txt";
-    private final String defaultParcFilePath = this.defaultDir + "/data-parcels.txt";
-    private final String defaultPropFilePath = this.defaultDir + "/data-properties.txt";
+    private final String defaultParcFilePath = this.defaultDir + "/data/data-parcels.csv";
+    private final String defaultPropFilePath = this.defaultDir + "/data/data-properties.csv";
     private String propertiesFilePath;
     private String parcelsFilePath;
 
@@ -40,6 +40,7 @@ public class GeoDbClient {
         this.kdTreeResources = new KDTree<>(2);
         this.idGenerator = IntegerIdGenerator.getInstance();
         this.readConfing();
+
 //        System.out.println(this.loadDataFromCsvFile());
 //        System.out.println(this.writeDataToCsvFile());
     }
@@ -520,16 +521,12 @@ public class GeoDbClient {
                         File f = new File(data[1]);
                         if (f.exists())
                             this.parcelsFilePath = f.getAbsolutePath();
-                        else
-                            this.parcelsFilePath = this.defaultParcFilePath;
                         aConfigSet[0] = true;
                     }
                     else if (data[0].equals("propertyFP")) {
                         File f = new File(data[1]);
                         if (f.exists())
                             this.propertiesFilePath = f.getAbsolutePath();
-                        else
-                            this.propertiesFilePath = this.defaultPropFilePath;
                         aConfigSet[1] = true;
                     }
                 }
@@ -539,6 +536,16 @@ public class GeoDbClient {
         }
         if (!aConfigSet[0]) {
             this.parcelsFilePath = this.defaultParcFilePath;
+            File f = new File(this.parcelsFilePath);
+            if (f.getParent() != null)
+                new File(f.getParent()).mkdirs();
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 //            try (FileWriter fw = new FileWriter(this.parcelsFilePath)) {
 //                fw.write(ID_FILE_PARCEL+"\n");
 //            } catch (IOException e) {
@@ -547,6 +554,16 @@ public class GeoDbClient {
         }
         if (!aConfigSet[1]) {
             this.propertiesFilePath = this.defaultPropFilePath;
+            File f = new File(this.propertiesFilePath);
+            if (f.getParent() != null)
+                new File(f.getParent()).mkdirs();
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 //            try (FileWriter fw = new FileWriter(this.propertiesFilePath)) {
 //                fw.write(ID_FILE_PROPERTY+"\n");
 //            } catch (IOException e) {
@@ -566,6 +583,7 @@ public class GeoDbClient {
     }
 
     public static void main(String[] args) {
+//        System.out.println(System.getProperty("user.dir"));
     }
 
 }

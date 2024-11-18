@@ -203,7 +203,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     public GeoAppFrame(GeoDbClient client) {
         this.controller = new OperationsController(client);
         this.selectedOp = OP_INSERT;
-        ImageIcon icon = new ImageIcon("src/mpoljak/files/GeoApp-icon.png");
+        ImageIcon icon = new ImageIcon(System.getProperty("user.dir")+"/GeoApp_imgs/GeoApp-icon.png");
         this.setIconImage(icon.getImage());
 //      ---- frame properties
         this.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -339,7 +339,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         loadPanel.setBackground(bgColor);
         this.loadLabel = new JLabel("Load "+this.fileChosenType+" from file:");
         loadPanel.add(loadLabel);
-        Icon icon = new ImageIcon("src/mpoljak/files/file-icon.png");
+        Icon icon = new ImageIcon(System.getProperty("user.dir")+"/GeoApp_imgs/file-icon.png");
         JButton btnLoad = new JButton(icon);
         btnLoad.setPreferredSize(new Dimension(24,25));
         btnLoad.addActionListener(e -> processFileFromDialog(FILE_LOAD_OPTION));
