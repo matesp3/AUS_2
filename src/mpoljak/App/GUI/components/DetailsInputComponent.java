@@ -17,7 +17,7 @@ public class DetailsInputComponent extends JPanel {
     private char currentType;
     private boolean enabledState;
 
-    public DetailsInputComponent(int prefWidth, int prefHeight, Color bgColor) {
+    public DetailsInputComponent(int prefWidth, int prefHeight, Color bgColor, GeoInfoModel model) {
         this.setSize(new Dimension(prefWidth, prefHeight));
         this.setBackground(bgColor);
         int inputHeight = 22;
@@ -61,6 +61,8 @@ public class DetailsInputComponent extends JPanel {
         this.descInput.setPreferredSize(new Dimension(prefWidth - 20, inputHeight));
         this.add(descInput, con);
 
+        if (model != null)
+            this.setModel(model);
         this.enabledState = true;
         this.currentType = GeoAppFrame.TYPE_PARCEL;
     }

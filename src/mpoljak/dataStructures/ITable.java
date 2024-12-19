@@ -4,7 +4,7 @@ import mpoljak.dataStructures.KdTree.ISame;
 
 import java.util.List;
 
-public interface ITable<E extends T, T extends ISame<T>, K extends ITableKey> extends IFilterIterable<E>, ICloneableStruct<ITable<E,T,K>> {
+public interface ITable<E extends T, T extends ISame<T>, K extends ITableKey> extends IFilterIterable<E>, ICloneable<ITable<E,T,K>> {
     public void insert(K key, E data);
 
     /**

@@ -68,4 +68,9 @@ public class PropertyParams implements IParams {
     public void setEvidedFrom(GregorianCalendar evidedFrom) {
         this.evidedFrom = evidedFrom;
     }
+
+    @Override
+    public IParams cloneInstance() {
+        return new PropertyParams(this.propertyNr, this.description, new GPS(this.gps1), new GPS(this.gps2), this.uniqueId, this.evidedFrom);
+    }
 }

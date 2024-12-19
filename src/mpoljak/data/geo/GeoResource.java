@@ -18,6 +18,10 @@ public abstract class GeoResource implements ITableData, ICsvFormattable<GeoReso
      */
     public abstract GeoResource deepCopy();
 
+    public int getUniqueId() {
+        return this.uniqueId;
+    }
+
     @Override
     public boolean isSame(ITableData other) {
         if (!(other instanceof GeoResource))

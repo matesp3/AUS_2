@@ -1,4 +1,4 @@
 package mpoljak.dataStructures;
 
-public interface IParams {
+public interface IParams extends ICloneable<IParams> {
 }

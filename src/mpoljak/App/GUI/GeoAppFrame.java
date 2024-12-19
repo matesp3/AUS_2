@@ -1,11 +1,12 @@
 package mpoljak.App.GUI;
 
 import mpoljak.App.GUI.components.*;
-import mpoljak.App.GUI.controllers.OperationsController;
+import mpoljak.App.GUI.controllers.GeoController;
 import mpoljak.App.GUI.models.*;
+import mpoljak.App.Logic.DataDb;
 import mpoljak.App.Logic.GeoDbClient;
-import mpoljak.data.geo.Parcel;
-import mpoljak.data.geo.Property;
+import mpoljak.data.geo.*;
+import mpoljak.dataStructures.*;
 import mpoljak.utilities.SwingTableColumnResizer;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -32,6 +34,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private static final int CANVAS_HEIGHT = 840;
     private static final int MANAGE_PANE_WIDTH = 350;
 
+    private IFormFactory formFactory;
+    private IParams currentlyChosenParams = null;
     private GpsInputComponent gpsInput1;
     private GpsInputComponent gpsInput2;
     private DetailsInputComponent detailsPanel;
@@ -64,7 +68,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     private String fileChosenType;
     private int selectedOp;
 
-    private OperationsController controller;
+    private GeoController controller;
 
     private void processFileFromDialog(char selectedOption) {
         JFileChooser fc = new JFileChooser();
@@ -98,9 +102,11 @@ public class GeoAppFrame extends JFrame implements ActionListener {
             }
             else if (rBtn == optionParcel) {
                 detailsPanel.setDetailsType(GeoAppFrame.TYPE_PARCEL);
+                formFactory = new ParcelFormFactory();
             }
             else if (rBtn == optionProperty) {
                 detailsPanel.setDetailsType(GeoAppFrame.TYPE_PROPERTY);
+                formFactory = new ParcelFormFactory();
             }
 
 //            if (selectedOp == OP_SEARCH)
@@ -162,34 +168,74 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JButton btn = (JButton) e.getSource();
             if (btn == executeBtn) {
-                if (selectedOp == OP_INSERT) {
-                    boolean insertOk = controller.insertDataToDb(gpsInput1.getModel(), gpsInput2.getModel(),
-                            detailsPanel.getModel());
-                    logOperation("INSERT", insertOk);
+                if (selectedOp == OP_INSERT || selectedOp == OP_EDIT) {
+                    if (selectedOp == OP_EDIT && currentlyChosenParams == null)
+                        return;
+                    GuiForm form = (selectedOp == OP_INSERT) ? formFactory.createAddForm()
+                                                             : formFactory.createEditForm(currentlyChosenParams);
+                    form.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            form.processForm(controller);
+                        }
+                    });
+
                 }
+//                if (selectedOp == OP_INSERT) {
+//                    boolean insertOk = controller.insertDataToDb(gpsInput1.getModel(), gpsInput2.getModel(),
+//                            detailsPanel.getModel());
+//                    logOperation("INSERT", insertOk);
+//                }
+//                else if (selectedOp == OP_EDIT) {
+//                    boolean editOk = controller.editDataInDb(gpsInput1.getModel(), gpsInput2.getModel(),
+//                            detailsPanel.getModel(),
+//                            parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
+//                    logOperation("EDIT", editOk);
+//                }
                 else if (selectedOp == OP_SEARCH) {
                     boolean searchOk = controller.searchDataInDb(gpsInput1.getModel(), gpsInput2.getModel(),
-                            optionParcel.isSelected(),
-                            optionProperty.isSelected(), optionAll.isSelected(), parcelModel, propertyModel);
+                    optionParcel.isSelected(),
+                    optionProperty.isSelected(), optionAll.isSelected(), parcelModel, propertyModel);
                     logOperation("SEARCH", searchOk);
                 }
                 else if (selectedOp == OP_DELETE) {
                     boolean deleteOk = controller.deleteDataFromDb(gpsInput1.getModel(), gpsInput2.getModel(),
-                            detailsPanel.getModel(),
-                            parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
+                    detailsPanel.getModel(),
+                    parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
                     logOperation("DELETE", deleteOk);
                 }
-                else if (selectedOp == OP_EDIT) {
-                    boolean editOk = controller.editDataInDb(gpsInput1.getModel(), gpsInput2.getModel(),
-                            detailsPanel.getModel(),
-                            parcelModel, parcelsJTab.getSelectedRow(), propertyModel, propertiesJTab.getSelectedRow());
-                    logOperation("EDIT", editOk);
-                }
                 else if (selectedOp == OP_PRINT) {
-                    consoleTxtArea.setText(" - - - - - - -   PARCELS:   - - - - - - -\n");
-                    consoleTxtArea.append( controller.getParcelsDataRepresentation() );
-                    consoleTxtArea.append("\n\n - - - - - - -   PROPERTIES:     - - - - - - -\n");
-                    consoleTxtArea.append( controller.getPropertiesDataRepresentation() );
+                    IPredicate<ITableData> typePredicate = new Predicate<ITableData>() {
+                        @Override
+                        public boolean evaluate(ITableData o) {
+                            return o instanceof Parcel;
+                        }
+                    };
+
+                    IPredicate<ITableData> directionPredicate = new Predicate<ITableData>() {
+                        @Override
+                        public boolean evaluate(ITableData o) {
+                            if (!(o instanceof GeoResource))
+                                return false;
+                            GeoResource p = (GeoResource) o;
+                            return p.getGps1().getLongitude() == 'E';
+                        }
+                    };
+                    IPredicate<ITableData> compoundPredicate = new CompositePredicateAnd<>();
+                    compoundPredicate.addSubPredicate(typePredicate);
+                    compoundPredicate.addSubPredicate(directionPredicate);
+
+                    List<ITableData> lResult = controller.searchInDb(compoundPredicate);
+                    if (lResult == null || lResult.isEmpty())
+                        return;
+                    parcelModel.clear();
+                    for (ITableData data : lResult) {
+                        parcelModel.add((Parcel) data);
+                    }
+//                    consoleTxtArea.setText(" - - - - - - -   PARCELS:   - - - - - - -\n");
+//                    consoleTxtArea.append( controller.getParcelsDataRepresentation() );
+//                    consoleTxtArea.append("\n\n - - - - - - -   PROPERTIES:     - - - - - - -\n");
+//                    consoleTxtArea.append( controller.getPropertiesDataRepresentation() );
                 }
                 else if (selectedOp == OP_GENERATE) {
                     controller.generateValuesToDb(panelForGenerating.getModel());
@@ -200,8 +246,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
     }
 
-    public GeoAppFrame(GeoDbClient client) {
-        this.controller = new OperationsController(client);
+    public GeoAppFrame(GeoDbClient client, DataDb<GPS> generalClient) {
+        this.controller = new GeoController(client, generalClient);
         this.selectedOp = OP_INSERT;
         ImageIcon icon = new ImageIcon(System.getProperty("user.dir")+"/GeoApp_imgs/GeoApp-icon.png");
         this.setIconImage(icon.getImage());
@@ -405,6 +451,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                     System.out.println("Parcel clicked");
 //                    ParcelModel parcel = parcelModel.getModel(parcelsJTab.getSelectedRow());
                     Parcel parcel = parcelModel.getModel(parcelsJTab.getSelectedRow());
+                    currentlyChosenParams = new ParcelParams(parcel.getParcelId(), parcel.getDescription(), parcel.getGps1(), parcel.getGps2(), parcel.getUniqueId());
                     gpsInput1.setModel(parcel.getGps1());
                     gpsInput2.setModel(parcel.getGps2());
                     optionParcel.setSelected(true);
@@ -450,6 +497,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                     System.out.println("Prop clicked");
 //                    PropertyModel prop = propertyModel.getModel(propertiesJTab.getSelectedRow());
                     Property prop = propertyModel.getModel(propertiesJTab.getSelectedRow());
+                    currentlyChosenParams = new PropertyParams(prop.getPropertyId(), prop.getDescription(), prop.getGps1(), prop.getGps2(), prop.getUniqueId(), prop.getEvidedFrom());
                     gpsInput1.setModel(prop.getGps1());
                     gpsInput2.setModel(prop.getGps2());
                     optionProperty.setSelected(true);
@@ -499,7 +547,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     }
 
     private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
-        DetailsInputComponent detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor);
+        DetailsInputComponent detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor, null);
         detailsPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
         detailsPanel.setBackground(backgroundColor);
         detailsPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -537,6 +585,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 0;
         radiosPanel.add(this.optionParcel, con);
         this.optionParcel.setSelected(true);
+        this.formFactory = new ParcelFormFactory();
 
         con.gridx = 1;
         con.gridy = 0;
@@ -594,7 +643,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         con.gridy = 0;
         con.insets = new Insets(12,0,0,0);
         String[] comboItems = {"search data", "insert data", "edit data", "delete data", "generate data",
-                "print all data"};
+                "parcels on 'E'"};
         JComboBox<String> operationsBox = new JComboBox<>(comboItems);
         operationsBox.addActionListener(new ActionListener() {
             @Override
@@ -616,7 +665,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                 else if (selectedOperation.compareTo("generate data") == 0) {
                     selectedOp = GeoAppFrame.OP_GENERATE;
                 }
-                else if (selectedOperation.compareTo("print all data") == 0) {
+                else if (selectedOperation.compareTo("parcels on 'E'") == 0) {
                     selectedOp = GeoAppFrame.OP_PRINT;
                 }
                 prepareOperationContext();
@@ -641,6 +690,7 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         this.gpsInput1.setComponentEnable(false);
         this.gpsInput2.setComponentEnable(false);
         this.detailsPanel.setComponentEnable(false);
+
         System.out.println("OP > "+this.selectedOp);
         if (this.selectedOp == OP_INSERT || this.selectedOp == OP_EDIT) {
 //            this.gpsInput1.setComponentEnable(true);
@@ -724,4 +774,12 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                 gc.get(GregorianCalendar.DAY_OF_MONTH), gc.get(GregorianCalendar.HOUR),
                 gc.get(GregorianCalendar.MINUTE), gc.get(GregorianCalendar.SECOND));
     }
+
+//    private IParams getCurrentModel() {
+//        GeoInfoModel details = this.detailsPanel.getModel();
+//        if (details == null)
+//            return null;
+//        if (details.getGeoType() == TYPE_PARCEL)
+//            return new ParcelParams(details.getNumber(), details.getDescription(), )
+//    }
 }

@@ -5,22 +5,23 @@ import mpoljak.App.GUI.models.GeneratorModel;
 import mpoljak.App.GUI.models.GeoInfoModel;
 import mpoljak.App.GUI.models.ParcelTableModel;
 import mpoljak.App.GUI.models.PropertyTableModel;
+import mpoljak.App.Logic.DataDb;
 import mpoljak.App.Logic.GeoDbClient;
-import mpoljak.data.geo.GPS;
-import mpoljak.data.geo.GeoResource;
-import mpoljak.data.geo.Parcel;
-import mpoljak.data.geo.Property;
+import mpoljak.data.geo.*;
+import mpoljak.dataStructures.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OperationsController {
+public class GeoController implements IController {
     private GeoDbClient client;
+    private DataDb<GPS> generalClient;
 
-    public OperationsController(GeoDbClient client) {
+    public GeoController(GeoDbClient client, DataDb<GPS> generalClient) {
         if (client == null)
             throw new NullPointerException("No client provided");
         this.client = client;
+        this.generalClient = generalClient;
     }
 
     public boolean insertDataToDb(GPS g1, GPS g2, GeoInfoModel info) {
@@ -37,25 +38,48 @@ public class OperationsController {
                                   boolean bothSelected, ParcelTableModel parcelModel, PropertyTableModel propertyModel) {
         if (g1 == null)
             return false;
+        List<ITableData> lResult;
         if (parcelSelected) {
-            List<Parcel> lPar = client.findParcels(g1);
-            parcelModel.setModels(lPar);
+
+            lResult = this.searchInDb(g1);
+//            List<Parcel> lPar = client.findParcels(g1);
+            if (lResult == null) {
+                List<Parcel> lPar = new ArrayList<>(lResult.size());
+                for (ITableData data : lResult)
+                    lPar.add((Parcel) data);
+                parcelModel.setModels(lPar);
+            }
+            else
+                parcelModel.clear();
             propertyModel.clear();
         }
         else if (propertySelected) {
-            List<Property> lProps = client.findProperties(g1);
-            propertyModel.setModels(lProps);
-            parcelModel.clear();
+//            lResult = this.searchInDb(new Predicate<ITableData>() {
+//                @Override
+//                public boolean evaluate(ITableData evaluated) {
+//                    return evaluated instanceof Property;
+//                }
+//            });
+////            List<Property> lProps = client.findProperties(g1);
+//            List<Property> lProps = new ArrayList<>(lResult.size());
+//            for (ITableData data : lResult)
+//                lProps.add((Property) data);
+//            propertyModel.setModels(lProps);
+//            parcelModel.clear();
         }
         else if (bothSelected) {
-            if (g2 == null)
-                return false;
-            List<GeoResource> lData = client.findGeoResources(g1, g2);
+//            if (g2 == null)
+//                return false;
+            lResult = this.searchInDb(g1);
+//            List<GeoResource> lData = client.findGeoResources(g1, g2);
+//            List<GeoResource> lData = new ArrayList<>(lResult.size());
+//            for (ITableData data : lResult)
+//                lData.add((GeoResource) data);
             List<Property> lProps = new ArrayList<>();
             List<Parcel> lParcels = new ArrayList<>();
             propertyModel.clear();  // need to do this, because don't know what has been retrieved (only parc e.g.)
             parcelModel.clear();    // need to do this, because don't know what has been retrieved (only props e.g.)
-            for (GeoResource g : lData) {
+            for (ITableData g : lResult) {
                 if (g instanceof Property)
                     lProps.add((Property) g);
                 else if (g instanceof Parcel)
@@ -64,6 +88,8 @@ public class OperationsController {
                 parcelModel.setModels(lParcels);
             }
         }
+        else
+            return false;
         return true;
     }
 
@@ -185,5 +211,52 @@ public class OperationsController {
         }
 
         return "E: Unknown operation requested.";
+    }
+
+    @Override
+    public boolean addToDb(IParams params) {
+        System.out.println("PRIDAVAM");
+        if (params == null)
+            return false;
+        if (params instanceof ParcelParams) {
+            this.generalClient.addData(params, ((ParcelParams)params).getGps1());
+        }
+        else {
+            this.generalClient.addData(params, ((PropertyParams)params).getGps1());
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean updateInDb(IParams oldParams, IParams newParams) {
+        System.out.println("EDITUJEM");
+        if (oldParams instanceof ParcelParams) {
+            return this.generalClient.editData(newParams, ((ParcelParams)oldParams).getGps1(), ((ParcelParams)newParams).getGps1());
+        }
+        else {
+            return this.generalClient.editData(newParams, ((PropertyParams)oldParams).getGps1(), ((PropertyParams)newParams).getGps1());
+        }
+    }
+
+    @Override
+    public ITableData searchInDb(ITableKey key, IParams params) {
+        return this.generalClient.findValue((GPS)key, params);
+    }
+
+    @Override
+    public List<ITableData> searchInDb(ITableKey key) {
+        return generalClient.findAllValues((GPS) key);
+    }
+
+    @Override
+    public List<ITableData> searchInDb(IPredicate<ITableData> predicate) {
+        return this.generalClient.findMatches(predicate);
+    }
+
+    @Override
+    public boolean deleteFromDb(ITableKey keyOfDeleted, ITableData dataToDelete) {
+        throw new RuntimeException("not implemented yet");
+//        return false;
     }
 }

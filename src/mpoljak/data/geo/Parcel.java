@@ -54,6 +54,7 @@ public class Parcel extends GeoResource {
         return this.positions[1];
     }
 
+
     public List<Property> getProperties() {
         return this.properties;
     }

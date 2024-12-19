@@ -56,4 +56,9 @@ public class ParcelParams implements IParams {
     public void setUniqueId(int uniqueId) {
         this.uniqueId = uniqueId;
     }
+
+    @Override
+    public IParams cloneInstance() {
+        return new ParcelParams(this.parcelId, this.description, new GPS(this.gps1), new GPS(this.gps2), this.uniqueId);
+    }
 }

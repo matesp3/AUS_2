@@ -85,6 +85,14 @@ public class Property extends GeoResource {
         this.parcels.addAll(lParcels);
     }
 
+    public GregorianCalendar getEvidedFrom() {
+        return evidedFrom;
+    }
+
+    public void setEvidedFrom(GregorianCalendar evidedFrom) {
+        this.evidedFrom = evidedFrom;
+    }
+
     public void removeParcel(Parcel parcel) {
         this.parcels.remove(parcel);
     }

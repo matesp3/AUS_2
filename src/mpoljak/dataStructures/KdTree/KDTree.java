@@ -105,6 +105,11 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
 
     @Override
     public E find(K key, E data) {
+        List<E> lRetrieved = this.findAll(key);
+        for (E element : lRetrieved) {
+            if (element.isSame(data))
+                return element;
+        }
         return null;
     }
 
@@ -315,8 +320,9 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
             if (this.predicate == null)
                 this.getNextNode();
             else {
-                while (this.currentNode != null && !this.predicate.evaluate(this.currentNode.getData()))
+                do {
                     this.getNextNode(); // prepare next node
+                } while (this.currentNode != null && !this.predicate.evaluate(this.currentNode.getData()));
             }
             return currentData;
         }
@@ -378,9 +384,9 @@ public class KDTree<E extends T, T extends ISame<T>, K extends IKdComparable<K> 
             if (this.predicate == null)
                 this.getNextNode(); // prepare next data
             else {
-                while (this.currentNode != null && !this.predicate.evaluate(this.currentNode.getData())) {
+                do {
                     this.getNextNode();
-                }
+                } while (this.currentNode != null && !this.predicate.evaluate(this.currentNode.getData()));
             }
             return currentData;
         }

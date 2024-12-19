@@ -17,33 +17,6 @@ public class DataDb<K extends ITableKey> {
     public DataDb(IDataFactory factory, ITable<ITableData, ITableData, K> dataCollector) {
         this.factory = factory;
         this.table = dataCollector.cloneInstance();
-        IPredicate<ITableData> predicate1 = new Predicate<ITableData>() {
-            @Override
-            public boolean evaluate(ITableData o) {
-                if (!(o instanceof GeoResource))
-                    return false;
-                GeoResource p = (GeoResource) o;
-                return p.getGps1().getLongitude() == 'E';
-            }
-        };
-
-        IPredicate<ITableData> predicate2 = new Predicate<ITableData>() {
-            @Override
-            public boolean evaluate(ITableData o) {
-                if (!(o instanceof GeoResource))
-                    return false;
-                GeoResource p = (GeoResource) o;
-                return p.getGps1().getLongitude() == 'E';
-            }
-        };
-        IPredicate<ITableData> compoundPredicate = new CompositePredicateAnd<>();
-        compoundPredicate.addSubPredicate(predicate1);
-        compoundPredicate.addSubPredicate(predicate2);
-
-        Iterator<ITableData> it = table.iterator(compoundPredicate);
-        while (it.hasNext()) {
-            ITableData geoData = it.next();
-        }
     }
 
     public boolean addData(IParams dataParams, K key) {
@@ -101,20 +74,20 @@ public class DataDb<K extends ITableKey> {
     /**
      *
      * @param key key of data
-     * @param data <code>null</code> if <code>key</code> is unique, else key has to be specified more by providing data
+     * @param params <code>null</code> if <code>key</code> is unique, else key has to be specified more by providing data
      *             with unique identifier.
      * @return found data regarding provided parameters or <code>null</code> if data not found.
      */
-    public ITableData findValue(K key, ITableData data) {
+    public ITableData findValue(K key, IParams params) {
         if (key == null)
             return null;
         if (key.isUnique()) {
             List<ITableData> lRes = this.table.findAll(key);
             return lRes == null || lRes.size() != 1 ? null : lRes.get(0);
         }
-        if (data == null)
+        if (params == null)
             return null;
-        return this.table.find(key, data);
+        return this.table.find(key, this.factory.createData(params));
     }
 
     public List<ITableData> findAllValues(K key) {

@@ -7,9 +7,11 @@ import mpoljak.dataStructures.IParams;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.GregorianCalendar;
 
-public class PropertyForm extends GuiForm{
+public class PropertyForm extends GuiForm {
 
     private final DetailsInputComponent detailsPanel;
     private final DateInputComponent dateInput;
@@ -18,16 +20,17 @@ public class PropertyForm extends GuiForm{
     private GpsInputComponent gpsInput1;
     private GpsInputComponent gpsInput2;
 
-    public PropertyForm(IParams params, int width, int height, Color bg, boolean add) {
+    public PropertyForm(PropertyParams params, int width, int height, Color bg, boolean add) {
+        super(!add, (add ? null : params));
         this.factory = new PropertyFactory();
         if (params == null)
             this.par = (PropertyParams) this.factory.createParams();
         else
-            this.par = (PropertyParams) params;
+            this.par = params;
          ///------------------- GUI PART
         this.setSize(new Dimension(width, height));
         this.setResizable(false);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setTitle(add ? "Add property" : "Edit property");
 
@@ -61,7 +64,7 @@ public class PropertyForm extends GuiForm{
         JPanel wrapper = new JPanel();
         wrapper.setBackground(bg);
         wrapper.setPreferredSize(new Dimension(width - 40, 140));
-        this.detailsPanel = this.createDetailsArea(width - 40, 140, bg);
+        this.detailsPanel = this.createDetailsArea(width - 40, 140, bg, params);
         wrapper.add(detailsPanel);// outer margin
         mainPanel.add(wrapper, con);
 
@@ -76,16 +79,42 @@ public class PropertyForm extends GuiForm{
         btnsPanel.setPreferredSize(new Dimension(width - 40, 36));
         btnsPanel.setBackground(bg);
         JButton btnSubmit = new JButton("Submit");
+        btnSubmit.addActionListener(e ->  {
+            this.updateFields();
+            this.setSubmittedState();
+            this.dispose();
+        });
         btnsPanel.add(btnSubmit);
         JButton btnDecline = new JButton("Decline");
+        btnDecline.addActionListener(e -> {
+            super.setDeclinedState();
+            this.dispose();
+        });
         btnsPanel.add(btnDecline);
         mainPanel.add(btnsPanel, con);
 
 //        ------- go live
+        this.addClosingBehavior();
         if (!add) {
             this.updateFields();
         }
         this.setVisible(true);
+    }
+
+    @Override
+    protected IParams getUserInputs() {
+        this.updateFields();
+        return this.par;
+    }
+
+    private void addClosingBehavior() {
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (!isSubmitted())
+                    setDeclinedState();
+            }
+        });
     }
 
     private void updateFields() {
@@ -99,12 +128,6 @@ public class PropertyForm extends GuiForm{
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public IParams getDataParams() {
-        this.updateFields();
-        return this.par;
     }
 
     private JPanel createGpsFormsArea(int prefWidth, int prefHeight, Color background, Color gpsBackground, GPS g1, GPS g2) {
@@ -130,8 +153,9 @@ public class PropertyForm extends GuiForm{
     }
 
 
-    private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor) {
-        DetailsInputComponent detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor);
+    private DetailsInputComponent createDetailsArea(int prefWidth, int prefHeight, Color backgroundColor, PropertyParams params) {
+        DetailsInputComponent detailsPanel = new DetailsInputComponent(prefWidth, prefHeight, backgroundColor,
+                params == null ? null : new GeoInfoModel(GeoAppFrame.TYPE_PROPERTY, params.getPropertyNr(), params.getDescription()));
         detailsPanel.setDetailsType(GeoAppFrame.TYPE_PROPERTY);
         detailsPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
         detailsPanel.setBackground(backgroundColor);
