@@ -6,12 +6,11 @@ import mpoljak.App.GUI.models.GeoInfoModel;
 import mpoljak.App.GUI.models.ParcelTableModel;
 import mpoljak.App.GUI.models.PropertyTableModel;
 import mpoljak.App.Logic.GeoDbClient;
-import mpoljak.data.GPS;
-import mpoljak.data.GeoResource;
-import mpoljak.data.Parcel;
-import mpoljak.data.Property;
+import mpoljak.data.geo.GPS;
+import mpoljak.data.geo.GeoResource;
+import mpoljak.data.geo.Parcel;
+import mpoljak.data.geo.Property;
 
-import javax.sound.sampled.Port;
 import java.util.ArrayList;
 import java.util.List;
 

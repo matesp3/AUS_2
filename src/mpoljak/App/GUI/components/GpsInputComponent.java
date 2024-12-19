@@ -1,7 +1,6 @@
 package mpoljak.App.GUI.components;
 
-import mpoljak.App.GUI.models.GpsModel;
-import mpoljak.data.GPS;
+import mpoljak.data.geo.GPS;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +22,7 @@ public class GpsInputComponent extends JPanel {
 
     private boolean enabledState;
 
-    public GpsInputComponent(String componentName, int width, int height) {
+    public GpsInputComponent(String componentName, int width, int height, GPS data) {
         this.gpsComponentNameLabel = new JLabel(componentName);
 //      ----------------------------------------- latitude
         this.latDegLabel = new JLabel("Lat degrees: ");
@@ -48,7 +47,8 @@ public class GpsInputComponent extends JPanel {
         this.setBorder(BorderFactory.createEtchedBorder());
 //        this.setBorder(BorderFactory.createLoweredSoftBevelBorder());
         this.setSize(new Dimension(width, height));
-
+        if (data != null)
+            this.setModel(data);
         this.enabledState = true;
     }
 
@@ -120,14 +120,14 @@ public class GpsInputComponent extends JPanel {
     public void setComponentEnable(boolean enabled) {
         if (this.enabledState == enabled)
             return;
-        this.gpsComponentNameLabel.setEnabled(enabled);
-        this.latDegLabel.setEnabled(enabled);
+//        this.gpsComponentNameLabel.setEnabled(enabled);
+//        this.latDegLabel.setEnabled(enabled);
         this.latDegTextField.setEnabled(enabled);
-        this.latDirLabel.setEnabled(enabled);
+//        this.latDirLabel.setEnabled(enabled);
         this.latDirTextField.setEnabled(enabled);
-        this.lonDegLabel.setEnabled(enabled);
+//        this.lonDegLabel.setEnabled(enabled);
         this.lonDegTextField.setEnabled(enabled);
-        this.lonDirLabel.setEnabled(enabled);
+//        this.lonDirLabel.setEnabled(enabled);
         this.lonDirTextField.setEnabled(enabled);
         this.enabledState = enabled;
         if (!enabled) {

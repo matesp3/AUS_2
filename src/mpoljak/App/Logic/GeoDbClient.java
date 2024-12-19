@@ -1,10 +1,12 @@
 package mpoljak.App.Logic;
 
-import mpoljak.data.GPS;
-import mpoljak.data.GeoResource;
-import mpoljak.data.Parcel;
-import mpoljak.data.Property;
-import mpoljak.dataStructures.searchTrees.KdTree.KDTree;
+import mpoljak.data.geo.GPS;
+import mpoljak.data.geo.GeoResource;
+import mpoljak.data.geo.Parcel;
+import mpoljak.data.geo.Property;
+import mpoljak.dataStructures.ITable;
+import mpoljak.dataStructures.ITableData;
+import mpoljak.dataStructures.KdTree.KDTree;
 import mpoljak.utilities.IntegerIdGenerator;
 
 import java.io.*;
@@ -23,9 +25,9 @@ public class GeoDbClient {
     private static final String STR_BLANK_REPLACEMENT = "NULL";
     private static final char DELIMITER = ';';
 
-    private KDTree<Property, GeoResource, GPS> kdTreeProps;
-    private KDTree<Parcel, GeoResource, GPS> kdTreeParcels;
-    private KDTree<GeoResource, GeoResource, GPS> kdTreeResources;
+    private KDTree<Property, ITableData, GPS> kdTreeProps;
+    private KDTree<Parcel, ITableData, GPS> kdTreeParcels;
+    private KDTree<GeoResource, ITableData, GPS> kdTreeResources;
     private IntegerIdGenerator idGenerator;
     private final String defaultDir          = System.getProperty("user.dir");
     private final String configPath          = this.defaultDir + "/config.txt";
@@ -332,7 +334,7 @@ public class GeoDbClient {
      * @param <T> geographical type of retrieved data
      */
     private <T extends GeoResource> List<T> retrieveData(GPS wantedPos1, GPS wantedPos2,
-                                                         KDTree<T, GeoResource, GPS> kdTree) {
+                                                         KDTree<T, ITableData, GPS> kdTree) {
         if (wantedPos1 == null)
             return new ArrayList<T>(0);
         List<T> lResultData;
@@ -380,12 +382,12 @@ public class GeoDbClient {
         return lData1;
     }
 
-    private String getTreeDataRepresentation(KDTree<? extends GeoResource, GeoResource, GPS> kdtree) {
+    private String getTreeDataRepresentation(KDTree<? extends GeoResource, ITableData, GPS> kdtree) {
         if (kdtree == null)
             return null;
         if (kdtree.isEmpty())
             return "    ..No data.";
-        KDTree<? extends GeoResource,GeoResource,GPS>.KdTreeInOrderIterator<? extends GeoResource,GeoResource,GPS> it =
+        KDTree<? extends GeoResource,ITableData,GPS>.KdTreeInOrderIterator<? extends GeoResource,ITableData,GPS> it =
                 kdtree.inOrderIterator();
         StringBuilder sb = new StringBuilder();
         while (it.hasNext())
@@ -427,13 +429,13 @@ public class GeoDbClient {
      * @return success of writing data to file
      */
     private <T extends GeoResource> boolean writeGeoResourceToCsvFile(String filePath, String identification,
-                                                                      KDTree<T, GeoResource, GPS>.KdTreeLevelOrderIterator
-                                                                       <T, GeoResource, GPS> iterator) {
+                                                                      KDTree<T, ITableData, GPS>.KdTreeLevelOrderIterator
+                                                                       <T, ITableData, GPS> iterator) {
         if (iterator == null)
             return false;
         try (FileWriter fw = new FileWriter(filePath)) { // n * 2 * log2(n)
             fw.write(identification+"\n");
-            KDTree<T, GeoResource, GPS> kdTreeIdEvidence = new KDTree<>(2);
+            KDTree<T, ITableData, GPS> kdTreeIdEvidence = new KDTree<>(2);
 
             while (iterator.hasNext()) {
                 T geoRes = iterator.next();

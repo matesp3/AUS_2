@@ -4,8 +4,8 @@ import mpoljak.App.GUI.components.*;
 import mpoljak.App.GUI.controllers.OperationsController;
 import mpoljak.App.GUI.models.*;
 import mpoljak.App.Logic.GeoDbClient;
-import mpoljak.data.Parcel;
-import mpoljak.data.Property;
+import mpoljak.data.geo.Parcel;
+import mpoljak.data.geo.Property;
 import mpoljak.utilities.SwingTableColumnResizer;
 
 import javax.swing.*;
@@ -103,8 +103,8 @@ public class GeoAppFrame extends JFrame implements ActionListener {
                 detailsPanel.setDetailsType(GeoAppFrame.TYPE_PROPERTY);
             }
 
-            if (selectedOp == OP_SEARCH)
-                gpsInput2.setComponentEnable(false);
+//            if (selectedOp == OP_SEARCH)
+//                gpsInput2.setComponentEnable(false);
         }
     }
 
@@ -556,10 +556,10 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         panelForGPS.setPreferredSize(new Dimension(prefWidth, prefHeight));
 
         this.gpsInput1 = new GpsInputComponent("GPS position nr. 1",
-                GpsInputComponent.PREFERRED_WIDTH,GpsInputComponent.PREFERRED_HEIGHT);
+                GpsInputComponent.PREFERRED_WIDTH,GpsInputComponent.PREFERRED_HEIGHT, null);
         this.gpsInput1.setBgColor(gpsBackground);
         this.gpsInput2 = new GpsInputComponent("GPS position nr. 2",
-                GpsInputComponent.PREFERRED_WIDTH,GpsInputComponent.PREFERRED_HEIGHT);
+                GpsInputComponent.PREFERRED_WIDTH,GpsInputComponent.PREFERRED_HEIGHT, null);
         this.gpsInput2.setBgColor(gpsBackground);
 
         panelForGPS.add(this.gpsInput1);
@@ -638,11 +638,14 @@ public class GeoAppFrame extends JFrame implements ActionListener {
     }
 
     private void prepareOperationContext() {
+        this.gpsInput1.setComponentEnable(false);
+        this.gpsInput2.setComponentEnable(false);
+        this.detailsPanel.setComponentEnable(false);
         System.out.println("OP > "+this.selectedOp);
         if (this.selectedOp == OP_INSERT || this.selectedOp == OP_EDIT) {
-            this.gpsInput1.setComponentEnable(true);
-            this.gpsInput2.setComponentEnable(true);
-            this.detailsPanel.setComponentEnable(true);
+//            this.gpsInput1.setComponentEnable(true);
+//            this.gpsInput2.setComponentEnable(true);
+//            this.detailsPanel.setComponentEnable(true);
             this.panelForGenerating.setComponentEnable(false);
             // it is not allowed to change type while editing
             this.setEnableSingleOptions(this.selectedOp == OP_INSERT);
@@ -653,17 +656,17 @@ public class GeoAppFrame extends JFrame implements ActionListener {
         }
         else if (this.selectedOp == OP_SEARCH) {
             this.gpsInput1.setComponentEnable(true);
-            this.gpsInput2.setComponentEnable(false);
-            this.detailsPanel.setComponentEnable(false);
+//            this.gpsInput2.setComponentEnable(false);
+//            this.detailsPanel.setComponentEnable(false);
             this.panelForGenerating.setComponentEnable(false);
             this.optionParcel.setEnabled(true);
             this.optionProperty.setEnabled(true);
             this.optionAll.setEnabled(true);
             return;
         }
-        this.gpsInput1.setComponentEnable(false);
-        this.gpsInput2.setComponentEnable(false);
-        this.detailsPanel.setComponentEnable(false);
+//        this.gpsInput1.setComponentEnable(false);
+//        this.gpsInput2.setComponentEnable(false);
+//        this.detailsPanel.setComponentEnable(false);
         if (this.selectedOp == OP_GENERATE) {
             this.panelForGenerating.setComponentEnable(true);
         }

@@ -18,7 +18,7 @@ public class DetailsInputComponent extends JPanel {
     private boolean enabledState;
 
     public DetailsInputComponent(int prefWidth, int prefHeight, Color bgColor) {
-        this.setPreferredSize(new Dimension(prefWidth, prefHeight));
+        this.setSize(new Dimension(prefWidth, prefHeight));
         this.setBackground(bgColor);
         int inputHeight = 22;
 
@@ -58,7 +58,7 @@ public class DetailsInputComponent extends JPanel {
         con.gridx = 0;
         con.gridy = 3;
         this.descInput = new JTextField();
-        this.descInput.setPreferredSize(new Dimension(prefWidth - 10, inputHeight));
+        this.descInput.setPreferredSize(new Dimension(prefWidth - 20, inputHeight));
         this.add(descInput, con);
 
         this.enabledState = true;
@@ -102,10 +102,10 @@ public class DetailsInputComponent extends JPanel {
     public void setComponentEnable(boolean enabled) {
         if (this.enabledState == enabled)
             return;
-        this.selectedDetailLabel.setEnabled(enabled);
-        this.numberSpecLabel.setEnabled(enabled);
+//        this.selectedDetailLabel.setEnabled(enabled);
+//        this.numberSpecLabel.setEnabled(enabled);
         this.numberInput.setEnabled(enabled);
-        this.descLabel.setEnabled(enabled);
+//        this.descLabel.setEnabled(enabled);
         this.descInput.setEnabled(enabled);
         this.enabledState = enabled;
         if (!enabled) {

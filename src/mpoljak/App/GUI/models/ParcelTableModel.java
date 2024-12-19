@@ -1,11 +1,8 @@
 package mpoljak.App.GUI.models;
 
-import mpoljak.data.Parcel;
-import mpoljak.data.Property;
+import mpoljak.data.geo.Parcel;
 
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
 public class ParcelTableModel extends AbstractTableModel {

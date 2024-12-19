@@ -1,6 +1,6 @@
 package mpoljak.App.GUI.models;
 
-import mpoljak.data.Property;
+import mpoljak.data.geo.Property;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
