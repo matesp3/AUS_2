@@ -43,7 +43,7 @@ public class GeoController implements IController {
 
             lResult = this.searchInDb(g1);
 //            List<Parcel> lPar = client.findParcels(g1);
-            if (lResult == null) {
+            if (lResult != null) {
                 List<Parcel> lPar = new ArrayList<>(lResult.size());
                 for (ITableData data : lResult)
                     lPar.add((Parcel) data);
